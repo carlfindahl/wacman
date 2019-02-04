@@ -1,0 +1,5 @@
+# Gitignore for IMT2531_assignment1 - Project Pacman
+build/
+
+# QtCreator IDE specific file - no need to replicate
+CMakeLists.txt.user
