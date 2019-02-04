@@ -18,12 +18,13 @@ find_package(glm REQUIRED)
 target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
+    # Manually link asan on GCC since it doesn't do it automatically (MUST BE FIRST IN THE LIST!)
+    $<IF:$<CXX_COMPILER_ID:GNU>,asan,>
+
     OpenGL::GL                      # For OpenGL
     glfw                            # For window integration
     glm                             # For Maths
 
-    # Manually link asan on GCC since it doesn't do it automatically
-    $<IF:$<CXX_COMPILER_ID:GNU>,asan,>
 )
 
 # Enable address sanitizer for debug builds that run on GCC or Clang
