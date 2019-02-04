@@ -12,3 +12,6 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
 )
+
+# Add any subdirectories with source files
+include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)

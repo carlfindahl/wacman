@@ -21,10 +21,10 @@ target_link_libraries(
     # Manually link asan on GCC since it doesn't do it automatically (MUST BE FIRST IN THE LIST!)
     $<IF:$<CXX_COMPILER_ID:GNU>,asan,>
 
+    $<IF:$<PLATFORM_ID:Linux>,dl,>  # Required by glad on Linux
     OpenGL::GL                      # For OpenGL
     glfw                            # For window integration
     glm                             # For Maths
-
 )
 
 # Enable address sanitizer for debug builds that run on GCC or Clang
