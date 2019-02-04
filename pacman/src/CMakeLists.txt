@@ -5,6 +5,9 @@ target_sources(
     
     ${CMAKE_CURRENT_LIST_DIR}/input.h
     ${CMAKE_CURRENT_LIST_DIR}/input.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/gfx.h
+    ${CMAKE_CURRENT_LIST_DIR}/single_header_implementations.cpp
 )
 
 target_include_directories(
