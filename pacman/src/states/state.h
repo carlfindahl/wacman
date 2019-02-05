@@ -64,6 +64,6 @@ public:
      * \brief unbind_key removes the action / function assosciated with the given key
      * \param glfw_key is the key to unbind
      */
-    void unbind_key(int glfw_key);
+    void unbind_key(int glfw_key) noexcept;
 };
 }  // namespace pac

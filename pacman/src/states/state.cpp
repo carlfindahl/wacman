@@ -30,6 +30,12 @@ void State::bind_key(int glfw_key, std::function<void()> action)
     m_keybindings.emplace(glfw_key, std::move(action));
 }
 
-void State::unbind_key(int glfw_key) { m_keybindings.erase(glfw_key); }
+void State::unbind_key(int glfw_key) noexcept
+{
+    if (auto it = m_keybindings.find(glfw_key); it != m_keybindings.end())
+    {
+        m_keybindings.erase(glfw_key);
+    }
+}
 
 }  // namespace pac
