@@ -40,3 +40,12 @@ target_compile_features(
     PRIVATE
     cxx_std_17
 )
+
+# Ensure resource files are available by copying
+add_custom_command(
+    TARGET ${EXEC_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res ${CMAKE_CURRENT_BINARY_DIR}/res
+    COMMAND ${CMAKE_COMMAND} -E echo "Copied resource directory to binary directory."
+)
+
+
