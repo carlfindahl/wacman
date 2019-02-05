@@ -2,4 +2,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(imt2531_assignment01)
+
+# CMake Complains if this is not set
+set(OpenGL_GL_PREFERENCE GLVND)
+
 add_subdirectory(pacman)
+add_subdirectory(cglutil)

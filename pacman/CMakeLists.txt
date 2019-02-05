@@ -7,9 +7,6 @@ add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 # Add this so it can specify source files and include directories local to it's own directory
 include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 
-# CMake Complains if this is not set
-set(OpenGL_GL_PREFERENCE GLVND)
-
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.2 REQUIRED)
@@ -25,6 +22,7 @@ target_link_libraries(
     OpenGL::GL                      # For OpenGL
     glfw                            # For window integration
     glm                             # For Maths
+    cgl                             # OpenGL utilities (custom library build in-source in this project)
 )
 
 # Enable address sanitizer for debug builds that run on GCC or Clang

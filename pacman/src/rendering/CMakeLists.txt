@@ -1,0 +1,8 @@
+target_sources(
+    ${EXEC_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/stb_image.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/animation.h
+    ${CMAKE_CURRENT_LIST_DIR}/animation.cpp
+)
