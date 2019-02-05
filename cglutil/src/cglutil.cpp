@@ -56,7 +56,7 @@ std::string read_entire_file(const char* fp)
     /* On failure, return an invalid GL name */
     if (file == nullptr)
     {
-        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", fp);
+        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", path.c_str());
         return {};
     }
 
@@ -156,14 +156,15 @@ GLuint create_program(const std::vector<GLuint>& shaders)
     {
         /* Get log length */
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
-        auto log = std::make_unique<GLchar>(len);
+        auto log = new GLchar[len];
 
         /* Get the log text and print it */
-        glGetProgramInfoLog(program, len, &len, log.get());
-        fprintf(stderr, "Program Link Error:\n%s\n", log.get());
+        glGetProgramInfoLog(program, len, &len, log);
+        fprintf(stderr, "Program Link Error:\n%s\n", log);
 
         /* Cleanup and return an invalid GL Name */
         glDeleteProgram(program);
+        delete[] log;
         return 0;
     }
 
