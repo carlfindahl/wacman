@@ -4,4 +4,7 @@
  */
 
 #define GFX_IMPLEMENTATION
-#include "gfx.h"
+#include <gfx.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <rendering/stb_image.h>
