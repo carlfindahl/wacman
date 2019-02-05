@@ -14,35 +14,19 @@ namespace pac
 {
 namespace input
 {
+/*!
+ * \brief key_callback handles key evens suchs as presses and releases
+ */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 /*!
- * \brief The EActions enum describes all possible actions supported by the game.
+ * \brief cursor_position_callback handles cursor movement (only relevant for ImGui in this project)
  */
-enum class EAction
-{
-    NOP,           // Does nothing
-    TURN_LEFT,     // Turn pacman left
-    TURN_RIGHT,    // Turn pacman right
-    TURN_UP,       // Turn pacman up
-    TURN_DOWN,     // Turn pacman down
-    MENU_UP,       // Navigate the menu upwards
-    MENU_DOWN,     // Navigate the menu downwards
-    MENU_CONFIRM,  // Confirm / select in the menu
-    BACK_CANCEL    // Go back in the menus OR pause / cancel an active action
-};
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 
 /*!
- * \brief The InputManager class is responsible for recieving low level inputs from GLFW and translating them
- * into actions that are mapped from the keys which the game then listens to and processes on a higher level.
+ * \brief mouse_button_callback handles mouse button clicks (only relevant for ImGui in this project)
  */
-class InputManager
-{
-private:
-    /* Maps keys to actions */
-    std::unordered_map<int, EAction> m_keymap = {};
-
-public:
-};
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 }  // namespace input
 }  // namespace pac
