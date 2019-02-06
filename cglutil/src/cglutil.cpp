@@ -56,7 +56,7 @@ std::string read_entire_file(const char* fp)
     /* On failure, return an invalid GL name */
     if (file == nullptr)
     {
-        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", path.c_str());
+        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", path.string().c_str());
         return {};
     }
 
@@ -76,7 +76,7 @@ std::string read_entire_file(const char* fp)
     std::string out{buf};
     delete[] buf;
 #else
-    std::filesystem::path(detail::getExecutableDir()) / fp;
+    auto path = std::filesystem::path(detail::get_executable_dir()) / fp;
 
     /* Also, fopen is weird with fs::path on windows since it uses wchar_t for me, so we use ifstream */
     std::ifstream file{path.c_str()};
@@ -192,7 +192,7 @@ std::vector<uint8_t> load_texture(const char* fp)
     {
         int w, h, c;
 
-        auto* raw_pixels = stbi_load(abs_path.c_str(), &w, &h, &c, STBI_rgb_alpha);
+        auto* raw_pixels = stbi_load(abs_path.string().c_str(), &w, &h, &c, STBI_rgb_alpha);
         std::vector<uint8_t> pixels(w * h * 4);
         memcpy(pixels.data(), raw_pixels, w * h * 4);
         stbi_image_free(raw_pixels);
