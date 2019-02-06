@@ -2,9 +2,13 @@
 
 namespace pac
 {
+GameState::GameState() {}
+
 void GameState::on_enter() {}
 
 void GameState::on_exit() {}
 
-void GameState::update(float dt) {}
+bool GameState::update(float dt) { return false; }
+
+bool GameState::draw() { return false; }
 }  // namespace pac

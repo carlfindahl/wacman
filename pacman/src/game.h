@@ -3,6 +3,8 @@
  */
 #pragma once
 
+#include "states/state_manager.h"
+
 #include <vector>
 #include <memory>
 
@@ -22,8 +24,11 @@ private:
     /* The Game Window */
     GLFWwindow* m_window = nullptr;
 
+    /* The currently active game state */
+    StateManager m_state_manager = {};
+
     /* This struct will contain flags that can be flipped on / off to toggle features */
-    struct State
+    struct Flags
     {
         uint8_t running = true;
     } m_flags = {true};
@@ -44,6 +49,11 @@ private:
     void init_glfw_window(const char* title, glm::uvec2 window_size);
 
     /*!
+     * \brief init_imgui initializes ImGui
+     */
+    void init_imgui();
+
+    /*!
      * \brief update updates the game state
      * \param dt is the delta time since the previous update
      */
@@ -52,7 +62,7 @@ private:
     /*!
      * \brief render will render what needs to be rendered.
      */
-    void render();
+    void draw();
 };
 
 }  // namespace pac

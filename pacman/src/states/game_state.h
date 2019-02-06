@@ -8,10 +8,14 @@ class GameState : public State
 private:
 
 public:
+    GameState();
+
     void on_enter() override;
 
     void on_exit() override;
 
-    void update(float dt) override;
+    bool update(float dt) override;
+
+    bool draw() override;
 };
 } // namespace pac
