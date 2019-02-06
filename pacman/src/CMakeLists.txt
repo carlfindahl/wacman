@@ -21,5 +21,6 @@ target_include_directories(
 
 # Add any subdirectories with source files
 include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/states/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)
