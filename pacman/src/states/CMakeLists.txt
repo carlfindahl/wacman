@@ -1,6 +1,9 @@
 target_sources(
     ${EXEC_NAME}
     PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/state_manager.h
+    ${CMAKE_CURRENT_LIST_DIR}/state_manager.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/state.h
     ${CMAKE_CURRENT_LIST_DIR}/state.cpp
 

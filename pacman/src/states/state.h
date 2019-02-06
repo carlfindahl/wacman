@@ -45,7 +45,13 @@ public:
      * \brief update is called every frame
      * \param dt is the delta time
      */
-    virtual void update(float dt) = 0;
+    virtual bool update(float dt) = 0;
+
+    /*!
+     * \brief draw is responsible for drawing
+     * \return true if you want to allow states below this one to draw also
+     */
+    virtual bool draw() = 0;
 
     /*!
      * \brief try_invoke_key attempts to invoke the action / function assosciated with a given key
