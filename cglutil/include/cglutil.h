@@ -120,7 +120,7 @@ std::vector<uint8_t> load_texture(const char* fp);
  * \return the size of the container's contents in bytes
  */
 template<typename Container>
-constexpr typename Container::size_type size_bytes(const Container& c)
+constexpr typename Container::size_type size_bytes(const Container& c) noexcept
 {
     return c.size() * sizeof(typename Container::value_type);
 }
