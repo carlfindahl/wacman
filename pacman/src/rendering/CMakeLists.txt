@@ -8,4 +8,6 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/shader_program.h
     ${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/uniform_buffer_object.h
 )
