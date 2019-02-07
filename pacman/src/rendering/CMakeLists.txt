@@ -10,4 +10,7 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/uniform_buffer_object.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/vertex_array_object.h
+    ${CMAKE_CURRENT_LIST_DIR}/vertex_array_object.cpp
 )
