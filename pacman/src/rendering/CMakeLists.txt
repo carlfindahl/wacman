@@ -6,6 +6,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/animation.h
     ${CMAKE_CURRENT_LIST_DIR}/animation.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/renderer.h
+    ${CMAKE_CURRENT_LIST_DIR}/renderer.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/shader_program.h
     ${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp
 
