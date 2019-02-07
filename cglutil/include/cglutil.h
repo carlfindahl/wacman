@@ -26,8 +26,8 @@ std::string get_executable_dir();
 /*!
  * \brief gl_debug_callback is the OpenGL debug message callback function
  */
-void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned severity, int length,
-                       const char* message, const void* userParam);
+void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message,
+                       const void* userParam);
 }  // namespace detail
 }  // namespace cgl
 
@@ -45,6 +45,16 @@ struct ShaderStage
 {
     unsigned stage = 0u;
     const char* sourcePath = nullptr;
+};
+
+/*!
+ * \brief The LoadedTexture struct represents a texture that has been loaded and contains relevant information about it.
+ */
+struct LoadedTexture
+{
+    int width = 0u;
+    int height = 0u;
+    std::vector<uint8_t> pixels = {};
 };
 }  // namespace cgl
 
@@ -109,9 +119,9 @@ namespace cgl
 /*!
  * \brief load_texture loads the texture at the given relative filepath.
  * \param fp is the filepath of the texture
- * \return a vector of pixel data laid out like: [R0,G0,B0,A0, R1,G1,B1,A1, R2,G2....]
+ * \return a Texture resource with information and a vector of pixel data laid out like: [R0,G0,B0,A0, R1,G1,B1,A1 ...]
  */
-std::vector<uint8_t> load_texture(const char* fp);
+LoadedTexture load_texture(const char* fp);
 
 /*!
  * \brief size_bytes returns the size in bytes of the elements of the given container.

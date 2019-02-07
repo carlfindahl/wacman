@@ -35,8 +35,8 @@ std::string get_executable_dir()
     return std::filesystem::path(path_str).parent_path().string();
 }
 
-void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                       const GLchar* message, const void* userParam)
+void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message,
+                       const void* userParam)
 {
     switch (severity)
     {
@@ -190,7 +190,7 @@ GLuint make_shader_program(const std::vector<ShaderStage>& stages)
     return create_program(std::vector<GLuint>(std::begin(shaders), std::end(shaders)));
 }
 
-std::vector<uint8_t> load_texture(const char* fp)
+LoadedTexture load_texture(const char* fp)
 {
     const auto abs_path = std::filesystem::path(detail::get_executable_dir()) / fp;
     if (std::filesystem::exists(abs_path))
@@ -201,7 +201,7 @@ std::vector<uint8_t> load_texture(const char* fp)
         std::vector<uint8_t> pixels(w * h * 4);
         memcpy(pixels.data(), raw_pixels, w * h * 4);
         stbi_image_free(raw_pixels);
-        return pixels;
+        return LoadedTexture{w, h, std::move(pixels)};
     }
     else
     {
@@ -231,7 +231,7 @@ GLFWwindow* create_window_and_context(unsigned w, unsigned h, const char* title)
 void create_debug_callback()
 {
     glDebugMessageCallback(detail::gl_debug_callback, nullptr);
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, true);
 }
 
 }  // namespace cgl
