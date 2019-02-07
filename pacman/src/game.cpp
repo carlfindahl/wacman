@@ -89,7 +89,7 @@ void Game::init_imgui()
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-    ImGui_ImplOpenGL3_Init("#version 450 core");
+    ImGui_ImplOpenGL3_Init("#version 430 core");
 }
 
 void Game::update(float dt)
