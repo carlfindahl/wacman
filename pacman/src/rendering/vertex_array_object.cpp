@@ -41,8 +41,12 @@ void VertexArray::set_attribute(const VertexArray::Attribute& attr)
 {
     glVertexArrayAttribFormat(m_name, attr.location, attr.components, attr.type, false, attr.offset);
     glVertexArrayAttribBinding(m_name, attr.location, attr.binding);
-    glVertexArrayBindingDivisor(m_name, attr.binding, attr.instance_divisor);
     glEnableVertexArrayAttrib(m_name, attr.location);
+    
+    if(attr.instance_divisor > 0)
+    {
+        glVertexArrayBindingDivisor(m_name, attr.binding, attr.instance_divisor);
+    }
 }
 
 }  // namespace pac

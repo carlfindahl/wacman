@@ -37,9 +37,6 @@ void Game::run()
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();
 
-    ShaderProgram prog({{GL_VERTEX_SHADER, "res/sprite.vert"}, {GL_FRAGMENT_SHADER, "res/sprite.frag"}});
-    prog.use();
-
     while (m_flags.running && !glfwWindowShouldClose(m_window))
     {
         /* Set ImGui up for a new frame */
@@ -55,7 +52,6 @@ void Game::run()
         ImGui::SameLine(0.f, 25.f);
         ImGui::Text("Frame Time: %6.4fms", dt);
 
-        Gfx::IntrospectShader("Sprite Shader", prog);
 
         glfwPollEvents();
         update(dt);

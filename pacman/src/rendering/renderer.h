@@ -1,9 +1,12 @@
 #pragma once
 
+#include "shader_program.h"
 #include "vertex_array_object.h"
 
 #include <vector>
+#include <memory>
 
+#include <cglutil.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -41,6 +44,9 @@ private:
     /* Buffer that contains sprite data */
     unsigned m_sprite_buffer = 0u;
 
+    /* Somehow, storing indices and vertices in the same buffer object caused lots of problems, so this is separate */
+    unsigned m_element_buffer = 0u;
+
     /* Buffer that contains per-instance data */
     unsigned m_instance_buffer = 0u;
 
@@ -53,8 +59,9 @@ private:
     /* Vertex layout */
     VertexArray m_vao = {};
 
+    std::unique_ptr<ShaderProgram> prog = nullptr;
+
 public:
-    Renderer();
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
     ~Renderer();
