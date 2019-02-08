@@ -127,6 +127,8 @@
 #include <cstdlib>
 #include <glad/glad.h>
 
+#define GFX_ENABLE_INTROSPECTION
+
 ///////////////////////////////////////////////////////////
 /// \brief
 ///     Prints the specified error to stderr and
@@ -638,7 +640,7 @@ namespace Gfx
 /// Implementation - Introspection (In development)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef GFX_ENABLE_INTROSPECTION
-#include "imgui.h"
+#include <imgui/imgui.h>
 #include <algorithm>
 #include <vector>
 #include <cinttypes>

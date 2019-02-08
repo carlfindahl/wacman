@@ -225,6 +225,9 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 
         glNamedBufferData(g_ElementsHandle, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                           (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+        
+        glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
+        glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, 0u, sizeof(ImDrawVert));
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
