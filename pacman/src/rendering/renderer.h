@@ -16,7 +16,7 @@ namespace pac
  * \brief The Renderer class is a specialized "renderer" designed to render this pacman game efficiently. It
  * uses a single, large buffer starting with vertex and index data for the one instanced quad. Then the rest
  * of the buffer is per-instance data for all the sprites in the game.
- * \note This class should be instanced once, and act as a Singleton ish
+ * \note This class should be instanced once, and act as a Singleton ish (taken care of with get_renderer function)
  */
 class Renderer
 {
@@ -41,11 +41,8 @@ private:
         uint32_t texture_id = 0u;
     };
 
-    /* Buffer that contains sprite data */
+    /* Buffer that contains sprite data, vertices and indices like [INDEX DATA ... VERTEX DATA] */
     unsigned m_sprite_buffer = 0u;
-
-    /* Somehow, storing indices and vertices in the same buffer object caused lots of problems, so this is separate */
-    unsigned m_element_buffer = 0u;
 
     /* Buffer that contains per-instance data */
     unsigned m_instance_buffer = 0u;
@@ -56,9 +53,10 @@ private:
     /* Instance data, added as you draw, and drawn once you submit the draw */
     std::vector<InstanceVertex> m_instance_data = {};
 
-    /* Vertex layout */
+    /* Vertex attribute layout */
     VertexArray m_vao = {};
 
+    /* Shader program (unique_ptr) since it has no default Ctor */
     std::unique_ptr<ShaderProgram> prog = nullptr;
 
 public:
@@ -74,7 +72,7 @@ public:
     void draw(const InstanceVertex& data);
 
     /*!
-     * \brief submit_work submits the collected draws for rendering.
+     * \brief submit_work submits the collected draws for rendering and renders it
      */
     void submit_work();
 
@@ -96,6 +94,8 @@ private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */
     explicit Renderer(unsigned max_sprites = 2048u);
     friend Renderer& get_renderer();
+
+    void init(unsigned max_sprites);
 };
 
 /*!
