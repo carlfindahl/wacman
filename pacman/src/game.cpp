@@ -1,10 +1,11 @@
 #include "game.h"
 #include "input.h"
 #include "states/game_state.h"
+#include "rendering/shader_program.h"
+#include "rendering/renderer.h"
 
 #include <chrono>
 
-#define GFX_ENABLE_INTROSPECTION
 #include <gfx.h>
 #include <cglutil.h>
 #include <GLFW/glfw3.h>
@@ -36,6 +37,9 @@ void Game::run()
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();
 
+    ShaderProgram prog({{GL_VERTEX_SHADER, "res/sprite.vert"}, {GL_FRAGMENT_SHADER, "res/sprite.frag"}});
+    prog.use();
+
     while (m_flags.running && !glfwWindowShouldClose(m_window))
     {
         /* Set ImGui up for a new frame */
@@ -46,6 +50,12 @@ void Game::run()
         /* Compute delta time in floating point seconds */
         const float dt = std::chrono::duration<float>(delta_clock.now() - last_frame).count();
         last_frame = delta_clock.now();
+
+        ImGui::Text("FPS: %5.1f", ImGui::GetIO().Framerate);
+        ImGui::SameLine(0.f, 25.f);
+        ImGui::Text("Frame Time: %6.4fms", dt);
+
+        Gfx::IntrospectShader("Sprite Shader", prog);
 
         glfwPollEvents();
         update(dt);
@@ -74,11 +84,12 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
     glfwSetMouseButtonCallback(m_window, pac::input::mouse_button_callback);
     glfwSetKeyCallback(m_window, pac::input::key_callback);
     glfwMakeContextCurrent(m_window);
+    glfwSwapInterval(0);
 
     /* Loads all GL function pointers for OpenGL 4.5 Core */
     gladLoadGL();
 
-    /* Enable debug callback provided by cgl */
+    /* Enable default debug callback provided by cgl */
 #ifndef NDEBUG
     cgl::create_debug_callback();
 #endif
@@ -89,15 +100,11 @@ void Game::init_imgui()
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImGui_ImplOpenGL3_Init();
 }
 
 void Game::update(float dt)
 {
-    ImGui::Begin("Debug");
-    ImGui::Text("FPS: %5.2f", 1.f / dt);
-    ImGui::End();
-
     m_state_manager.update(dt);
     glfwSetWindowUserPointer(m_window, m_state_manager.get_active_state());
 }
@@ -107,6 +114,7 @@ void Game::draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_state_manager.draw();
+    get_renderer().submit_work();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

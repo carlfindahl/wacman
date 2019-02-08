@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vertex_array_object.h"
+
 #include <vector>
 
 #include <glm/vec2.hpp>
@@ -16,15 +18,6 @@ namespace pac
 class Renderer
 {
 private:
-    /* Buffer that contains sprite data */
-    unsigned m_sprite_buffer = 0u;
-
-    /* Buffer that contains per-instance data */
-    unsigned m_instance_buffer = 0u;
-
-    /* Vector of all currently available textures */
-    std::vector<unsigned> m_textures = {};
-
     /*!
      * \brief The Vertex struct is the vertex layout for the sprite quad
      */
@@ -40,15 +33,43 @@ private:
     struct InstanceVertex
     {
         glm::vec2 pos = {};
+        glm::vec2 size = {};
         glm::vec3 col = {};
+        uint32_t texture_id = 0u;
     };
 
+    /* Buffer that contains sprite data */
+    unsigned m_sprite_buffer = 0u;
+
+    /* Buffer that contains per-instance data */
+    unsigned m_instance_buffer = 0u;
+
+    /* Vector of all currently available textures */
+    std::vector<unsigned> m_textures = {};
+
+    /* Instance data, added as you draw, and drawn once you submit the draw */
+    std::vector<InstanceVertex> m_instance_data = {};
+
+    /* Vertex layout */
+    VertexArray m_vao = {};
+
 public:
+    Renderer();
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
     ~Renderer();
 
-    void draw(const InstanceVertex& data, std::size_t texture_id);
+    /*!
+     * \brief draw adds a sprite to the draws that will appear the next time work is submitted
+     * \param data is the vertex data to add
+     * \param texture_id is the id of the texture that this sprite should use
+     */
+    void draw(const InstanceVertex& data);
+
+    /*!
+     * \brief submit_work submits the collected draws for rendering.
+     */
+    void submit_work();
 
     /*!
      * \brief load_texture loads the texture at the given relative file path
