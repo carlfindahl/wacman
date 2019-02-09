@@ -20,11 +20,13 @@ layout(binding = 0, std140) uniform Matrices
 layout(location = 0) out vec2 vs_uv;
 layout(location = 1) out vec3 vs_col;
 layout(location = 2) out flat uint vs_tex_id;
+layout(location = 3) out flat uint vs_frame_no;
 
 void main()
 {
     vs_uv = a_uv;
     vs_col = ai_col;
-    vs_tex_id = ai_tex_id;
+    vs_tex_id = bitfieldExtract(ai_tex_id, 0, 8);
+    vs_frame_no = bitfieldExtract(ai_tex_id, 8, 8);
     gl_Position = projection_matrix * view_matrix * vec4(ai_scale * a_pos + ai_pos, 0., 1.);        
 }
