@@ -88,6 +88,8 @@ void Renderer::draw(const Renderer::InstanceVertex& data) { m_instance_data.push
 
 void Renderer::submit_work()
 {
+    Gfx::IntrospectShader("Sprite Shader", *prog);
+
     /* Write data to GPU */
     void* data = glMapNamedBufferRange(m_instance_buffer, 0, cgl::size_bytes(m_instance_data), GL_MAP_WRITE_BIT);
     if (data)
@@ -127,10 +129,29 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
     return {0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
 }
 
-TextureID Renderer::load_animation_texture(std::string_view relative_fp)
+TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
+                                           int count)
 {
-    /* TODO : IMPLEMENT */
-    return {};
+    auto tex_data = cgl::load_texture_partitioned(relative_fp.data(), xoffset, yoffset, w, h, cols, count);
+
+    GLuint tex_id = 0u;
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &tex_id);
+    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(tex_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    /* Allocate and transfer data to Texture */
+    glTextureStorage3D(tex_id, 1, GL_RGBA8, tex_data[0].width, tex_data[0].height, tex_data.size());
+    for (int i = 0; i < static_cast<int>(tex_data.size()); ++i)
+    {
+        glTextureSubImage3D(tex_id, 0, 0, 0, i, tex_data[i].width, tex_data[i].height, 1, GL_RGBA, GL_UNSIGNED_BYTE,
+                            tex_data[i].pixels.data());
+    }
+
+    /* Return ID */
+    m_textures.push_back(tex_id);
+    return {0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
 }
 
 Renderer& get_renderer()

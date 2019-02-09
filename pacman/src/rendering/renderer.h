@@ -14,15 +14,19 @@
 namespace pac
 {
 /*!
- * \brief The TextureID struct represents a texture ID, and is a bitfield of a single unsigned, where 12 bits are used
- * to encode the array and frame number of the texture. Supports up to 16 textures with up to 64 animation frames each.
+ * \brief The TextureID struct represents a texture ID. Supports up to 16 textures with up to 64 animation frames each.
  */
 struct TextureID
 {
-    uint32_t _ : 14;
-    uint32_t frame_count : 6;
-    uint32_t frame_number : 6;
-    uint32_t array_index : 4;
+    uint8_t _ = 0u;
+    uint8_t frame_count = 1u;
+    uint8_t frame_number = 0u;
+    uint8_t array_index = 0u;
+
+    operator uint32_t()
+    {
+        return (frame_count << 16u) | (frame_number << 8u) | (array_index);
+    }
 };
 
 /*!
@@ -51,7 +55,7 @@ private:
         glm::vec2 pos = {};
         glm::vec2 size = {};
         glm::vec3 col = {};
-        TextureID texture_id = {};
+        uint32_t texture_id = {};
     };
 
     /* Buffer that contains sprite data, vertices and indices like [INDEX DATA ... VERTEX DATA] */
@@ -101,7 +105,8 @@ public:
      * \param relative_fp is the relative file path
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
-    TextureID load_animation_texture(std::string_view relative_fp);
+    TextureID load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
+                                     int count);
 
 private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */
