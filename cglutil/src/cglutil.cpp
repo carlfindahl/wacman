@@ -234,4 +234,49 @@ void create_debug_callback()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, true);
 }
 
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols,
+                                                    int count)
+{
+    auto whole_texture = load_texture(fp);
+
+    /* Number of channels (RGBA) */
+    constexpr int ch = 4;
+
+    int current_row = 0;
+    int current_col = 0;
+
+    /* We have a total of count textures where there are cols sprites per row. We will read rows until we hit the count.
+     * For each of those rows, read in a block of pixels encoded as RGBA with dimensions WxH and store that data in a new
+     * loaded texture struct.
+     */
+    std::vector<LoadedTexture> out_textures(count);
+    for (int i = 0; i < count; ++i)
+    {
+        /* Reads a block of pixels into the appropriate loaded texture */
+        for (int y = yoffset + h * current_row; y < (yoffset + h * current_row) + h; ++y)
+        {
+            for (int x = xoffset * ch + w * ch * current_col; x < (xoffset * ch + w * ch * current_col) + w * ch; x += ch)
+            {
+                /* Each pixel is 4 values, so read R, G, B, A */
+                out_textures[i].pixels.push_back(whole_texture.pixels[y * ch * whole_texture.width + x]);
+                out_textures[i].pixels.push_back(whole_texture.pixels[y * ch * whole_texture.width + x + 1]);
+                out_textures[i].pixels.push_back(whole_texture.pixels[y * ch * whole_texture.width + x + 2]);
+                out_textures[i].pixels.push_back(whole_texture.pixels[y * ch * whole_texture.width + x + 3]);
+            }
+        }
+
+        out_textures[i].width = w;
+        out_textures[i].height = h;
+
+        /* Increment the current row and col */
+        if (!(++current_col % cols))
+        {
+            current_col = 0;
+            ++current_row;
+        }
+    }
+
+    return out_textures;
+}
+
 }  // namespace cgl

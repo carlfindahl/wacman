@@ -112,6 +112,7 @@ unsigned make_shader_program(const std::vector<ShaderStage>& stages);
 
 /* RESOURCE UTILITIES:
  *  - load_texture loads a texture file from disk and returns a vector of R8G8B8A8 pixels
+ *  - load_texture_partitioned
  *  - size_bytes returns the size of a standard container's contents in bytes
  */
 namespace cgl
@@ -122,6 +123,9 @@ namespace cgl
  * \return a Texture resource with information and a vector of pixel data laid out like: [R0,G0,B0,A0, R1,G1,B1,A1 ...]
  */
 LoadedTexture load_texture(const char* fp);
+
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h,
+                                                    int cols, int count);
 
 /*!
  * \brief size_bytes returns the size in bytes of the elements of the given container.
