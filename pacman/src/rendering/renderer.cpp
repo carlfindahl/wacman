@@ -114,8 +114,8 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
 
     GLuint tex_id = 0u;
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &tex_id);
-    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(tex_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTextureParameteri(tex_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -136,8 +136,8 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
 
     GLuint tex_id = 0u;
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &tex_id);
-    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(tex_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTextureParameteri(tex_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
