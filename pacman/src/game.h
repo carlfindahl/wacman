@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <memory>
+#include <string_view>
 
 #include <glm/vec2.hpp>
 
@@ -34,7 +35,7 @@ private:
     } m_flags = {true};
 
 public:
-    Game(const char* title, glm::uvec2 window_size);
+    Game(std::string_view title, glm::uvec2 window_size);
 
     ~Game() noexcept;
 

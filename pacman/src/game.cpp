@@ -15,9 +15,9 @@
 
 namespace pac
 {
-Game::Game(const char* title, glm::uvec2 window_size)
+Game::Game(std::string_view title, glm::uvec2 window_size)
 {
-    init_glfw_window(title, window_size);
+    init_glfw_window(title.data(), window_size);
     init_imgui();
     m_state_manager.push(std::make_unique<GameState>());
 }

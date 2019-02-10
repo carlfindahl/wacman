@@ -1,4 +1,5 @@
 #include "game.h"
+#include <config.h>
 
 #include <GLFW/glfw3.h>
 
@@ -6,7 +7,8 @@ int main()
 {
     glfwInit();
 
-    pac::Game game("OGLPM v0.0.0", {800u, 800u});
+    const auto title_string = std::string("OpenGL Pacman ") + pac::VERSION_STRING;
+    pac::Game game(title_string, {700u, 900u});
     game.run();
 
     glfwTerminate();
