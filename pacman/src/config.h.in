@@ -1,0 +1,21 @@
+/*!
+ * \file config.h contains various configurable variables. Some in CMake, and some in the options menu in game.
+ */
+
+#pragma once
+
+namespace pac
+{
+/* Screen width and height */
+template<typename T>
+constexpr T TILE_SIZE = @PACMAN_TILE_SIZE@;
+constexpr unsigned SCREEN_W = TILE_SIZE<unsigned> * 28u;
+constexpr unsigned SCREEN_H = TILE_SIZE<unsigned> * 36u;
+
+/* Version Numbers */
+constexpr int VERSION_MAJOR = @PROJECT_VERSION_MAJOR@;
+constexpr int VERSION_MINOR = @PROJECT_VERSION_MINOR@;
+constexpr int VERSION_PATCH = @PROJECT_VERSION_PATCH@;
+
+inline const char* VERSION_STRING = "v@PROJECT_VERSION@";
+} // namespace pac

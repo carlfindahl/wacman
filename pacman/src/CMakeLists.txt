@@ -17,6 +17,15 @@ target_include_directories(
     ${EXEC_NAME}
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR} # for the configured file (config.h)
+)
+
+# Compile Options
+set(PACMAN_TILE_SIZE 25 CACHE STRING "The tile size of each tile in the game. Affects the screen size. Default recommended for 1080p.")
+
+configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/config.h.in
+    config.h
 )
 
 # Add any subdirectories with source files
