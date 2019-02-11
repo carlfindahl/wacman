@@ -9,6 +9,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/game.h
     ${CMAKE_CURRENT_LIST_DIR}/game.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/level.h
+    ${CMAKE_CURRENT_LIST_DIR}/level.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/gfx.h
     ${CMAKE_CURRENT_LIST_DIR}/single_header_implementations.cpp
 )
