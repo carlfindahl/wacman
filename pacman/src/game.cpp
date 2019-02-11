@@ -48,6 +48,7 @@ void Game::run()
         const float dt = std::chrono::duration<float>(delta_clock.now() - last_frame).count();
         last_frame = delta_clock.now();
 
+        /* ImGui Stuff */
         ImGui::Text("FPS: %5.1f", ImGui::GetIO().Framerate);
         ImGui::SameLine(0.f, 25.f);
         ImGui::Text("Frame Time: %6.4fms", dt);
@@ -98,7 +99,20 @@ void Game::init_imgui()
     ImGui_ImplOpenGL3_Init();
 }
 
-void Game::update(float dt) { m_state_manager.update(dt); }
+void Game::update(float dt)
+{
+    m_state_manager.update(dt);
+
+    /* ImGui Stuff */
+    ImGui::Begin("Rendering");
+    static bool vsync = false;
+    if (ImGui::Checkbox("Vsync", &vsync))
+    {
+        GFX_INFO("Toggled, V-Sync. Is now %s", vsync ? "ON" : "OFF");
+        glfwSwapInterval(vsync ? 1 : 0);
+    }
+    ImGui::End();
+}
 
 void Game::draw()
 {

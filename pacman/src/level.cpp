@@ -14,7 +14,7 @@ namespace pac
 Level::Level()
 {
     m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
-    m_pacman = std::make_unique<Pacman>(glm::ivec2(13, 25));
+    m_pacman = std::make_unique<Pacman>(glm::ivec2(0, 16));
 }
 
 Level::Level(std::string_view fp) : Level() { load(fp); }
@@ -25,15 +25,33 @@ void Level::update(float dt)
 
     /* Update Pacman in relation to world */
 
+    /* Teleport Pacman across map if going into edge : TODO (make more generic around bounds) */
+    if (m_pacman->m_position == glm::ivec2{0, 16} && m_pacman->current_direction() == glm::ivec2{-1, 0})
+    {
+        m_pacman->m_position = {27, 16};
+    }
+    else if (m_pacman->m_position == glm::ivec2{27, 16} && m_pacman->current_direction() == glm::ivec2{1, 0})
+    {
+        m_pacman->m_position = {0, 16};
+    }
+
+    /* Make sure we can not turn into adjacent walls */
     if (m_pacman->current_direction() != m_pacman->desired_direction())
     {
-        const auto& target_tile =
-            m_tiles[m_pacman->m_position.y + m_pacman->desired_direction().y][m_pacman->m_position.x + m_pacman->desired_direction().x];
-
+        const auto& target_tile = get_tile(m_pacman->m_position + m_pacman->desired_direction());
         if (target_tile.type != ETileType::Wall)
         {
             m_pacman->m_current_direction = m_pacman->m_desired_direction;
+
+            /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that. */
+            m_pacman->m_move_progress += 0.15f;
         }
+    }
+
+    /* Make sure we are not moving through an existing wall */
+    if (get_tile(m_pacman->m_position + m_pacman->current_direction()).type == ETileType::Wall)
+    {
+        m_pacman->m_move_progress = 0.f;
     }
 }
 
