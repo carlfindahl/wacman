@@ -1,5 +1,4 @@
 #include "level.h"
-#include "rendering/renderer.h"
 #include <config.h>
 
 #include <regex>
@@ -12,6 +11,8 @@
 
 namespace pac
 {
+Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20); }
+
 Level::Level(std::string_view fp) { load(fp); }
 
 void Level::update(float dt) {}
@@ -24,26 +25,18 @@ void Level::draw()
         for (auto x = 0u; x < m_tiles[y].size(); ++x)
         {
             const Tile& t = m_tiles[y][x];
-            glm::vec3 col{};
 
-            /* Draw Food */
-            if (t.type == ETileType::Food)
+            /* Skip blank tiles */
+            if (t.type == ETileType::Blank)
             {
-                col = {0.85f, 0.77f, 0.68f};
-                r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
-                        {TILE_SIZE<float> / 5.f, TILE_SIZE<float> / 5.f},
-                        col,
-                        {}});
+                continue;
             }
-            /* Draw walls */
-            else if (t.type == ETileType::Wall)
-            {
-                col = {0.05f, 0.05f, 0.35f};
-                r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
-                        {TILE_SIZE<float>, TILE_SIZE<float>},
-                        col,
-                        {}});
-            }
+
+            /* Draw tile */
+            r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
+                    {TILE_SIZE<float>, TILE_SIZE<float>},
+                    {1.f, 1.f, 1.f},
+                    t.texture});
         }
     }
 }
@@ -80,11 +73,32 @@ void Level::load(std::string_view fp)
     for (auto& row : m_tiles)
     {
         row.resize(level_size.x);
-        unsigned tmp_val;
+        int tmp_val;
         for (auto& col : row)
         {
             level_stream >> tmp_val;
-            col.type = tmp_val == 2u ? ETileType::Food : static_cast<ETileType>(tmp_val);
+
+            /* If it is not a tile, then move on */
+            if (tmp_val == -1)
+            {
+                col.type = ETileType::Blank;
+                continue;
+            }
+
+            /* Use texture ID, but assign frame number from the value in the map */
+            col.texture = m_tileset_texture;
+            col.texture.frame_number = tmp_val;
+
+            /* Assign based on value */
+            if (tmp_val < 14)
+            {
+                col.type = ETileType::Wall;
+            }
+            else
+            {
+                /* This works since the Enum values have been set to match the tile index in the tileset for the level */
+                col.type = static_cast<ETileType>(tmp_val);
+            }
         }
     }
 }

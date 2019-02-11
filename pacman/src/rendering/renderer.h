@@ -25,7 +25,7 @@ struct TextureID
     uint8_t frame_number = 0u;
     uint8_t array_index = 0u;
 
-    operator uint32_t() { return (frame_count << 16u) | (frame_number << 8u) | (array_index); }
+    operator uint32_t() const { return (frame_count << 16u) | (frame_number << 8u) | (array_index); }
 };
 
 /*!

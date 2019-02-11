@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rendering/renderer.h"
+
 #include <vector>
 #include <string_view>
 
@@ -12,23 +14,35 @@ namespace pac
 class Level
 {
 private:
-    enum class ETileType
+    /*!
+     * \brief The ETileType enum specifies the various tiles that exist in the game
+     */
+    enum class ETileType : int32_t
     {
+        Blank = -1,
+        Wall, // 0-14
+        Strawberry = 15,
+        Banana,
+        Orange,
         Food,
-        Wall,
-        Blank,
-        Powerup
+        GhostKiller
     };
 
+    /*!
+     * \brief The Tile struct contains data needed to draw and know the type of each tile
+     */
     struct Tile
     {
         ETileType type = ETileType::Blank;
+        TextureID texture = {};
     };
+
+    TextureID m_tileset_texture = {};
 
     std::vector<std::vector<Tile>> m_tiles = {};
 
 public:
-    Level() = default;
+    Level();
 
     Level(std::string_view fp);
 
