@@ -33,7 +33,7 @@ private:
     float m_move_progress = 0.f;
 
     /* Speed - Tiles per second */
-    float m_speed = 2.f;
+    float m_speed = 4.f;
 
     /* Animation timer */
     float m_animation_time = 0.f;
@@ -42,10 +42,24 @@ public:
     Pacman();
     Pacman(glm::ivec2 position);
 
+    friend class Level;
+
     void turn(EDirection new_direction);
 
     void update(float dt);
 
     void draw();
+
+    /* Get the current/desired direction as a vector */
+    glm::ivec2 current_direction() const;
+    glm::ivec2 desired_direction() const;
+
+private:
+    /*!
+     * \brief is_opposite checks if the given direction is the opposite of the given because pacman can not do a 180
+     * \param dir is the direction to check
+     * \return true if it's the opposite direction
+     */
+    bool is_opposite(EDirection dir);
 };
 }  // namespace pac

@@ -52,7 +52,6 @@ void Game::run()
         ImGui::SameLine(0.f, 25.f);
         ImGui::Text("Frame Time: %6.4fms", dt);
 
-
         glfwPollEvents();
         update(dt);
         draw();
@@ -87,7 +86,7 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
 
     /* Enable default debug callback provided by cgl */
 #ifndef NDEBUG
-    cgl::create_debug_callback();
+//    cgl::create_debug_callback();
 #endif
 }
 
@@ -99,11 +98,7 @@ void Game::init_imgui()
     ImGui_ImplOpenGL3_Init();
 }
 
-void Game::update(float dt)
-{
-    m_state_manager.update(dt);
-    glfwSetWindowUserPointer(m_window, m_state_manager.get_active_state());
-}
+void Game::update(float dt) { m_state_manager.update(dt); }
 
 void Game::draw()
 {

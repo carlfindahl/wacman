@@ -19,7 +19,23 @@ Level::Level()
 
 Level::Level(std::string_view fp) : Level() { load(fp); }
 
-void Level::update(float dt) { m_pacman->update(dt); }
+void Level::update(float dt)
+{
+    m_pacman->update(dt);
+
+    /* Update Pacman in relation to world */
+
+    if (m_pacman->current_direction() != m_pacman->desired_direction())
+    {
+        const auto& target_tile =
+            m_tiles[m_pacman->m_position.y + m_pacman->desired_direction().y][m_pacman->m_position.x + m_pacman->desired_direction().x];
+
+        if (target_tile.type != ETileType::Wall)
+        {
+            m_pacman->m_current_direction = m_pacman->m_desired_direction;
+        }
+    }
+}
 
 void Level::draw()
 {

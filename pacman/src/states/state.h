@@ -1,5 +1,7 @@
 #pragma once
 
+#include <input.h>
+
 #include <utility>
 #include <functional>
 #include <unordered_map>
@@ -14,20 +16,16 @@ namespace pac
  */
 class State
 {
-private:
-    /* Keybindings for the state */
-    std::unordered_map<int, std::function<void()>> m_keybindings = {};
-
 public:
     State() = default;
 
     State(const State&) = delete;
 
-    State(State&& other) noexcept;
+    State(State&& other) noexcept = default;
 
     State& operator=(const State&) = delete;
 
-    State& operator=(State&& other) noexcept;
+    State& operator=(State&& other) noexcept = default;
 
     virtual ~State() noexcept = default;
 
@@ -52,24 +50,5 @@ public:
      * \return true if you want to allow states below this one to draw also
      */
     virtual bool draw() = 0;
-
-    /*!
-     * \brief try_invoke_key attempts to invoke the action / function assosciated with a given key
-     * \param glfw_key is the key to invoke
-     */
-    void try_invoke_key(int glfw_key);
-
-    /*!
-     * \brief bind_key assosciates an action / function with the given key
-     * \param glfw_key is the key to bind to the action
-     * \param action is the action to be performed
-     */
-    void bind_key(int glfw_key, std::function<void()> action);
-
-    /*!
-     * \brief unbind_key removes the action / function assosciated with the given key
-     * \param glfw_key is the key to unbind
-     */
-    void unbind_key(int glfw_key) noexcept;
 };
 }  // namespace pac
