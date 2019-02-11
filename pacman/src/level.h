@@ -20,7 +20,7 @@ private:
     enum class ETileType : int32_t
     {
         Blank = -1,
-        Wall, // 0-14
+        Wall,  // 0-14
         Strawberry = 15,
         Banana,
         Orange,
@@ -37,8 +37,10 @@ private:
         TextureID texture = {};
     };
 
+    /* The level tileset texture */
     TextureID m_tileset_texture = {};
 
+    /* The tiles in the level (basically the map) */
     std::vector<std::vector<Tile>> m_tiles = {};
 
 public:

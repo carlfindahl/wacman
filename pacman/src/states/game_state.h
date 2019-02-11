@@ -1,9 +1,10 @@
 #pragma once
 
-#include <rendering/vertex_array_object.h>
+#include <level.h>
 #include <rendering/uniform_buffer_object.h>
 #include <states/state.h>
 
+#include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 
 namespace pac
@@ -22,6 +23,9 @@ class GameState : public State
 private:
     /* Matrix UBO */
     UniformBuffer<detail::MatrixData> m_ubo = {};
+
+    /* The level / world */
+    Level m_level = {};
 
 public:
     GameState();
