@@ -11,11 +11,15 @@
 
 namespace pac
 {
-Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20); }
+Level::Level()
+{
+    m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
+    m_pacman = std::make_unique<Pacman>(glm::ivec2(13, 25));
+}
 
-Level::Level(std::string_view fp) { load(fp); }
+Level::Level(std::string_view fp) : Level() { load(fp); }
 
-void Level::update(float dt) {}
+void Level::update(float dt) { m_pacman->update(dt); }
 
 void Level::draw()
 {
@@ -39,6 +43,8 @@ void Level::draw()
                     t.texture});
         }
     }
+
+    m_pacman->draw();
 }
 
 void Level::load(std::string_view fp)

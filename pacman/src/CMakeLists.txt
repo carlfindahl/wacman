@@ -9,6 +9,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/game.h
     ${CMAKE_CURRENT_LIST_DIR}/game.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/pacman.h
+    ${CMAKE_CURRENT_LIST_DIR}/pacman.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/level.h
     ${CMAKE_CURRENT_LIST_DIR}/level.cpp
 

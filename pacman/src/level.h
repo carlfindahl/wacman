@@ -1,8 +1,10 @@
 #pragma once
 
+#include "pacman.h"
 #include "rendering/renderer.h"
 
 #include <vector>
+#include <memory>
 #include <string_view>
 
 namespace pac
@@ -42,6 +44,9 @@ private:
 
     /* The tiles in the level (basically the map) */
     std::vector<std::vector<Tile>> m_tiles = {};
+
+    /* Pacman, starts bottom center */
+    std::unique_ptr<Pacman> m_pacman = nullptr;
 
 public:
     Level();
