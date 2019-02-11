@@ -53,11 +53,10 @@ void Renderer::init(unsigned max_sprites)
     /* Init sprite buffer */
     glCreateBuffers(1, &m_sprite_buffer);
 
-    std::array<GLuint, 6> sprite_indices = {0, 1, 2, 2, 3, 0};
-
     /* Quad is centered, so origin is at {0, 0}, will be scaled in instance data to reach proper size */
     std::array<Vertex, 4> sprite_quad = {Vertex{{-0.5f, -0.5f}, {0.f, 0.f}}, Vertex{{0.5f, -0.5f}, {1.f, 0.f}},
                                          Vertex{{0.5f, 0.5f}, {1.f, 1.f}}, Vertex{{-0.5f, 0.5f}, {0.f, 1.f}}};
+    std::array<GLuint, 6> sprite_indices = {0, 1, 2, 2, 3, 0};
 
     /* Combine vertex and index data into one array and store everything in a single buffer (for locality) */
     std::array<GLubyte, cgl::size_bytes(sprite_indices) + cgl::size_bytes(sprite_quad)> data = {};
@@ -75,6 +74,9 @@ void Renderer::init(unsigned max_sprites)
     glVertexArrayElementBuffer(m_vao, m_sprite_buffer);
     glVertexArrayVertexBuffer(m_vao, 0u, m_sprite_buffer, cgl::size_bytes(sprite_indices), sizeof(Vertex));
     glVertexArrayVertexBuffer(m_vao, 1u, m_instance_buffer, 0u, sizeof(InstanceVertex));
+
+    /* Load default texture ID 0 -> blank.png */
+    load_texture("res/blank.png");
 }
 
 Renderer::~Renderer()
@@ -88,8 +90,6 @@ void Renderer::draw(const Renderer::InstanceVertex& data) { m_instance_data.push
 
 void Renderer::submit_work()
 {
-    Gfx::IntrospectShader("Sprite Shader", *prog);
-
     /* Write data to GPU */
     void* data = glMapNamedBufferRange(m_instance_buffer, 0, cgl::size_bytes(m_instance_data), GL_MAP_WRITE_BIT);
     if (data)
@@ -110,6 +110,12 @@ void Renderer::submit_work()
 
 TextureID Renderer::load_texture(std::string_view relative_fp)
 {
+    /* If texture is loaded already, return it */
+    if (auto out = check_texture_is_loaded(relative_fp))
+    {
+        return *out;
+    }
+
     auto tex_data = cgl::load_texture(relative_fp.data());
 
     GLuint tex_id = 0u;
@@ -124,14 +130,18 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
     glTextureSubImage3D(tex_id, 0, 0, 0, 0, tex_data.width, tex_data.height, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                         tex_data.pixels.data());
 
-    /* Returns index into texture array */
+    /* Return texture ID and add to cache */
+    TextureID out{0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
+    m_loaded_texture_cache.emplace(relative_fp.data(), out);
     m_textures.push_back(tex_id);
-    return {0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
+    return out;
 }
 
 TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
                                            int count)
 {
+    /* Don't check if texture is already loaded here since the offsets might be different. Trust the programmer! */
+
     auto tex_data = cgl::load_texture_partitioned(relative_fp.data(), xoffset, yoffset, w, h, cols, count);
 
     GLuint tex_id = 0u;
@@ -149,9 +159,22 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
                             tex_data[i].pixels.data());
     }
 
-    /* Return ID */
+    /* Return ID and add to texture cache */
     m_textures.push_back(tex_id);
     return {0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
+}
+
+std::optional<TextureID> Renderer::check_texture_is_loaded(std::string_view fp)
+{
+    /* Check for existence in hash map and then return if found */
+    if (m_loaded_texture_cache.find(fp.data()) != m_loaded_texture_cache.end())
+    {
+        GFX_DEBUG("Not loading %s, since it is already loaded.", fp.data());
+        auto out = m_loaded_texture_cache[fp.data()];
+        return out;
+    }
+
+    return std::nullopt;
 }
 
 Renderer& get_renderer()

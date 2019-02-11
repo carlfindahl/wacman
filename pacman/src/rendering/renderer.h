@@ -5,7 +5,9 @@
 
 #include <vector>
 #include <memory>
+#include <optional>
 #include <string_view>
+#include <unordered_map>
 
 #include <cglutil.h>
 #include <glm/vec2.hpp>
@@ -23,10 +25,7 @@ struct TextureID
     uint8_t frame_number = 0u;
     uint8_t array_index = 0u;
 
-    operator uint32_t()
-    {
-        return (frame_count << 16u) | (frame_number << 8u) | (array_index);
-    }
+    operator uint32_t() { return (frame_count << 16u) | (frame_number << 8u) | (array_index); }
 };
 
 /*!
@@ -67,6 +66,9 @@ private:
     /* Vector of all currently available textures */
     std::vector<unsigned> m_textures = {};
 
+    /* A cache of mapping file paths to texture ID's so we don't have to load the same texture twice */
+    std::unordered_map<std::string, TextureID> m_loaded_texture_cache = {};
+
     /* Instance data, added as you draw, and drawn once you submit the draw */
     std::vector<InstanceVertex> m_instance_data = {};
 
@@ -95,6 +97,7 @@ public:
 
     /*!
      * \brief load_texture loads the texture at the given relative file path
+     * \note if you call this multiple times with the same texture, it will not be loaded twice
      * \param relative_fp is the relative file path
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
@@ -102,6 +105,7 @@ public:
 
     /*!
      * \brief load_animation_texture loads a texture with an animated sprite in it that can later be used with an animation
+     * \note if you call this multiple times with the same texture, it will be loaded again! Not cached. So be careful.
      * \param relative_fp is the relative file path
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
@@ -111,9 +115,21 @@ public:
 private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */
     explicit Renderer(unsigned max_sprites = 2048u);
-    friend Renderer& get_renderer();
 
+    /*!
+     * \brief check_texture_is_loaded checks if the given filepath is loaded and cached
+     * \param fp is the filepath to check
+     * \return An optional with a value if the texture is cached, otherwise nullopt
+     */
+    std::optional<TextureID> check_texture_is_loaded(std::string_view fp);
+
+    /*!
+     * \brief init initializes the renderer's OpenGL state and objects
+     * \param max_sprites is the maximum amount of sprites to draw simultaneously for this renderer
+     */
     void init(unsigned max_sprites);
+
+    friend Renderer& get_renderer();
 };
 
 /*!
