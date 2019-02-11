@@ -69,5 +69,7 @@ public:
      * \param fp is the relative (to the executable dir) file path of the level file
      */
     void load(std::string_view fp);
+
+    Tile& get_tile(glm::ivec2 coordinate);
 };
 }  // namespace pac

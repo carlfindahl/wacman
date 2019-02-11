@@ -125,4 +125,11 @@ void Level::load(std::string_view fp)
     }
 }
 
+Level::Tile& Level::get_tile(glm::ivec2 coordinate)
+{
+    GFX_ASSERT(coordinate.y >= 0 && coordinate.y < static_cast<int>(m_tiles.size()), "Y Coordinate out of bounds!");
+    GFX_ASSERT(coordinate.x >= 0 && coordinate.x < static_cast<int>(m_tiles[coordinate.y].size()), "X Coordinate out of bounds!");
+    return m_tiles[coordinate.y][coordinate.x];
+}
+
 }  // namespace pac
