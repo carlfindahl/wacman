@@ -4,6 +4,7 @@
 #include <numeric>
 
 #include <gfx.h>
+#include <sstream>
 #include <cstring>
 #include <cglutil.h>
 #include <glad/glad.h>
@@ -113,6 +114,7 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
     /* If texture is loaded already, return it */
     if (auto out = check_texture_is_loaded(relative_fp))
     {
+        GFX_DEBUG("Skip reload of texture %d", relative_fp.data());
         return *out;
     }
 
@@ -131,16 +133,26 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
                         tex_data.pixels.data());
 
     /* Return texture ID and add to cache */
+    m_textures.push_back(tex_id);
     TextureID out{0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
     m_loaded_texture_cache.emplace(relative_fp.data(), out);
-    m_textures.push_back(tex_id);
     return out;
 }
 
 TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
                                            int count)
 {
-    /* Don't check if texture is already loaded here since the offsets might be different. Trust the programmer! */
+    /* Check if it is loaded already, by using all parameters as a string, and then hashing on that*/
+    std::stringstream hash_str_stream{};
+    hash_str_stream << relative_fp << xoffset << yoffset << w << h << cols << count;
+    const auto hash_string = hash_str_stream.str();
+
+    if (auto out = check_texture_is_loaded(hash_str_stream.str()))
+    {
+        GFX_DEBUG("Skip re-load of animation %s, (%d %d)-(%d %d) c%d n%d", relative_fp.data(), xoffset, yoffset, w, h, cols,
+                  count);
+        return *out;
+    }
 
     auto tex_data = cgl::load_texture_partitioned(relative_fp.data(), xoffset, yoffset, w, h, cols, count);
 
@@ -161,7 +173,9 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
 
     /* Return ID and add to texture cache */
     m_textures.push_back(tex_id);
-    return {0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
+    TextureID out{0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
+    m_loaded_texture_cache.emplace(hash_string, out);
+    return out;
 }
 
 std::optional<TextureID> Renderer::check_texture_is_loaded(std::string_view fp)
