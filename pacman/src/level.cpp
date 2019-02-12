@@ -15,12 +15,23 @@ Level::Level()
 {
     m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
     m_pacman = std::make_unique<Pacman>(glm::ivec2(0, 16));
+
+    for (int i = 1; i < 5; ++i)
+    {
+        m_ghosts.emplace_back(glm::ivec2{i, 3});
+    }
 }
 
 Level::Level(std::string_view fp) : Level() { load(fp); }
 
 void Level::update(float dt)
 {
+    /* Update all ghosts */
+    for (auto& ghost : m_ghosts)
+    {
+        ghost.update(dt);
+    }
+
     /* First update Pacman, and then update him in relation to this level (with collision and tile awareness) */
     m_pacman->update(dt);
     update_pacman();
@@ -50,6 +61,10 @@ void Level::draw()
     }
 
     m_pacman->draw();
+    for (auto& ghost : m_ghosts)
+    {
+        ghost.draw();
+    }
 }
 
 void Level::load(std::string_view fp)

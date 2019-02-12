@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ghost.h"
 #include "pacman.h"
 #include "rendering/renderer.h"
 
@@ -48,6 +49,9 @@ private:
     /* Pacman, starts bottom center */
     std::unique_ptr<Pacman> m_pacman = nullptr;
 
+    /* Ghost vector */
+    std::vector<Ghost> m_ghosts = {};
+
 public:
     Level();
 
@@ -69,7 +73,6 @@ public:
      * \param fp is the relative (to the executable dir) file path of the level file
      */
     void load(std::string_view fp);
-
 
 private:
     Tile& get_tile(glm::ivec2 coordinate);
