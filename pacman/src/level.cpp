@@ -21,38 +21,9 @@ Level::Level(std::string_view fp) : Level() { load(fp); }
 
 void Level::update(float dt)
 {
+    /* First update Pacman, and then update him in relation to this level (with collision and tile awareness) */
     m_pacman->update(dt);
-
-    /* Update Pacman in relation to world */
-
-    /* Teleport Pacman across map if going into edge : TODO (make more generic around bounds) */
-    if (m_pacman->m_position == glm::ivec2{0, 16} && m_pacman->current_direction() == glm::ivec2{-1, 0})
-    {
-        m_pacman->m_position = {27, 16};
-    }
-    else if (m_pacman->m_position == glm::ivec2{27, 16} && m_pacman->current_direction() == glm::ivec2{1, 0})
-    {
-        m_pacman->m_position = {0, 16};
-    }
-
-    /* Make sure we can not turn into adjacent walls */
-    if (m_pacman->current_direction() != m_pacman->desired_direction())
-    {
-        const auto& target_tile = get_tile(m_pacman->m_position + m_pacman->desired_direction());
-        if (target_tile.type != ETileType::Wall)
-        {
-            m_pacman->m_current_direction = m_pacman->m_desired_direction;
-
-            /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that. */
-            m_pacman->m_move_progress += 0.15f;
-        }
-    }
-
-    /* Make sure we are not moving through an existing wall */
-    if (get_tile(m_pacman->m_position + m_pacman->current_direction()).type == ETileType::Wall)
-    {
-        m_pacman->m_move_progress = 0.f;
-    }
+    update_pacman();
 }
 
 void Level::draw()
@@ -148,6 +119,38 @@ Level::Tile& Level::get_tile(glm::ivec2 coordinate)
     GFX_ASSERT(coordinate.y >= 0 && coordinate.y < static_cast<int>(m_tiles.size()), "Y Coordinate out of bounds!");
     GFX_ASSERT(coordinate.x >= 0 && coordinate.x < static_cast<int>(m_tiles[coordinate.y].size()), "X Coordinate out of bounds!");
     return m_tiles[coordinate.y][coordinate.x];
+}
+
+void Level::update_pacman()
+{
+    /* Teleport Pacman across map if going into edge : TODO (make more generic around bounds) */
+    if (m_pacman->m_position == glm::ivec2{0, 16} && m_pacman->current_direction() == glm::ivec2{-1, 0})
+    {
+        m_pacman->m_position = {27, 16};
+    }
+    else if (m_pacman->m_position == glm::ivec2{27, 16} && m_pacman->current_direction() == glm::ivec2{1, 0})
+    {
+        m_pacman->m_position = {0, 16};
+    }
+
+    /* Make sure we can not turn into adjacent walls */
+    if (m_pacman->current_direction() != m_pacman->desired_direction() && m_pacman->m_move_progress < 0.15f)
+    {
+        const auto& target_tile = get_tile(m_pacman->m_position + m_pacman->desired_direction());
+        if (target_tile.type != ETileType::Wall)
+        {
+            m_pacman->m_current_direction = m_pacman->m_desired_direction;
+
+            /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that. */
+            m_pacman->m_move_progress += 0.15f;
+        }
+    }
+
+    /* Make sure we are not moving through an existing wall */
+    if (get_tile(m_pacman->m_position + m_pacman->current_direction()).type == ETileType::Wall)
+    {
+        m_pacman->m_move_progress = 0.f;
+    }
 }
 
 }  // namespace pac

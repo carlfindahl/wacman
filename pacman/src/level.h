@@ -70,6 +70,10 @@ public:
      */
     void load(std::string_view fp);
 
+
+private:
     Tile& get_tile(glm::ivec2 coordinate);
+
+    void update_pacman();
 };
 }  // namespace pac
