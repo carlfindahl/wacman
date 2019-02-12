@@ -30,14 +30,29 @@ public:
     using value_type = DataType;
 
     UniformBuffer() { create(); }
-    explicit UniformBuffer(const DataType& data) : m_data(data) { create(); }
-    UniformBuffer(const UniformBuffer& other) = delete;
-    UniformBuffer& operator=(const UniformBuffer& other) = delete;
 
-    UniformBuffer(UniformBuffer&& other) noexcept : m_data(std::move(other.m_data)), m_name(other.m_name)
+    explicit UniformBuffer(const DataType& data) : m_data(data) { create(); }
+
+    UniformBuffer(const UniformBuffer& other) : m_data(other.m_data) { create(); }
+
+    UniformBuffer& operator=(const UniformBuffer& other)
     {
-        other.m_name = 0u;
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        /* Destroy existing and then copy */
+        glDeleteBuffers(1, &m_name);
+        m_data = other.m_data;
+
+        /* Create buffer from copied data */
+        create();
+
+        return *this;
     }
+
+    UniformBuffer(UniformBuffer&& other) noexcept : m_data(std::move(other.m_data)), m_name(other.m_name) { other.m_name = 0u; }
 
     UniformBuffer& operator=(UniformBuffer&& other) noexcept
     {
