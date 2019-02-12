@@ -26,10 +26,11 @@ Level::Level(std::string_view fp) : Level() { load(fp); }
 
 void Level::update(float dt)
 {
-    /* Update all ghosts */
+    /* Update all ghosts, first internally, then with level context */
     for (auto& ghost : m_ghosts)
     {
         ghost.update(dt);
+        update_ghost(ghost);
     }
 
     /* First update Pacman, and then update him in relation to this level (with collision and tile awareness) */
@@ -156,7 +157,8 @@ void Level::update_pacman()
         {
             m_pacman->m_current_direction = m_pacman->m_desired_direction;
 
-            /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that. */
+            /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that.
+             * And also stops player from doing 180 degree turns! */
             m_pacman->m_move_progress += 0.15f;
         }
     }
@@ -165,6 +167,26 @@ void Level::update_pacman()
     if (get_tile(m_pacman->m_position + m_pacman->current_direction()).type == ETileType::Wall)
     {
         m_pacman->m_move_progress = 0.f;
+    }
+}
+
+void Level::update_ghost(Ghost& g)
+{
+    /* Do regular AI (Chasing, Scattering or Scared) */
+    switch (g.ai_state())
+    {
+    case Ghost::EState::Scared: break;
+    case Ghost::EState::Chasing: break;
+    case Ghost::EState::Scattering: break;
+    default: break;
+    }
+
+    /* Pathfind to Pacman with A* */
+
+    /* Kill or be killed by Pacman if overlap */
+    if (g.position() == m_pacman->m_position)
+    {
+        GFX_INFO("Pacman has been conusmed by a Ghost, and is dead!");
     }
 }
 

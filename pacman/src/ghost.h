@@ -12,7 +12,8 @@ namespace pac
 namespace detail
 {
 /*!
- * \brief The custom_ivec2_hash struct is a quick hash that puts x in upper 32 bits and y in lower. Used for mapping dirs to textures
+ * \brief The custom_ivec2_hash struct is a quick hash that puts x in upper 32 bits and y in lower. Used for mapping dirs to
+ * textures
  */
 struct custom_ivec2_hash
 {
@@ -29,6 +30,17 @@ struct custom_ivec2_hash
  */
 class Ghost
 {
+public:
+    /*!
+     * \brief The EState enum describes the current state of the Ghost
+     */
+    enum class EState : uint16_t
+    {
+        Scattering,
+        Chasing,
+        Scared
+    };
+
 private:
     /* Animation Textures */
     std::unordered_map<glm::ivec2, TextureID, detail::custom_ivec2_hash> m_textures{};
@@ -48,6 +60,9 @@ private:
     /* Animation timer */
     float m_animation_time = 0.f;
 
+    /* The Ghost AI State */
+    EState m_ai_state = EState::Scattering;
+
 public:
     Ghost();
 
@@ -56,6 +71,24 @@ public:
     void update(float dt);
 
     void draw();
+
+    /*!
+     * \brief ai_state get the ai state of the ghost
+     * \return the current ai state
+     */
+    EState ai_state() const;
+
+    /*!
+     * \brief set_ai_state set the ai state of the ghost
+     * \param ai_state the new ai state of the ghost
+     */
+    void set_ai_state(EState& ai_state);
+
+    /*!
+     * \brief position get the position of the ghost
+     * \return the ghost position
+     */
+    glm::ivec2 position() const;
 
 private:
     /*!

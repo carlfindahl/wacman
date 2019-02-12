@@ -78,5 +78,7 @@ private:
     Tile& get_tile(glm::ivec2 coordinate);
 
     void update_pacman();
+
+    void update_ghost(Ghost& g);
 };
 }  // namespace pac

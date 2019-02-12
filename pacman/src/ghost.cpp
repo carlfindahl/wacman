@@ -52,5 +52,11 @@ void Ghost::draw()
                          m_textures[m_direction]});
 }
 
+Ghost::EState Ghost::ai_state() const { return m_ai_state; }
+
+void Ghost::set_ai_state(Ghost::EState& ai_state) { m_ai_state = ai_state; }
+
+glm::ivec2 Ghost::position() const { return m_position; }
+
 bool Ghost::is_opposite(glm::ivec2 dir) { return dir == -m_direction; }
 }  // namespace pac
