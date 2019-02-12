@@ -9,10 +9,9 @@
 namespace pac
 {
 /*!
- * \brief The State class describes a specifc game state (IE: Menu, Playnig, Highscore) and contains state
- * and functionality to accomodate this. It is a base class of the various states to allow states be stored
- * in a heterogeneous container and to elegantly call different update methods based on the dynamic type of
- * the state.
+ * \brief The State class describes a specifc game state (IE: Menu, Playnig, Highscore). It is a base class of the various states
+ * to allow states be stored in a heterogeneous container and to elegantly call different update methods based on the dynamic
+ * type of the state.
  */
 class State
 {
