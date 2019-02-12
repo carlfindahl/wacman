@@ -12,6 +12,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/pacman.h
     ${CMAKE_CURRENT_LIST_DIR}/pacman.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/ghost.h
+    ${CMAKE_CURRENT_LIST_DIR}/ghost.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/level.h
     ${CMAKE_CURRENT_LIST_DIR}/level.cpp
 
