@@ -18,15 +18,15 @@ pac::Pacman::Pacman(glm::ivec2 position) : m_position(position)
     m_textures.emplace(EDirection::West, get_renderer().load_animation_texture("res/pacman.png", 7, 7 + 2 * 70, 70, 70, 4, 4));
     m_textures.emplace(EDirection::East, get_renderer().load_animation_texture("res/pacman.png", 7, 7 + 3 * 70, 70, 70, 4, 4));
 
-    /* Add pacman input to the stack */
+    /* Add pacman input to the stack (if more time, do this in scripting instead of hard coding it) */
     input::InputState pacman_input{};
     pacman_input.set_binding(GLFW_KEY_W, [this] { this->turn(EDirection::North); });
-    pacman_input.set_binding(GLFW_KEY_A, [this] { this->turn(EDirection::South); });
-    pacman_input.set_binding(GLFW_KEY_S, [this] { this->turn(EDirection::West); });
+    pacman_input.set_binding(GLFW_KEY_A, [this] { this->turn(EDirection::West); });
+    pacman_input.set_binding(GLFW_KEY_S, [this] { this->turn(EDirection::South); });
     pacman_input.set_binding(GLFW_KEY_D, [this] { this->turn(EDirection::East); });
     pacman_input.set_binding(GLFW_KEY_UP, [this] { this->turn(EDirection::North); });
-    pacman_input.set_binding(GLFW_KEY_DOWN, [this] { this->turn(EDirection::South); });
     pacman_input.set_binding(GLFW_KEY_LEFT, [this] { this->turn(EDirection::West); });
+    pacman_input.set_binding(GLFW_KEY_DOWN, [this] { this->turn(EDirection::South); });
     pacman_input.set_binding(GLFW_KEY_RIGHT, [this] { this->turn(EDirection::East); });
 
     input::get_input().push(std::move(pacman_input));

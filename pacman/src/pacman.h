@@ -8,7 +8,7 @@
 
 namespace pac
 {
-enum class EDirection
+enum class EDirection : int16_t
 {
     North,
     South,
@@ -16,13 +16,17 @@ enum class EDirection
     West
 };
 
+/*!
+ * \brief The Pacman class contains pacman's movement and rendering logic for everything that only modifies this class and does
+ * not rely on outside data (IE: Pacman does not handle collisions, but whoever owns him does (the level).
+ */
 class Pacman
 {
 private:
     /* Animation Textures */
     std::unordered_map<EDirection, TextureID> m_textures = {};
 
-    /* Direction data */
+    /* Direction data as an enum */
     EDirection m_current_direction = EDirection::East;
     EDirection m_desired_direction = EDirection::East;
 
