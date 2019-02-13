@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "rendering/renderer.h"
 
 #include <unordered_map>
@@ -8,14 +9,6 @@
 
 namespace pac
 {
-enum class EDirection : int16_t
-{
-    North,
-    South,
-    East,
-    West
-};
-
 /*!
  * \brief The Pacman class contains pacman's movement and rendering logic for everything that only modifies this class and does
  * not rely on outside data (IE: Pacman does not handle collisions, but whoever owns him does (the level).
@@ -24,11 +17,11 @@ class Pacman
 {
 private:
     /* Animation Textures */
-    std::unordered_map<EDirection, TextureID> m_textures = {};
+    std::unordered_map<glm::ivec2, TextureID, detail::custom_ivec2_hash> m_textures = {};
 
     /* Direction data as an enum */
-    EDirection m_current_direction = EDirection::East;
-    EDirection m_desired_direction = EDirection::East;
+    glm::ivec2 m_current_direction = {0, -1};
+    glm::ivec2 m_desired_direction = {0, -1};
 
     /* Grid position of Pacman */
     glm::ivec2 m_position = {};
@@ -37,7 +30,7 @@ private:
     float m_move_progress = 0.f;
 
     /* Speed - Tiles per second */
-    float m_speed = 4.f;
+    float m_speed = 3.f;
 
     /* Animation timer */
     float m_animation_time = 0.f;
@@ -48,7 +41,7 @@ public:
 
     friend class Level;
 
-    void turn(EDirection new_direction);
+    void turn(glm::ivec2 new_direction);
 
     void update(float dt);
 
@@ -56,6 +49,7 @@ public:
 
     /* Get the current/desired direction as a vector */
     glm::ivec2 current_direction() const;
+
     glm::ivec2 desired_direction() const;
 
 private:
@@ -64,6 +58,6 @@ private:
      * \param dir is the direction to check
      * \return true if it's the opposite direction
      */
-    bool is_opposite(EDirection dir);
+    bool is_opposite(glm::ivec2 dir);
 };
 }  // namespace pac
