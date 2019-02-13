@@ -1,4 +1,5 @@
 #include "ghost.h"
+#include "pathfinding.h"
 #include <config.h>
 
 namespace pac
@@ -13,6 +14,74 @@ Ghost::Ghost(glm::ivec2 position) : m_position(position)
     m_textures.emplace(glm::ivec2{-1, 0}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 2 * 70, 70, 70, 2, 2));
     m_textures.emplace(glm::ivec2{1, 0}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 3 * 70, 70, 70, 2, 2));
 }
+
+Ghost::Ghost(const Ghost& other)
+    : m_textures(other.m_textures), m_position(other.m_position), m_direction(other.m_direction),
+      m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
+      m_ai_state(other.m_ai_state)
+{
+    m_path = new Path(*other.m_path);
+}
+
+Ghost& Ghost::operator=(const Ghost& other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    if (m_path)
+    {
+        delete m_path;
+    }
+
+    m_textures = other.m_textures;
+    m_position = other.m_position;
+    m_direction = other.m_direction;
+    m_move_progress = other.m_move_progress;
+    m_speed = other.m_speed;
+    m_animation_time = other.m_animation_time;
+    m_ai_state = other.m_ai_state;
+
+    m_path = new Path(*other.m_path);
+    return *this;
+}
+
+Ghost::Ghost(Ghost&& other) noexcept
+    : m_textures(std::move(other.m_textures)), m_position(other.m_position), m_direction(other.m_direction),
+      m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
+      m_ai_state(other.m_ai_state)
+{
+    m_path = other.m_path;
+    other.m_path = nullptr;
+}
+
+Ghost& Ghost::operator=(Ghost&& other) noexcept
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    if (m_path)
+    {
+        delete m_path;
+    }
+
+    m_textures = std::move(other.m_textures);
+    m_position = other.m_position;
+    m_direction = other.m_direction;
+    m_move_progress = other.m_move_progress;
+    m_speed = other.m_speed;
+    m_animation_time = other.m_animation_time;
+    m_ai_state = other.m_ai_state;
+    m_path = other.m_path;
+    other.m_path = nullptr;
+
+    return *this;
+}
+
+Ghost::~Ghost() { delete m_path; }
 
 void Ghost::update(float dt)
 {
@@ -31,9 +100,13 @@ void Ghost::update(float dt)
     m_move_progress += m_speed * dt;
     if (m_move_progress >= 1.f)
     {
-        glm::ivec2 to_position = m_position + m_direction;
         m_move_progress = 0.f;
-        m_position = to_position;
+        m_position += m_direction;
+
+        if (m_path && !m_path->empty())
+        {
+            m_direction = m_path->get();
+        }
     }
 }
 
@@ -57,6 +130,16 @@ Ghost::EState Ghost::ai_state() const { return m_ai_state; }
 void Ghost::set_ai_state(Ghost::EState& ai_state) { m_ai_state = ai_state; }
 
 glm::ivec2 Ghost::position() const { return m_position; }
+
+void Ghost::set_path(Path* path_on_heap)
+{
+    if (m_path)
+    {
+        delete m_path;
+    }
+
+    m_path = path_on_heap;
+}
 
 bool Ghost::is_opposite(glm::ivec2 dir) { return dir == -m_direction; }
 }  // namespace pac

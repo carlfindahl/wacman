@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "rendering/renderer.h"
 
 #include <utility>
@@ -9,21 +10,8 @@
 
 namespace pac
 {
-namespace detail
-{
-/*!
- * \brief The custom_ivec2_hash struct is a quick hash that puts x in upper 32 bits and y in lower. Used for mapping dirs to
- * textures
- */
-struct custom_ivec2_hash
-{
-    std::size_t operator()(const glm::ivec2& vec) const noexcept
-    {
-        const uint64_t hash = (static_cast<uint64_t>(vec.x) << 32u) | vec.y;
-        return hash;
-    }
-};
-}  // namespace detail
+class Path;
+
 /*!
  * \brief The Pacman class contains pacman's movement and rendering logic for everything that only modifies this class and does
  * not rely on outside data (IE: Pacman does not handle collisions, but whoever owns him does (the level).
@@ -61,12 +49,25 @@ private:
     float m_animation_time = 0.f;
 
     /* The Ghost AI State */
-    EState m_ai_state = EState::Scattering;
+    EState m_ai_state = EState::Chasing;
+
+    /* Path we are following */
+    Path* m_path = nullptr;
 
 public:
     Ghost();
 
     explicit Ghost(glm::ivec2 position);
+
+    Ghost(const Ghost& other);
+
+    Ghost& operator=(const Ghost& other);
+
+    Ghost(Ghost&& other) noexcept;
+
+    Ghost& operator=(Ghost&& other) noexcept;
+
+    ~Ghost();
 
     void update(float dt);
 
@@ -89,6 +90,8 @@ public:
      * \return the ghost position
      */
     glm::ivec2 position() const;
+
+    void set_path(Path* path_on_heap);
 
 private:
     /*!
