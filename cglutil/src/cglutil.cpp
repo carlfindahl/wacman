@@ -35,6 +35,28 @@ std::string get_executable_dir()
     return std::filesystem::path(path_str).parent_path().string();
 }
 
+std::string convert_path_separator(std::string_view str)
+{
+#ifndef WIN32
+    constexpr char native_separator = '/';
+    const char* foreign_separator = R"(\)";
+#else
+    const char* native_separator = R"(\)";
+    constexpr char foreign_separator = '/';
+#endif
+    std::string str_copy{str};
+    do 
+    {
+        auto pos = str_copy.find_first_of(foreign_separator);
+        if (pos != std::string::npos)
+        {
+            str_copy.replace(pos, 1, native_separator);
+        }
+    } while (str_copy.find(foreign_separator) != str_copy.npos);
+
+    return str_copy;
+}
+
 void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message,
                        const void* userParam)
 {
@@ -48,11 +70,12 @@ void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, G
 
 }  // namespace detail
 
-std::string read_entire_file(const char* fp)
+std::string read_entire_file(std::string_view fp)
 {
+    const auto native_path = detail::convert_path_separator(fp);
 #ifndef WIN32
     /* Create absolute path */
-    auto path = std::filesystem::path(detail::get_executable_dir()) / fp;
+    auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
     /* Attempt to open the file provided with absolute path */
     FILE* file;
@@ -81,7 +104,7 @@ std::string read_entire_file(const char* fp)
     std::string out{buf};
     delete[] buf;
 #else
-    auto path = std::filesystem::path(detail::get_executable_dir()) / fp;
+    auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
     /* Also, fopen is weird with fs::path on windows since it uses wchar_t for me, so we use ifstream */
     std::ifstream file{path.c_str()};
@@ -192,7 +215,8 @@ GLuint make_shader_program(const std::vector<ShaderStage>& stages)
 
 LoadedTexture load_texture(const char* fp)
 {
-    const auto abs_path = std::filesystem::path(detail::get_executable_dir()) / fp;
+    const auto native_path = detail::convert_path_separator(fp);
+    const auto abs_path = std::filesystem::path(detail::get_executable_dir()) / native_path;
     if (std::filesystem::exists(abs_path))
     {
         int w, h, c;

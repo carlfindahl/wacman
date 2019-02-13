@@ -24,6 +24,14 @@ namespace detail
 std::string get_executable_dir();
 
 /*!
+ * \brief convert_path_separator converts the path separator of the given string to the native platform's
+ * separator. On Unix, this will convert \\ to / and on Windows, it will be the other way round.
+ * \param str is the string to convert
+ * \return A string with proper separators
+ */
+std::string convert_path_separator(std::string_view str);
+
+/*!
  * \brief gl_debug_callback is the OpenGL debug message callback function
  */
 void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message,
@@ -73,7 +81,7 @@ namespace cgl
  * \param fp is the filepath to read from
  * \return A string containing the contents of the entire file
  */
-std::string read_entire_file(const char* fp);
+std::string read_entire_file(std::string_view fp);
 
 /*!
  * \brief compile_shader compiles a shader from the provided shader source code
