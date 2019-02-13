@@ -38,14 +38,14 @@ std::string get_executable_dir()
 std::string convert_path_separator(std::string_view str)
 {
 #ifndef WIN32
-    constexpr char native_separator = '/';
+    const char* native_separator = "/";
     const char* foreign_separator = R"(\)";
 #else
     const char* native_separator = R"(\)";
     constexpr char foreign_separator = '/';
 #endif
     std::string str_copy{str};
-    do 
+    do
     {
         auto pos = str_copy.find_first_of(foreign_separator);
         if (pos != std::string::npos)
@@ -258,8 +258,7 @@ void create_debug_callback()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, true);
 }
 
-std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols,
-                                                    int count)
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count)
 {
     auto whole_texture = load_texture(fp);
 
