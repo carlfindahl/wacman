@@ -64,7 +64,7 @@ public:
      * \brief outdated checks if the path is outdated
      * \return true if the path is considered outdated.
      */
-    bool outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(250); }
+    bool outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(200); }
 
 private:
     void pathfind_bfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target)

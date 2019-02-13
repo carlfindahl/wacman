@@ -7,6 +7,7 @@
 
 #include <gfx.h>
 #include <cglutil.h>
+#include <imgui/imgui.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -28,6 +29,10 @@ void Level::update(float dt)
     /* First update Pacman, and then update him in relation to this level (with collision and tile awareness) */
     m_pacman->update(dt);
     update_pacman();
+
+    /* ImGui Stuff */
+    ImGui::Text("Pacman has %u lives", m_pacman->m_lives);
+    ImGui::Text("SCORE: %u", m_score);
 }
 
 void Level::draw()
@@ -127,11 +132,12 @@ void Level::load(std::string_view fp)
     std::string entity_line = {};
     while (std::getline(level_stream, entity_line))
     {
-        const auto pattern = std::regex(R"((Pacman|Ghost)\s+(\d+)\s+(\d+))");
+        const auto pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
         std::smatch match{};
         if (!std::regex_match(entity_line, match, pattern) || match.empty())
         {
-            GFX_ERROR("The entity list in the level is not correct, or has unsupported entity type!");
+            GFX_WARN("The entity (%s) is not correct, or has unsupported entity type!", entity_line.c_str());
+            continue;
         }
 
         GFX_INFO("Spawning Entity %s at %d:%d", match[1], match[2], match[3]);
@@ -174,6 +180,13 @@ std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
     return out;
 }
 
+Level::Tile& Level::get_tile(glm::ivec2 coordinate)
+{
+    GFX_ASSERT(coordinate.y >= 0 && coordinate.y < static_cast<int>(m_tiles.size()), "Y Coordinate out of bounds!");
+    GFX_ASSERT(coordinate.x >= 0 && coordinate.x < static_cast<int>(m_tiles[coordinate.y].size()), "X Coordinate out of bounds!");
+    return m_tiles[coordinate.y][coordinate.x];
+}
+
 const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 {
     GFX_ASSERT(coordinate.y >= 0 && coordinate.y < static_cast<int>(m_tiles.size()), "Y Coordinate out of bounds!");
@@ -212,6 +225,22 @@ void Level::update_pacman()
     {
         m_pacman->m_move_progress = 0.f;
     }
+
+    /* Consume food / powerups */
+    if (static_cast<int>(get_tile(m_pacman->m_position).type) >= 15)
+    {
+        switch (get_tile(m_pacman->m_position).type)
+        {
+        case ETileType::Food: m_score += 10; break;
+        case ETileType::GhostKiller: m_score += 50; break;
+        case ETileType::Banana:
+        case ETileType::Orange:
+        case ETileType::Strawberry: m_score += 200; break; // TODO: Update this
+        default: break;
+        }
+
+        get_tile(m_pacman->m_position).type = ETileType::Blank;
+    }
 }
 
 void Level::update_ghost(float dt, Ghost& g)
@@ -233,7 +262,7 @@ void Level::update_ghost(float dt, Ghost& g)
     /* Kill or be killed by Pacman if overlap */
     if (g.position() == m_pacman->m_position)
     {
-        GFX_INFO("Pacman has been conusmed by a Ghost, and is dead!");
+        --m_pacman->m_lives;
     }
 }
 

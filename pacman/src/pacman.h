@@ -35,6 +35,9 @@ private:
     /* Animation timer */
     float m_animation_time = 0.f;
 
+    /* Number of lives */
+    uint32_t m_lives = 3u;
+
 public:
     Pacman();
     Pacman(glm::ivec2 position);
@@ -49,8 +52,9 @@ public:
 
     /* Get the current/desired direction as a vector */
     glm::ivec2 current_direction() const;
-
     glm::ivec2 desired_direction() const;
+
+    unsigned lives() const;
 
 private:
     /*!

@@ -53,6 +53,9 @@ private:
     /* Ghost vector */
     std::vector<Ghost> m_ghosts = {};
 
+    /* Score on this level */
+    unsigned m_score = 0u;
+
 public:
     Level();
 
@@ -80,6 +83,7 @@ public:
      * \param coordinate is the requested coordinate of the tile
      * \return the tile at the given coordinate
      */
+    Tile& get_tile(glm::ivec2 coordinate);
     const Tile& get_tile(glm::ivec2 coordinate) const;
 
     /*!
