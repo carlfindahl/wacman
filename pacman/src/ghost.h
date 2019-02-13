@@ -37,7 +37,7 @@ private:
     glm::ivec2 m_position = {};
 
     /* Ghost movement direction */
-    glm::ivec2 m_direction = {1, 0};
+    glm::ivec2 m_direction = {0, 0};
 
     /* Interpolation between current grid position and next */
     float m_move_progress = 0.f;
@@ -91,7 +91,17 @@ public:
      */
     glm::ivec2 position() const;
 
+    /*!
+     * \brief set_path sets the path of the Ghost to follow
+     * \param path_on_heap is the new heap-allocated path to follow
+     */
     void set_path(Path* path_on_heap);
+
+    /*!
+     * \brief requires_path_update checks if the path needs an update
+     * \return true if the path should be updated
+     */
+    bool requires_path_update() const;
 
 private:
     /*!

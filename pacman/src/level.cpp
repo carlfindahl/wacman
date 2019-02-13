@@ -12,16 +12,7 @@
 
 namespace pac
 {
-Level::Level()
-{
-    m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
-    m_pacman = std::make_unique<Pacman>(glm::ivec2(0, 16));
-
-    for (int i = 1; i < 2; ++i)
-    {
-        m_ghosts.emplace_back(glm::ivec2{i, 3});
-    }
-}
+Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20); }
 
 Level::Level(std::string_view fp) : Level() { load(fp); }
 
@@ -129,6 +120,31 @@ void Level::load(std::string_view fp)
             }
         }
     }
+
+    level_stream.ignore(1);
+
+    /* Parse entities listed after the map */
+    std::string entity_line = {};
+    while (std::getline(level_stream, entity_line))
+    {
+        const auto pattern = std::regex(R"((Pacman|Ghost)\s+(\d+)\s+(\d+))");
+        std::smatch match{};
+        if (!std::regex_match(entity_line, match, pattern) || match.empty())
+        {
+            GFX_ERROR("The entity list in the level is not correct, or has unsupported entity type!");
+        }
+
+        GFX_INFO("Spawning Entity %s at %d:%d", match[1], match[2], match[3]);
+
+        if (match[1] == "Pacman")
+        {
+            m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match[2]), std::stoi(match[3])});
+        }
+        else
+        {
+            m_ghosts.emplace_back(glm::ivec2(std::stoi(match[2]), std::stoi(match[3])));
+        }
+    }
 }
 
 std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
@@ -200,22 +216,18 @@ void Level::update_pacman()
 
 void Level::update_ghost(float dt, Ghost& g)
 {
-    constexpr float time_per_pathfind = 0.5f;
-    static float time_since_pathfind = 0.f;
-
-    time_since_pathfind += dt;
-
     /* Do regular AI (Chasing, Scattering or Scared) */
-    while (time_since_pathfind > time_per_pathfind)
+    switch (g.ai_state())
     {
-        time_since_pathfind -= time_per_pathfind;
-        switch (g.ai_state())
+    case Ghost::EState::Scared: break;
+    case Ghost::EState::Chasing:
+        if (g.requires_path_update())
         {
-        case Ghost::EState::Scared: break;
-        case Ghost::EState::Chasing: g.set_path(new Path(*this, g.position(), m_pacman->m_position)); break;
-        case Ghost::EState::Scattering: break;
-        default: break;
+            g.set_path(new Path(*this, g.position(), m_pacman->m_position));
         }
+        break;
+    case Ghost::EState::Scattering: break;
+    default: break;
     }
 
     /* Kill or be killed by Pacman if overlap */

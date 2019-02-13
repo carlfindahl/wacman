@@ -6,6 +6,7 @@
 #include <stack>
 #include <queue>
 #include <vector>
+#include <chrono>
 #include <type_traits>
 #include <unordered_map>
 
@@ -23,13 +24,19 @@ private:
     /* The directions you must take to get to your target */
     std::stack<glm::ivec2> m_directions = {};
 
+    /* Creation time of this path. Paths will time out after 0.25 seconds */
+    std::chrono::steady_clock::time_point m_creation_time = {};
+
 public:
     Path() = delete;
 
     /*!
      * \brief Construct  a Path from a type of Graph
      */
-    Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target) { pathfind_dfs(graph, origin, target); }
+    Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target) : m_creation_time(std::chrono::steady_clock::now())
+    {
+        pathfind_bfs(graph, origin, target);
+    }
 
     /*!
      * \brief get the next direction from the path
@@ -37,9 +44,14 @@ public:
      */
     glm::ivec2 get()
     {
-        auto val = m_directions.top();
-        m_directions.pop();
-        return val;
+        if (!m_directions.empty())
+        {
+            auto val = m_directions.top();
+            m_directions.pop();
+            return val;
+        }
+
+        return {};
     }
 
     /*!
@@ -48,8 +60,14 @@ public:
      */
     bool empty() const { return m_directions.empty(); }
 
+    /*!
+     * \brief outdated checks if the path is outdated
+     * \return true if the path is considered outdated.
+     */
+    bool outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(250); }
+
 private:
-    void pathfind_dfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target)
+    void pathfind_bfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target)
     {
         /* Get neighbours and try all paths until we find target, or if we don't the Path will be empty */
         std::queue<glm::ivec2> next_node = {};
@@ -62,6 +80,11 @@ private:
         {
             auto current = next_node.front();
             next_node.pop();
+
+            if (current == target)
+            {
+                break;
+            }
 
             for (auto next : graph.get_neighbours(current))
             {

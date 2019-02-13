@@ -2,6 +2,8 @@
 #include "pathfinding.h"
 #include <config.h>
 
+#include <gfx.h>
+
 namespace pac
 {
 Ghost::Ghost() : Ghost({0, 0}) {}
@@ -9,6 +11,7 @@ Ghost::Ghost() : Ghost({0, 0}) {}
 Ghost::Ghost(glm::ivec2 position) : m_position(position)
 {
     /* Load Ghost textures */
+    m_textures.emplace(glm::ivec2{0, 0}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 1 * 70, 70, 70, 1, 1));
     m_textures.emplace(glm::ivec2{0, -1}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 1 * 70, 70, 70, 2, 2));
     m_textures.emplace(glm::ivec2{0, 1}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 0 * 70, 70, 70, 2, 2));
     m_textures.emplace(glm::ivec2{-1, 0}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 2 * 70, 70, 70, 2, 2));
@@ -138,8 +141,12 @@ void Ghost::set_path(Path* path_on_heap)
         delete m_path;
     }
 
+    /* Update path and then immediately update direction */
     m_path = path_on_heap;
+    m_direction = m_path->get();
 }
+
+bool Ghost::requires_path_update() const { return m_path == nullptr || m_path->outdated(); }
 
 bool Ghost::is_opposite(glm::ivec2 dir) { return dir == -m_direction; }
 }  // namespace pac
