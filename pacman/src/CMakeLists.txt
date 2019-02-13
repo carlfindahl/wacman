@@ -18,6 +18,12 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/level.h
     ${CMAKE_CURRENT_LIST_DIR}/level.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/pathfinding.h
+    ${CMAKE_CURRENT_LIST_DIR}/pathfinding.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/common.h
+    ${CMAKE_CURRENT_LIST_DIR}/common.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/gfx.h
     ${CMAKE_CURRENT_LIST_DIR}/single_header_implementations.cpp
 )
