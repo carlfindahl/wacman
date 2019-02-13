@@ -16,7 +16,7 @@ namespace pac
  */
 class Level
 {
-private:
+public:
     /*!
      * \brief The ETileType enum specifies the various tiles that exist in the game
      */
@@ -40,6 +40,7 @@ private:
         TextureID texture = {};
     };
 
+private:
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
 
@@ -74,11 +75,13 @@ public:
      */
     void load(std::string_view fp);
 
-private:
-    Tile& get_tile(glm::ivec2 coordinate);
+    const Tile& get_tile(glm::ivec2 coordinate) const;
 
+    std::vector<glm::ivec2> get_neighbours(glm::ivec2 pos) const;
+
+private:
     void update_pacman();
 
-    void update_ghost(Ghost& g);
+    void update_ghost(float dt, Ghost& g);
 };
 }  // namespace pac

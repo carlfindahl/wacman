@@ -1,4 +1,5 @@
 #include "level.h"
+#include "pathfinding.h"
 #include <config.h>
 
 #include <regex>
@@ -16,7 +17,7 @@ Level::Level()
     m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
     m_pacman = std::make_unique<Pacman>(glm::ivec2(0, 16));
 
-    for (int i = 1; i < 5; ++i)
+    for (int i = 1; i < 2; ++i)
     {
         m_ghosts.emplace_back(glm::ivec2{i, 3});
     }
@@ -30,7 +31,7 @@ void Level::update(float dt)
     for (auto& ghost : m_ghosts)
     {
         ghost.update(dt);
-        update_ghost(ghost);
+        update_ghost(dt, ghost);
     }
 
     /* First update Pacman, and then update him in relation to this level (with collision and tile awareness) */
@@ -130,7 +131,34 @@ void Level::load(std::string_view fp)
     }
 }
 
-Level::Tile& Level::get_tile(glm::ivec2 coordinate)
+std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
+{
+    std::vector<glm::ivec2> out{};
+
+    if (pos.x > 0 && get_tile(pos + glm::ivec2{-1, 0}).type != ETileType::Wall)
+    {
+        out.push_back(pos + glm::ivec2{-1, 0});
+    }
+
+    if (pos.x < static_cast<int>(m_tiles[pos.y].size() - 1) && get_tile(pos + glm::ivec2{1, 0}).type != ETileType::Wall)
+    {
+        out.push_back(pos + glm::ivec2{1, 0});
+    }
+
+    if (pos.y > 0 && get_tile(pos + glm::ivec2{0, -1}).type != ETileType::Wall)
+    {
+        out.push_back(pos + glm::ivec2{0, -1});
+    }
+
+    if (pos.y < static_cast<int>(m_tiles.size()) && get_tile(pos + glm::ivec2{0, 1}).type != ETileType::Wall)
+    {
+        out.push_back(pos + glm::ivec2{0, 1});
+    }
+
+    return out;
+}
+
+const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 {
     GFX_ASSERT(coordinate.y >= 0 && coordinate.y < static_cast<int>(m_tiles.size()), "Y Coordinate out of bounds!");
     GFX_ASSERT(coordinate.x >= 0 && coordinate.x < static_cast<int>(m_tiles[coordinate.y].size()), "X Coordinate out of bounds!");
@@ -170,18 +198,25 @@ void Level::update_pacman()
     }
 }
 
-void Level::update_ghost(Ghost& g)
+void Level::update_ghost(float dt, Ghost& g)
 {
-    /* Do regular AI (Chasing, Scattering or Scared) */
-    switch (g.ai_state())
-    {
-    case Ghost::EState::Scared: break;
-    case Ghost::EState::Chasing: break;
-    case Ghost::EState::Scattering: break;
-    default: break;
-    }
+    constexpr float time_per_pathfind = 0.5f;
+    static float time_since_pathfind = 0.f;
 
-    /* Pathfind to Pacman with A* */
+    time_since_pathfind += dt;
+
+    /* Do regular AI (Chasing, Scattering or Scared) */
+    while (time_since_pathfind > time_per_pathfind)
+    {
+        time_since_pathfind -= time_per_pathfind;
+        switch (g.ai_state())
+        {
+        case Ghost::EState::Scared: break;
+        case Ghost::EState::Chasing: g.set_path(new Path(*this, g.position(), m_pacman->m_position)); break;
+        case Ghost::EState::Scattering: break;
+        default: break;
+        }
+    }
 
     /* Kill or be killed by Pacman if overlap */
     if (g.position() == m_pacman->m_position)
