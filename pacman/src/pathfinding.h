@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <unordered_map>
 
+#include <gfx.h>
 #include <glm/vec2.hpp>
 
 namespace pac
@@ -64,7 +65,7 @@ public:
      * \brief outdated checks if the path is outdated
      * \return true if the path is considered outdated.
      */
-    bool outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(200); }
+    bool outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(100); }
 
 private:
     void pathfind_bfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target)
@@ -74,7 +75,7 @@ private:
         next_node.push(origin);
 
         std::unordered_map<glm::ivec2, glm::ivec2, detail::custom_ivec2_hash> traceback = {};
-        traceback.emplace(origin, origin);
+        traceback[origin] = origin;
 
         while (!next_node.empty())
         {
@@ -91,7 +92,7 @@ private:
                 if (traceback.find(next) == traceback.end())
                 {
                     next_node.push(next);
-                    traceback.emplace(next, current);
+                    traceback[next] = current;
                 }
             }
         }
