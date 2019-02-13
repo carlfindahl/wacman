@@ -75,8 +75,18 @@ public:
      */
     void load(std::string_view fp);
 
+    /*!
+     * \brief get_tile returns the tile at the given coordinate
+     * \param coordinate is the requested coordinate of the tile
+     * \return the tile at the given coordinate
+     */
     const Tile& get_tile(glm::ivec2 coordinate) const;
 
+    /*!
+     * \brief get_neighbours gets all non-wall neighbouring tiles of the tile at pos
+     * \param pos the position of the tile to get the neighbours (NESW) of
+     * \return A vector of tile coordinates
+     */
     std::vector<glm::ivec2> get_neighbours(glm::ivec2 pos) const;
 
 private:
