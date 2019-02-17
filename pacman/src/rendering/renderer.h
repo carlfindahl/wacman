@@ -80,7 +80,9 @@ private:
 
 public:
     Renderer(const Renderer&) = delete;
+    Renderer(Renderer&&) = delete;
     Renderer& operator=(const Renderer&) = delete;
+    Renderer& operator=(Renderer&&) = delete;
     ~Renderer();
 
     /*!
@@ -89,6 +91,7 @@ public:
      * \param texture_id is the id of the texture that this sprite should use
      */
     void draw(const InstanceVertex& data);
+    void draw(InstanceVertex&& data);
 
     /*!
      * \brief submit_work submits the collected draws for rendering and renders it

@@ -36,7 +36,7 @@ void Renderer::init(unsigned max_sprites)
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
     prog->use();
-    std::vector<int> tmp(MAX_TEXTURES);  // # TODO : Don't use 16 magically
+    std::vector<int> tmp(MAX_TEXTURES);
     std::iota(tmp.begin(), tmp.end(), 0u);
     glUniform1iv(0, tmp.size(), tmp.data());
 
@@ -89,6 +89,8 @@ Renderer::~Renderer()
 }
 
 void Renderer::draw(const Renderer::InstanceVertex& data) { m_instance_data.push_back(data); }
+
+void Renderer::draw(InstanceVertex&& data) { m_instance_data.emplace_back(data); }
 
 void Renderer::submit_work()
 {
