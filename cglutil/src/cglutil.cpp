@@ -136,6 +136,7 @@ GLuint compile_shader(const char* source, GLenum type)
         /* Get log length */
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
         auto* log = new GLchar[len];
+        SCOPE_EXIT { delete[] log; };
 
         /* Get the log text and print it */
         const char* typeString = (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment");
@@ -144,7 +145,6 @@ GLuint compile_shader(const char* source, GLenum type)
         fprintf(stderr, "%s Shader Compile Error:\n%s\n", typeString, log);
 
         /* Cleanup and return an invalid GL Name */
-        delete[] log;
         glDeleteShader(shader);
         return 0;
     }
@@ -186,6 +186,7 @@ GLuint create_program(const std::vector<GLuint>& shaders)
         /* Get log length */
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
         auto log = new GLchar[len];
+        SCOPE_EXIT { delete[] log; };
 
         /* Get the log text and print it */
         glGetProgramInfoLog(program, len, &len, log);
@@ -193,7 +194,6 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 
         /* Cleanup and return an invalid GL Name */
         glDeleteProgram(program);
-        delete[] log;
         return 0;
     }
 
@@ -203,12 +203,12 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 GLuint make_shader_program(const std::vector<ShaderStage>& stages)
 {
     /* Create arrays of stage definitions and compiled shaders */
-    std::vector<unsigned> shaders;
+    std::vector<unsigned> shaders = {};
 
     /* Compile all shaders and put them in the shader array */
     for (const auto& stage : stages)
     {
-        shaders.push_back(fcompile_shader(stage.sourcePath, stage.stage));
+        shaders.emplace_back(fcompile_shader(stage.sourcePath, stage.stage));
     }
 
     return create_program(std::vector<GLuint>(std::begin(shaders), std::end(shaders)));
@@ -223,9 +223,11 @@ LoadedTexture load_texture(const char* fp)
         int w, h, c;
 
         auto* raw_pixels = stbi_load(abs_path.string().c_str(), &w, &h, &c, STBI_rgb_alpha);
+        SCOPE_EXIT { stbi_image_free(raw_pixels); };
+
+        /* Copy pixels into vector and return vector */
         std::vector<uint8_t> pixels(w * h * 4);
         memcpy(pixels.data(), raw_pixels, w * h * 4);
-        stbi_image_free(raw_pixels);
         return LoadedTexture{w, h, std::move(pixels)};
     }
     else
