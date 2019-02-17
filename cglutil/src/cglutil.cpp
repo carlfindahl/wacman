@@ -4,6 +4,7 @@
 #include <cstring>
 #include <memory>
 #include <fstream>
+#include <exception>
 #include <filesystem>
 
 #include <stb_image.h>
@@ -302,4 +303,10 @@ std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset,
     return out_textures;
 }
 
+namespace detail
+{
+UncaughtExceptionCounter::UncaughtExceptionCounter() : m_exception_count(std::uncaught_exceptions()) {}
+
+bool UncaughtExceptionCounter::new_uncaught_exception() noexcept { return std::uncaught_exceptions() > m_exception_count; }
+}  // namespace detail
 }  // namespace cgl

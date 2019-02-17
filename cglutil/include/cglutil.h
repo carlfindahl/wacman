@@ -42,6 +42,7 @@ void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned sev
 /*
  * DATA TYPES:
  *  - ShaderStage represents the path and type of stage, used with some shader utilites
+ *  - LoadedTexture contains image info and pixel data from a loaded texture
  */
 namespace cgl
 {
@@ -132,8 +133,7 @@ namespace cgl
  */
 LoadedTexture load_texture(const char* fp);
 
-std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h,
-                                                    int cols, int count);
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 /*!
  * \brief size_bytes returns the size in bytes of the elements of the given container.
@@ -168,10 +168,54 @@ GLFWwindow* create_window_and_context(unsigned w, unsigned h, const char* title)
 }  // namespace cgl
 #endif
 
+/*
+ * DEBUG UTILITIES:
+ *  - create_debug_callback sets up a default OpenGL debug callback that enables everything by default
+ */
 namespace cgl
 {
 /*!
  * \brief create_debug_callback sets the OpenGL debug callback to the default callback.
  */
 void create_debug_callback();
+}  // namespace cgl
+
+/*
+ * DECLARATIVE SCOPE UTILITIES:
+ *
+ */
+namespace cgl
+{
+namespace detail
+{
+/*!
+ * \brief The UncaughtExceptionCounter class is able to track if any new exceptions have occured since this object was created.
+ * This is useful since, for example, a scope guard can use this information to declaratively do operations when things fail or
+ * succeed. Inspired by [https://www.youtube.com/watch?v=WjTrfoiB0MQ](This Talk).
+ */
+class UncaughtExceptionCounter
+{
+private:
+    /* Number of unhandled exceptsion on creation */
+    int m_exception_count = 0;
+
+public:
+    UncaughtExceptionCounter();
+
+    /*!
+     * \brief new_uncaught_exception returns true if there is a new exception since this class was constructed
+     * \return true if a new exception has occured
+     */
+    bool new_uncaught_exception() noexcept;
+};
+}  // namespace detail
+
+}  // namespace cgl
+
+/*
+ * MEMORY UTILITIES:
+ *
+ */
+namespace cgl
+{
 }  // namespace cgl
