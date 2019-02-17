@@ -74,18 +74,19 @@ void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, G
 std::string read_entire_file(std::string_view fp)
 {
     const auto native_path = detail::convert_path_separator(fp);
+
 #ifndef WIN32
     /* Create absolute path */
     auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
     /* Attempt to open the file provided with absolute path */
-    FILE* file;
-    file = fopen(path.c_str(), "r");
+    FILE* file = fopen(path.c_str(), "r");
+    SCOPE_EXIT { fclose(file); };
 
     /* On failure, return an invalid GL name */
     if (file == nullptr)
     {
-        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", path.string().c_str());
+        fprintf(stderr, "read_entire_file failed to open input file:\n%s\n", path.string().c_str());
         return {};
     }
 
@@ -96,14 +97,13 @@ std::string read_entire_file(std::string_view fp)
 
     /* Read the file into the buffer */
     auto* buf = new GLchar[bufsz + 1];
+    SCOPE_EXIT { delete[] buf; };
+
     fread(buf, sizeof(GLchar), bufsz, file);
-    fclose(file);
 
     /* Important to terminate string */
     buf[bufsz] = '\0';
-
     std::string out{buf};
-    delete[] buf;
 #else
     auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
