@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "config.h"
 
 #include <array>
 #include <numeric>
@@ -35,20 +36,20 @@ void Renderer::init(unsigned max_sprites)
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
     prog->use();
-    std::vector<int> tmp(16u);  // # TODO : Don't use 16 magically
+    std::vector<int> tmp(MAX_TEXTURES);  // # TODO : Don't use 16 magically
     std::iota(tmp.begin(), tmp.end(), 0u);
     glUniform1iv(0, tmp.size(), tmp.data());
 
     /* Check maximum amount of texture units and hopefully it's enough :D */
     int max_tex_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
-    if (max_tex_units < 32)
+    if (max_tex_units < MAX_TEXTURES)
     {
-        GFX_INFO("Application supports only %d/16 texture units.", max_tex_units);
+        GFX_INFO("Application supports only %d/%d texture units.", max_tex_units, MAX_TEXTURES);
     }
     else
     {
-        GFX_INFO("Application supports more than the recommended 16 (%d) texture units! Nice.", max_tex_units);
+        GFX_INFO("Application supports more than the recommended %d (%d) texture units! Nice.", MAX_TEXTURES, max_tex_units);
     }
 
     /* Init sprite buffer */
