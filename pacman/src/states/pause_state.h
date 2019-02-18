@@ -14,10 +14,7 @@ private:
 public:
     PauseState() = default;
 
-    explicit PauseState(StateManager& owner) : State(owner)
-    { 
-        m_splash = get_renderer().load_texture("res/pause_screen.png");       
-    }
+    explicit PauseState(StateManager& owner);
 
     void on_enter() override;
 
