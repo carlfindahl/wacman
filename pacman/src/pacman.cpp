@@ -81,7 +81,7 @@ glm::ivec2 Pacman::current_direction() const { return m_current_direction; }
 
 glm::ivec2 Pacman::desired_direction() const { return m_desired_direction; };
 
-unsigned Pacman::lives() const { return m_lives; }
+int Pacman::lives() const { return m_lives; }
 
 bool Pacman::is_opposite(glm::ivec2 dir) { return m_current_direction == -dir; }
 
