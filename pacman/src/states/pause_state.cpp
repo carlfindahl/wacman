@@ -1,5 +1,6 @@
 #include "pause_state.h"
 #include "state_manager.h"
+#include "main_menu_state.h"
 #include "config.h"
 
 #include <GLFW/glfw3.h>
@@ -11,11 +12,18 @@ PauseState::PauseState(StateManager& owner) : State(owner) { m_splash = get_rend
 void PauseState::on_enter()
 {
     input::InputState pause_input(true);
+
+    /* Resume game */
     pause_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_owner->pop(); });
     pause_input.set_binding(GLFW_KEY_P, [this] { m_owner->pop(); });
 
-    auto& input_manager = input::get_input();
-    input_manager.push(std::move(pause_input));
+    /* Quit to main menu */
+    pause_input.set_binding(GLFW_KEY_Q, [this] {
+        m_owner->clear();
+        m_owner->push<MainMenuState>();
+    });
+
+    input::get_input().push(std::move(pause_input));
 }
 
 void PauseState::on_exit() { input::get_input().pop(); }
