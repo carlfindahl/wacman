@@ -116,9 +116,9 @@ void Game::init_imgui()
 
     /* Update Colors */
     auto* colors = style.Colors;
-    colors[ImGuiCol_Button]                 = ImVec4(0.01f, 0.00f, 0.78f, 0.40f);
-    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.02f, 0.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_ButtonActive]           = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.01f, 0.00f, 0.78f, 0.40f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.02f, 0.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
     
     /* Load Font */
     ImGuiIO& io = ImGui::GetIO();
