@@ -141,6 +141,8 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
 
     /* Return texture ID and add to cache */
     m_textures.push_back(tex_id);
+    GFX_DEBUG("You have loaded %u textures now.", m_textures.size());
+
     TextureID out{0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
     m_loaded_texture_cache.emplace(relative_fp.data(), out);
     return out;
@@ -180,6 +182,8 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
 
     /* Return ID and add to texture cache */
     m_textures.push_back(tex_id);
+    GFX_DEBUG("You have loaded %u textures now.", m_textures.size());
+
     TextureID out{0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
     m_loaded_texture_cache.emplace(hash_string, out);
     return out;
