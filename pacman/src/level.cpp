@@ -213,14 +213,15 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 
 void Level::update_pacman()
 {
-    /* Teleport Pacman across map if going into edge : TODO (make more generic around bounds) */
-    if (m_pacman->m_position == glm::ivec2{0, 16} && m_pacman->current_direction() == glm::ivec2{-1, 0})
+    /* Teleport Pacman across map if going into edge (TODO: On Y axis too) */
+    if (m_pacman->m_position.x == 0 && m_pacman->current_direction().x == -1)
     {
-        m_pacman->m_position = {27, 16};
+        m_pacman->m_position.x = m_tiles[m_pacman->m_position.y].size() - 1;
     }
-    else if (m_pacman->m_position == glm::ivec2{27, 16} && m_pacman->current_direction() == glm::ivec2{1, 0})
+    else if (m_pacman->m_position.x == static_cast<int>(m_tiles[m_pacman->m_position.y].size()) - 1 &&
+             m_pacman->current_direction().x == 1)
     {
-        m_pacman->m_position = {0, 16};
+        m_pacman->m_position.x = 0;
     }
 
     /* Make sure we can not turn into adjacent walls */
