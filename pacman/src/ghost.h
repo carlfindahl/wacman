@@ -33,6 +33,9 @@ private:
     /* Animation Textures */
     std::unordered_map<glm::ivec2, TextureID, detail::custom_ivec2_hash> m_textures{};
 
+    /* Home position */
+    glm::ivec2 m_home = {};
+
     /* Grid position of Pacman */
     glm::ivec2 m_position = {};
 
@@ -54,6 +57,9 @@ private:
     /* Path we are following */
     Path* m_path = nullptr;
 
+    /* Are you a dead ghost */
+    bool m_dead = false;
+
 public:
     Ghost();
 
@@ -71,7 +77,7 @@ public:
 
     void update(float dt);
 
-    void draw();
+    void draw(bool blue = false);
 
     /*!
      * \brief ai_state get the ai state of the ghost
@@ -83,13 +89,19 @@ public:
      * \brief set_ai_state set the ai state of the ghost
      * \param ai_state the new ai state of the ghost
      */
-    void set_ai_state(EState& ai_state);
+    void set_ai_state(EState ai_state);
 
     /*!
      * \brief position get the position of the ghost
      * \return the ghost position
      */
     glm::ivec2 position() const;
+
+    /*!
+     * \brief home get the home position of the Ghost
+     * \return the home position
+     */
+    glm::ivec2 home() const;
 
     /*!
      * \brief set_path sets the path of the Ghost to follow
@@ -102,6 +114,13 @@ public:
      * \return true if the path should be updated
      */
     bool requires_path_update() const;
+
+    /*!
+     * \brief die kills the ghost
+     */
+    void die();
+
+    bool dead() const;
 
 private:
     /*!

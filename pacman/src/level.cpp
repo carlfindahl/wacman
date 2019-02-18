@@ -75,7 +75,7 @@ void Level::draw()
     m_pacman->draw();
     for (auto& ghost : m_ghosts)
     {
-        ghost.draw();
+        ghost.draw(m_pacman_kill_timer > seconds(0));
     }
 }
 
@@ -249,37 +249,51 @@ void Level::update_pacman()
         switch (get_tile(m_pacman->m_position).type)
         {
         case ETileType::Food: m_score += 10; break;
-        case ETileType::GhostKiller: m_score += 50; break;
+        case ETileType::GhostKiller:
+            m_score += 50;
+            m_pacman_kill_timer = seconds(10.f);
+            //            for(auto& g : m_ghosts)
+            //            {
+            //                g.set_ai_state(Ghost::EState::Scared);
+            //            }
+            break;
         case ETileType::Banana:
         case ETileType::Orange:
-        case ETileType::Strawberry: m_score += 200; break; // TODO: Update this
+        case ETileType::Strawberry: m_score += 200; break;  // TODO: Update this
         default: break;
         }
 
         get_tile(m_pacman->m_position).type = ETileType::Blank;
     }
-}
+}  // namespace pac
 
 void Level::update_ghost(float dt, Ghost& g)
 {
     /* Do regular AI (Chasing, Scattering or Scared) */
-    switch (g.ai_state())
+    if (g.requires_path_update())
     {
-    case Ghost::EState::Scared: break;
-    case Ghost::EState::Chasing:
-        if (g.requires_path_update())
+        switch (g.ai_state())
         {
-            g.set_path(new Path(*this, g.position(), m_pacman->m_position));
+        case Ghost::EState::Scared: break;
+        case Ghost::EState::Chasing: g.set_path(new Path(*this, g.position(), m_pacman->m_position)); break;
+        case Ghost::EState::Scattering: g.set_path(new Path(*this, g.position(), g.home())); break;
+        default: break;
         }
-        break;
-    case Ghost::EState::Scattering: break;
-    default: break;
     }
 
     /* Kill or be killed by Pacman if overlap */
-    if (g.position() == m_pacman->m_position)
+    if (g.position() == m_pacman->m_position && !g.dead())
     {
-        --m_pacman->m_lives;
+        if (m_pacman_kill_timer > seconds(0.f))
+        {
+            g.die();
+            g.set_path(new Path(*this, g.position(), g.home()));
+            m_score += 200;  // TODO : Fix this so it doubles per ghost
+        }
+        else
+        {
+            --m_pacman->m_lives;
+        }
     }
 }
 
