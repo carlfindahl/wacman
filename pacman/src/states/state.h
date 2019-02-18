@@ -8,6 +8,8 @@
 
 namespace pac
 {
+class StateManager;
+
 /*!
  * \brief The State class describes a specifc game state (IE: Menu, Playnig, Highscore). It is a base class of the various states
  * to allow states be stored in a heterogeneous container and to elegantly call different update methods based on the dynamic
@@ -15,8 +17,13 @@ namespace pac
  */
 class State
 {
+protected:
+    StateManager* m_owner = nullptr;
+
 public:
     State() = default;
+
+    State(StateManager& owner) : m_owner(&owner) {}
 
     State(const State&) = delete;
 

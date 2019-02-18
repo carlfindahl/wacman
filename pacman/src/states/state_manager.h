@@ -7,22 +7,55 @@
 
 namespace pac
 {
+class State;
+
 class StateManager
 {
 private:
+    /*!
+     * \brief The ECommandType enum represents a command that can be executed by the state manager.
+     */
+    enum class ECommandType : uint16_t
+    {
+        Nothing,
+        Push,
+        Pop
+    };
+
+    struct Command
+    {
+        /* Used when Command is Push */
+        std::unique_ptr<State> new_state = nullptr;
+
+        /* The command to execute */
+        ECommandType command_type = ECommandType::Nothing;
+
+        /* So we can emplace back */
+        Command(std::unique_ptr<State> state, ECommandType type) : new_state(std::move(state)), command_type(type) {}
+    };
+
     /* Game State Stack */
     std::vector<std::unique_ptr<State>> m_statestack = {};
 
-    std::vector<std::unique_ptr<State>> m_pending_pushes = {};
-
-    uint8_t m_pending_pop_count = 0u;
+    /* Commands waiting */
+    std::vector<Command> m_pending_commands = {};
 
 public:
     /*!
      * \brief push push a new state on the state stack
      * \param new_state is the state to push, is unique ptr to hint that we are transferring ownership
      */
-    void push(std::unique_ptr<State> new_state);
+    template<typename State_>
+    void push()
+    {
+        m_pending_commands.emplace_back(std::make_unique<State_>(*this), ECommandType::Push);
+    }
+
+    /*!
+     * \brief empty checks if the state stack is empty
+     * \return true if the state stack is empty
+     */
+    bool empty() const;
 
     /*!
      * \brief pop a state from the stack

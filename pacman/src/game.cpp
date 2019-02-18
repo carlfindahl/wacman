@@ -1,6 +1,7 @@
 #include "game.h"
 #include "input.h"
 #include "states/game_state.h"
+#include "states/main_menu_state.h"
 #include "rendering/shader_program.h"
 #include "rendering/renderer.h"
 
@@ -19,7 +20,7 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
-    m_state_manager.push(std::make_unique<GameState>());
+    m_state_manager.push<MainMenuState>();
 }
 
 Game::~Game() noexcept
@@ -37,7 +38,7 @@ void Game::run()
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();
 
-    while (m_flags.running && !glfwWindowShouldClose(m_window))
+    do
     {
         /* Set ImGui up for a new frame */
         ImGui_ImplOpenGL3_NewFrame();
@@ -56,7 +57,7 @@ void Game::run()
         glfwPollEvents();
         update(dt);
         draw();
-    }
+    } while (m_flags.running && !glfwWindowShouldClose(m_window) && !m_state_manager.empty());
 }
 
 void Game::init_glfw_window(const char* title, glm::uvec2 window_size)

@@ -7,8 +7,6 @@
 
 namespace pac
 {
-GameState::GameState() = default;
-
 GameState::~GameState() noexcept = default;
 
 void GameState::on_enter()

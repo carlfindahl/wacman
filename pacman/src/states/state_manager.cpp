@@ -2,25 +2,34 @@
 
 namespace pac
 {
-void pac::StateManager::push(std::unique_ptr<pac::State> new_state) { m_pending_pushes.emplace_back(std::move(new_state)); }
+bool StateManager::empty() const { return m_statestack.empty(); }
 
-void pac::StateManager::pop() { ++m_pending_pop_count; }
+void pac::StateManager::pop() { m_pending_commands.emplace_back(nullptr, ECommandType::Pop); }
 
 void StateManager::update(float dt)
 {
-    for (uint8_t i = 0u; i < m_pending_pop_count; ++i)
+    /* Process Commands */
+    for (auto& command : m_pending_commands)
     {
-        m_statestack.back()->on_exit();
-        m_statestack.pop_back();
+        switch (command.command_type)
+        {
+        /* Enter and push state */
+        case ECommandType::Push:
+            command.new_state->on_enter();
+            m_statestack.emplace_back(std::move(command.new_state));
+            break;
+        /* Exit and pop a state */
+        case ECommandType::Pop:
+            m_statestack.back()->on_exit();
+            m_statestack.pop_back();
+            break;
+        default: break;
+        }
     }
 
-    for (auto& push_op : m_pending_pushes)
-    {
-        m_statestack.emplace_back(std::move(push_op));
-        m_statestack.back()->on_enter();
-    }
-    m_pending_pushes.clear();
+    m_pending_commands.clear();
 
+    /* Update states from top to bottom */
     for (auto it = m_statestack.rbegin(); it != m_statestack.rend(); ++it)
     {
         if (!(*it)->update(dt))
@@ -32,6 +41,7 @@ void StateManager::update(float dt)
 
 void StateManager::draw()
 {
+    /* Draw from top to bottom */
     for (auto it = m_statestack.rbegin(); it != m_statestack.rend(); ++it)
     {
         if (!(*it)->draw())

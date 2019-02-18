@@ -13,7 +13,9 @@ private:
     Level m_level = {};
 
 public:
-    GameState();
+    GameState() = default;
+
+    GameState(StateManager& owner) : State(owner) {}
 
     ~GameState() noexcept override;
 

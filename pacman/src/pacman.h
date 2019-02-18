@@ -41,13 +41,22 @@ private:
 
 public:
     Pacman();
+
     Pacman(glm::ivec2 position);
 
     /* Level can update pacman as it sees fit */
     friend class Level;
 
+    /*!
+     * \brief turn marks pacman for turning as soon as he is able
+     * \param new_direction is the desired direction that Pacman should move in
+     */
     void turn(glm::ivec2 new_direction);
 
+    /*!
+     * \brief update pacman
+     * \param dt delta time
+     */
     void update(float dt);
 
     void draw();
