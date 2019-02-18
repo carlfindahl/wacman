@@ -4,6 +4,8 @@ namespace pac
 {
 bool StateManager::empty() const { return m_statestack.empty(); }
 
+void StateManager::clear() { m_pending_commands.emplace_back(nullptr, ECommandType::Clear); }
+
 void pac::StateManager::pop() { m_pending_commands.emplace_back(nullptr, ECommandType::Pop); }
 
 void StateManager::update(float dt)
@@ -22,6 +24,14 @@ void StateManager::update(float dt)
         case ECommandType::Pop:
             m_statestack.back()->on_exit();
             m_statestack.pop_back();
+            break;
+        /* Clear the state stack */
+        case ECommandType::Clear:
+            for (auto it = m_statestack.rbegin(); it != m_statestack.rend(); ++it)
+            {
+                (*it)->on_exit();
+                m_statestack.pop_back();
+            }
             break;
         default: break;
         }

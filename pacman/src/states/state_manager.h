@@ -19,7 +19,8 @@ private:
     {
         Nothing,
         Push,
-        Pop
+        Pop,
+        Clear
     };
 
     struct Command
@@ -56,6 +57,11 @@ public:
      * \return true if the state stack is empty
      */
     bool empty() const;
+
+    /*!
+     * \brief clear clears the state stack of all states
+     */
+    void clear();
 
     /*!
      * \brief pop a state from the stack
