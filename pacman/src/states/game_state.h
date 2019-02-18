@@ -15,7 +15,7 @@ private:
 public:
     GameState() = default;
 
-    GameState(StateManager& owner) : State(owner) {}
+    GameState(StateManager& owner);
 
     ~GameState() noexcept override;
 
