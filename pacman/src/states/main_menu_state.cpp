@@ -8,6 +8,11 @@
 
 namespace pac
 {
+MainMenuState::MainMenuState(StateManager& owner) : State(owner)
+{
+    m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
+}
+
 void pac::MainMenuState::on_enter() {}
 
 void pac::MainMenuState::on_exit() {}
@@ -16,8 +21,7 @@ bool pac::MainMenuState::update(float dt)
 {
     /* Begin Main Menu Window, and center it */
     ImGui::SetNextWindowPos({SCREEN_W / 2.f, SCREEN_H / 2.f}, 0, {0.5f, 0.5f});
-    ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration
-                                     | ImGuiWindowFlags_NoMove);
+    ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
     if (ImGui::Button("Start Game", {150, 50}))
     {
@@ -40,8 +44,10 @@ bool pac::MainMenuState::update(float dt)
     return false;
 }
 
-bool pac::MainMenuState::draw() { 
+bool pac::MainMenuState::draw()
+{
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_splash_texture});
-    return true; }
+    return true;
+}
 
 }  // namespace pac
