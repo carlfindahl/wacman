@@ -12,7 +12,7 @@ bool PauseState::update(float dt) { return false; }
 
 bool PauseState::draw()
 {
-    get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {0.f, 0.f, 0.2f}, {}});
+    get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {0.f, 0.f, 0.2f}, m_splash});
     return true;
 }
 
