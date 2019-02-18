@@ -103,7 +103,28 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
 void Game::init_imgui()
 {
     ImGui::CreateContext();
+
+    /* Modify style to match our application, starting with default color style */
     ImGui::StyleColorsDark();
+    auto& style = ImGui::GetStyle();
+
+    /* Update rounding */
+    style.WindowRounding = 0.f;
+    style.FrameRounding = 0.f;
+    style.ScrollbarRounding = 0.f;
+    style.TabRounding = 0.f;
+
+    /* Update Colors */
+    auto* colors = style.Colors;
+    colors[ImGuiCol_Button]                 = ImVec4(0.01f, 0.00f, 0.78f, 0.40f);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.02f, 0.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
+    
+    /* Load Font */
+    ImGuiIO& io = ImGui::GetIO();
+    const auto abs_path = cgl::native_absolute_path("res/ATI_9x16.ttf");
+    ImFont* font1 = io.Fonts->AddFontFromFileTTF(abs_path.c_str(), 16.f);
+    
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 }
