@@ -3,6 +3,7 @@
 #include "common.h"
 #include "rendering/renderer.h"
 
+#include <chrono>
 #include <unordered_map>
 
 #include <glm/vec2.hpp>
@@ -36,12 +37,13 @@ private:
     float m_animation_time = 0.f;
 
     /* Number of lives */
-    uint32_t m_lives = 3u;
+    int32_t m_lives = 3;
 
 public:
     Pacman();
     Pacman(glm::ivec2 position);
 
+    /* Level can update pacman as it sees fit */
     friend class Level;
 
     void turn(glm::ivec2 new_direction);
@@ -54,7 +56,7 @@ public:
     glm::ivec2 current_direction() const;
     glm::ivec2 desired_direction() const;
 
-    unsigned lives() const;
+    int lives() const;
 
 private:
     /*!

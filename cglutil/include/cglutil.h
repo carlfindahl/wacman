@@ -42,6 +42,7 @@ void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned sev
 /*
  * DATA TYPES:
  *  - ShaderStage represents the path and type of stage, used with some shader utilites
+ *  - LoadedTexture contains image info and pixel data from a loaded texture
  */
 namespace cgl
 {
@@ -132,8 +133,7 @@ namespace cgl
  */
 LoadedTexture load_texture(const char* fp);
 
-std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h,
-                                                    int cols, int count);
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 /*!
  * \brief size_bytes returns the size in bytes of the elements of the given container.
@@ -168,10 +168,152 @@ GLFWwindow* create_window_and_context(unsigned w, unsigned h, const char* title)
 }  // namespace cgl
 #endif
 
+/*
+ * DEBUG UTILITIES:
+ *  - create_debug_callback sets up a default OpenGL debug callback that enables everything by default
+ */
 namespace cgl
 {
 /*!
  * \brief create_debug_callback sets the OpenGL debug callback to the default callback.
  */
 void create_debug_callback();
+}  // namespace cgl
+
+/*
+ * DECLARATIVE SCOPE UTILITIES:
+ *
+ */
+namespace cgl
+{
+namespace detail
+{
+/*!
+ * \brief The UncaughtExceptionCounter class is able to track if any new exceptions have occured since this object was created.
+ * This is useful since, for example, a scope guard can use this information to declaratively do operations when things fail or
+ * succeed. Inspired by [https://www.youtube.com/watch?v=WjTrfoiB0MQ](This Talk).
+ */
+class UncaughtExceptionCounter
+{
+private:
+    /* Number of unhandled exceptsion on creation */
+    int m_exception_count = 0;
+
+public:
+    UncaughtExceptionCounter();
+
+    /*!
+     * \brief new_uncaught_exception returns true if there is a new exception since this class was constructed
+     * \return true if a new exception has occured
+     */
+    bool new_uncaught_exception() noexcept;
+};
+
+/* Types just to have types for the various operator+'s */
+enum class ScopeGuardOnFail
+{
+};
+enum class ScopeGuardOnSuccess
+{
+};
+enum class ScopeGuardOnExit
+{
+};
+
+/*!
+ * \brief ScopeGuard is an unconditional scope guard that unconditionally calls it's clean up function
+ */
+template<typename Func>
+class ScopeGuard
+{
+private:
+    Func m_function{};
+
+public:
+    /* Allow lvalue and rvalue construction */
+    explicit ScopeGuard(const Func& f) : m_function(f) {}
+    explicit ScopeGuard(Func&& f) : m_function(std::move(f)) {}
+
+    /* No copying or moving of this class */
+    ScopeGuard(const ScopeGuard&) = delete;
+    ScopeGuard(ScopeGuard&&) = delete;
+    ScopeGuard& operator=(const ScopeGuard&) = delete;
+    ScopeGuard& operator=(ScopeGuard&&) = delete;
+
+    /* Conditionally noexcept based on the fail state because if we have already thrown, then there is no point for us to do so,
+     * and if we do it would only call std::terminate anyway so there we go. */
+    ~ScopeGuard() { m_function(); }
+};
+
+/*!
+ * \brief ScopeGuardWithExceptions deals with the Success and Fail conditions of a scope by counting exceptions
+ */
+template<typename Func, bool ExecuteOnFail>
+class ScopeGuardWithExceptions
+{
+private:
+    /* Function to call either on fail or on success */
+    Func m_function{};
+
+    /* This counter will determine if we will call the function or not */
+    detail::UncaughtExceptionCounter m_counter{};
+
+public:
+    /* Allow lvalue and rvalue construction */
+    explicit ScopeGuardWithExceptions(const Func& f) : m_function(f) {}
+    explicit ScopeGuardWithExceptions(Func&& f) : m_function(std::move(f)) {}
+
+    /* No copying or moving of this class */
+    ScopeGuardWithExceptions(const ScopeGuardWithExceptions&) = delete;
+    ScopeGuardWithExceptions(ScopeGuardWithExceptions&&) = delete;
+    ScopeGuardWithExceptions& operator=(const ScopeGuardWithExceptions&) = delete;
+    ScopeGuardWithExceptions& operator=(ScopeGuardWithExceptions&&) = delete;
+
+    /* Conditionally noexcept based on the fail state because if we have already thrown, then there is no point for us to do so,
+     * and if we do it would only call std::terminate anyway so there we go. */
+    ~ScopeGuardWithExceptions() noexcept(ExecuteOnFail)
+    {
+        if (ExecuteOnFail == m_counter.new_uncaught_exception())
+        {
+            m_function();
+        }
+    }
+};
+
+/* Scope Guard Operator+'s to create the correct scope guard based on the empty tag type */
+
+template<typename Func>
+ScopeGuard<typename std::decay_t<Func>> operator+(detail::ScopeGuardOnExit, Func&& f)
+{
+    return ScopeGuard<typename std::decay_t<Func>>(std::forward<Func>(f));
+}
+
+template<typename Func>
+ScopeGuardWithExceptions<typename std::decay_t<Func>, true> operator+(detail::ScopeGuardOnFail, Func&& f)
+{
+    return ScopeGuardWithExceptions<typename std::decay_t<Func>, true>(std::forward<Func>(f));
+}
+
+template<typename Func>
+ScopeGuardWithExceptions<typename std::decay_t<Func>, false> operator+(detail::ScopeGuardOnSuccess, Func&& f)
+{
+    return ScopeGuardWithExceptions<typename std::decay_t<Func>, false>(std::forward<Func>(f));
+}
+}  // namespace detail
+
+#define CGL_DETAIL_CONCAT_IMPL(s1, s2) s1##s2
+#define CGL_DETAIL_CONCAT(s1, s2) CGL_DETAIL_CONCAT_IMPL(s1, s2)
+#define CGL_DETAIL_ANON_VAR(name) CGL_DETAIL_CONCAT(name, __COUNTER__)
+
+#define SCOPE_EXIT auto CGL_DETAIL_ANON_VAR(SCOPE_EXIT_STATE) = cgl::detail::ScopeGuardOnExit() + [&]()
+#define SCOPE_FAIL auto CGL_DETAIL_ANON_VAR(SCOPE_FAIL_STATE) = cgl::detail::ScopeGuardOnFail() + [&]() noexcept
+#define SCOPE_SUCCESS auto CGL_DETAIL_ANON_VAR(SCOPE_SUCCESS_STATE) = cgl::detail::ScopeGuardOnSuccess() + [&]()
+}  // namespace cgl
+
+/*
+ * MEMORY UTILITIES:
+ *
+ */
+namespace cgl
+{
 }  // namespace cgl

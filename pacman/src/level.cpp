@@ -19,6 +19,20 @@ Level::Level(std::string_view fp) : Level() { load(fp); }
 
 void Level::update(float dt)
 {
+    /* Chase timer */
+    m_chasetime -= seconds(dt);
+    if (m_chasetime <= seconds(0.f))
+    {
+        for (auto& ghost : m_ghosts)
+        {
+            ghost.set_ai_state(Ghost::EState::Scattering);
+            m_chasetime = seconds(30.f);
+        }
+    }
+
+    /* Pacman kill timer */
+    m_pacman_kill_timer -= seconds(dt);
+
     /* Update all ghosts, first internally, then with level context */
     for (auto& ghost : m_ghosts)
     {
@@ -61,7 +75,7 @@ void Level::draw()
     m_pacman->draw();
     for (auto& ghost : m_ghosts)
     {
-        ghost.draw();
+        ghost.draw(m_pacman_kill_timer > seconds(0));
     }
 }
 
@@ -75,14 +89,14 @@ void Level::load(std::string_view fp)
 
     /* Read level size from stream. NOTE: I mostly use regex here for fun since it's the first time I am using the <regex>
      * header, so it's a bit experimental, but it works and is actually quite nice, so yeah! */
-    auto pat = std::regex(R"((\d+)x(\d+))");
+    auto lvl_size_pattern = std::regex(R"((\d+)x(\d+))");
     std::smatch matches{};
 
     /* Map size should always be in first line, so we get it out of the stream to pattern match */
     std::string first_line = {};
     std::getline(level_stream, first_line);
 
-    if (!std::regex_match(first_line.cbegin(), first_line.cend(), matches, pat) || matches.empty())
+    if (!std::regex_match(first_line.cbegin(), first_line.cend(), matches, lvl_size_pattern) || matches.empty())
     {
         GFX_ERROR("Failed to find level size in level file (%s) with format (WxH).", fp.data());
     }
@@ -128,13 +142,15 @@ void Level::load(std::string_view fp)
 
     level_stream.ignore(1);
 
+    /* Matches either Pacman or Ghost followed by an X and Y coordinate with any number of spaces between */
+    const auto entity_pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
+
     /* Parse entities listed after the map */
     std::string entity_line = {};
     while (std::getline(level_stream, entity_line))
     {
-        const auto pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
         std::smatch match{};
-        if (!std::regex_match(entity_line, match, pattern) || match.empty())
+        if (!std::regex_match(entity_line, match, entity_pattern) || match.empty())
         {
             GFX_WARN("The entity (%s) is not correct, or has unsupported entity type!", entity_line.c_str());
             continue;
@@ -142,6 +158,7 @@ void Level::load(std::string_view fp)
 
         GFX_INFO("Spawning Entity %s at %d:%d", match[1], match[2], match[3]);
 
+        /* Use knowledge about the subgroups in the regex to interpret the data on the line */
         if (match[1] == "Pacman")
         {
             m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match[2]), std::stoi(match[3])});
@@ -196,14 +213,15 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 
 void Level::update_pacman()
 {
-    /* Teleport Pacman across map if going into edge : TODO (make more generic around bounds) */
-    if (m_pacman->m_position == glm::ivec2{0, 16} && m_pacman->current_direction() == glm::ivec2{-1, 0})
+    /* Teleport Pacman across map if going into edge (TODO: On Y axis too) */
+    if (m_pacman->m_position.x == 0 && m_pacman->current_direction().x == -1)
     {
-        m_pacman->m_position = {27, 16};
+        m_pacman->m_position.x = m_tiles[m_pacman->m_position.y].size() - 1;
     }
-    else if (m_pacman->m_position == glm::ivec2{27, 16} && m_pacman->current_direction() == glm::ivec2{1, 0})
+    else if (m_pacman->m_position.x == static_cast<int>(m_tiles[m_pacman->m_position.y].size()) - 1 &&
+             m_pacman->current_direction().x == 1)
     {
-        m_pacman->m_position = {0, 16};
+        m_pacman->m_position.x = 0;
     }
 
     /* Make sure we can not turn into adjacent walls */
@@ -216,7 +234,7 @@ void Level::update_pacman()
 
             /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that.
              * And also stops player from doing 180 degree turns! */
-            m_pacman->m_move_progress += 0.15f;
+            m_pacman->m_move_progress += 0.2f;
         }
     }
 
@@ -232,37 +250,51 @@ void Level::update_pacman()
         switch (get_tile(m_pacman->m_position).type)
         {
         case ETileType::Food: m_score += 10; break;
-        case ETileType::GhostKiller: m_score += 50; break;
+        case ETileType::GhostKiller:
+            m_score += 50;
+            m_pacman_kill_timer = seconds(10.f);
+            //            for(auto& g : m_ghosts)
+            //            {
+            //                g.set_ai_state(Ghost::EState::Scared);
+            //            }
+            break;
         case ETileType::Banana:
         case ETileType::Orange:
-        case ETileType::Strawberry: m_score += 200; break; // TODO: Update this
+        case ETileType::Strawberry: m_score += 200; break;  // TODO: Update this
         default: break;
         }
 
         get_tile(m_pacman->m_position).type = ETileType::Blank;
     }
-}
+}  // namespace pac
 
 void Level::update_ghost(float dt, Ghost& g)
 {
     /* Do regular AI (Chasing, Scattering or Scared) */
-    switch (g.ai_state())
+    if (g.requires_path_update())
     {
-    case Ghost::EState::Scared: break;
-    case Ghost::EState::Chasing:
-        if (g.requires_path_update())
+        switch (g.ai_state())
         {
-            g.set_path(new Path(*this, g.position(), m_pacman->m_position));
+        case Ghost::EState::Scared: break;
+        case Ghost::EState::Chasing: g.set_path(new Path(*this, g.position(), m_pacman->m_position)); break;
+        case Ghost::EState::Scattering: g.set_path(new Path(*this, g.position(), g.home())); break;
+        default: break;
         }
-        break;
-    case Ghost::EState::Scattering: break;
-    default: break;
     }
 
     /* Kill or be killed by Pacman if overlap */
-    if (g.position() == m_pacman->m_position)
+    if (g.position() == m_pacman->m_position && !g.dead())
     {
-        --m_pacman->m_lives;
+        if (m_pacman_kill_timer > seconds(0.f))
+        {
+            g.die();
+            g.set_path(new Path(*this, g.position(), g.home()));
+            m_score += 200;  // TODO : Fix this so it doubles per ghost
+        }
+        else
+        {
+            --m_pacman->m_lives;
+        }
     }
 }
 

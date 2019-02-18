@@ -4,6 +4,7 @@
 #include <cstring>
 #include <memory>
 #include <fstream>
+#include <exception>
 #include <filesystem>
 
 #include <stb_image.h>
@@ -38,14 +39,14 @@ std::string get_executable_dir()
 std::string convert_path_separator(std::string_view str)
 {
 #ifndef WIN32
-    constexpr char native_separator = '/';
+    const char* native_separator = "/";
     const char* foreign_separator = R"(\)";
 #else
     const char* native_separator = R"(\)";
     constexpr char foreign_separator = '/';
 #endif
     std::string str_copy{str};
-    do 
+    do
     {
         auto pos = str_copy.find_first_of(foreign_separator);
         if (pos != std::string::npos)
@@ -73,18 +74,19 @@ void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, G
 std::string read_entire_file(std::string_view fp)
 {
     const auto native_path = detail::convert_path_separator(fp);
+
 #ifndef WIN32
     /* Create absolute path */
     auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
     /* Attempt to open the file provided with absolute path */
-    FILE* file;
-    file = fopen(path.c_str(), "r");
+    FILE* file = fopen(path.c_str(), "r");
+    SCOPE_EXIT { fclose(file); };
 
     /* On failure, return an invalid GL name */
     if (file == nullptr)
     {
-        fprintf(stderr, "readEntireFile failed to open input file:\n%s\n", path.string().c_str());
+        fprintf(stderr, "read_entire_file failed to open input file:\n%s\n", path.string().c_str());
         return {};
     }
 
@@ -95,14 +97,13 @@ std::string read_entire_file(std::string_view fp)
 
     /* Read the file into the buffer */
     auto* buf = new GLchar[bufsz + 1];
+    SCOPE_EXIT { delete[] buf; };
+
     fread(buf, sizeof(GLchar), bufsz, file);
-    fclose(file);
 
     /* Important to terminate string */
     buf[bufsz] = '\0';
-
     std::string out{buf};
-    delete[] buf;
 #else
     auto path = std::filesystem::path(detail::get_executable_dir()) / native_path;
 
@@ -135,6 +136,7 @@ GLuint compile_shader(const char* source, GLenum type)
         /* Get log length */
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
         auto* log = new GLchar[len];
+        SCOPE_EXIT { delete[] log; };
 
         /* Get the log text and print it */
         const char* typeString = (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment");
@@ -143,7 +145,6 @@ GLuint compile_shader(const char* source, GLenum type)
         fprintf(stderr, "%s Shader Compile Error:\n%s\n", typeString, log);
 
         /* Cleanup and return an invalid GL Name */
-        delete[] log;
         glDeleteShader(shader);
         return 0;
     }
@@ -185,6 +186,7 @@ GLuint create_program(const std::vector<GLuint>& shaders)
         /* Get log length */
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
         auto log = new GLchar[len];
+        SCOPE_EXIT { delete[] log; };
 
         /* Get the log text and print it */
         glGetProgramInfoLog(program, len, &len, log);
@@ -192,7 +194,6 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 
         /* Cleanup and return an invalid GL Name */
         glDeleteProgram(program);
-        delete[] log;
         return 0;
     }
 
@@ -202,12 +203,12 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 GLuint make_shader_program(const std::vector<ShaderStage>& stages)
 {
     /* Create arrays of stage definitions and compiled shaders */
-    std::vector<unsigned> shaders;
+    std::vector<unsigned> shaders = {};
 
     /* Compile all shaders and put them in the shader array */
     for (const auto& stage : stages)
     {
-        shaders.push_back(fcompile_shader(stage.sourcePath, stage.stage));
+        shaders.emplace_back(fcompile_shader(stage.sourcePath, stage.stage));
     }
 
     return create_program(std::vector<GLuint>(std::begin(shaders), std::end(shaders)));
@@ -222,9 +223,11 @@ LoadedTexture load_texture(const char* fp)
         int w, h, c;
 
         auto* raw_pixels = stbi_load(abs_path.string().c_str(), &w, &h, &c, STBI_rgb_alpha);
+        SCOPE_EXIT { stbi_image_free(raw_pixels); };
+
+        /* Copy pixels into vector and return vector */
         std::vector<uint8_t> pixels(w * h * 4);
         memcpy(pixels.data(), raw_pixels, w * h * 4);
-        stbi_image_free(raw_pixels);
         return LoadedTexture{w, h, std::move(pixels)};
     }
     else
@@ -258,8 +261,7 @@ void create_debug_callback()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, true);
 }
 
-std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols,
-                                                    int count)
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count)
 {
     auto whole_texture = load_texture(fp);
 
@@ -303,4 +305,10 @@ std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset,
     return out_textures;
 }
 
+namespace detail
+{
+UncaughtExceptionCounter::UncaughtExceptionCounter() : m_exception_count(std::uncaught_exceptions()) {}
+
+bool UncaughtExceptionCounter::new_uncaught_exception() noexcept { return std::uncaught_exceptions() > m_exception_count; }
+}  // namespace detail
 }  // namespace cgl

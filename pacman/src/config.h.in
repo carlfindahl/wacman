@@ -15,6 +15,7 @@ constexpr unsigned SCREEN_H = TILE_SIZE<unsigned> * 36u;
 /* Animation Frame rate */
 constexpr unsigned FRAME_RATE = 24u;
 constexpr float TIME_PER_FRAME = 1.f / FRAME_RATE;
+constexpr int MAX_TEXTURES = 16;
 
 /* Version Numbers */
 constexpr int VERSION_MAJOR = @PROJECT_VERSION_MAJOR@;

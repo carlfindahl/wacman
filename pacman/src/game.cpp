@@ -85,6 +85,14 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
     /* Loads all GL function pointers for OpenGL 4.5 Core */
     gladLoadGL();
 
+    /* Ensure we got a 4.5 Profile */
+    int v_maj = 0;
+    int v_min = 0;
+    glGetIntegerv(GL_MAJOR_VERSION, &v_maj);
+    glGetIntegerv(GL_MINOR_VERSION, &v_min);
+
+    GFX_ASSERT(v_maj >= 4 && v_min >= 5, "The created context does not support OpenGL 4.5, so we must fail!");
+
     /* Enable default debug callback provided by cgl */
 #ifndef NDEBUG
 //    cgl::create_debug_callback();

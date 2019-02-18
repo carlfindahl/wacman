@@ -4,6 +4,7 @@
 #include "pacman.h"
 #include "rendering/renderer.h"
 
+#include <chrono>
 #include <vector>
 #include <memory>
 #include <string_view>
@@ -41,6 +42,8 @@ public:
     };
 
 private:
+    using seconds = std::chrono::duration<float>;
+
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
 
@@ -55,6 +58,12 @@ private:
 
     /* Score on this level */
     unsigned m_score = 0u;
+
+    /* How long will ghosts chase before scattering */
+    seconds m_chasetime{10.f};
+
+    /* Number of seconds left before pacman is no longer a killer */
+    seconds m_pacman_kill_timer{0.f};
 
 public:
     Level();

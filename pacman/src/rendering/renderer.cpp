@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "config.h"
 
 #include <array>
 #include <numeric>
@@ -8,6 +9,8 @@
 #include <cstring>
 #include <cglutil.h>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace pac
 {
@@ -20,6 +23,7 @@ Renderer::Renderer(unsigned max_sprites)
                                                  {5u, 1u, 1, GL_UNSIGNED_INT, offsetof(InstanceVertex, texture_id), 1u}}})
 {
     init(max_sprites);
+    m_ubo.update(glm::ortho<float>(0.f, SCREEN_W, SCREEN_H, 0.f), glm::mat4(1.f));
 }
 
 void Renderer::init(unsigned max_sprites)
@@ -35,20 +39,20 @@ void Renderer::init(unsigned max_sprites)
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
     prog->use();
-    std::vector<int> tmp(16u);  // # TODO : Don't use 16 magically
+    std::vector<int> tmp(MAX_TEXTURES);
     std::iota(tmp.begin(), tmp.end(), 0u);
     glUniform1iv(0, tmp.size(), tmp.data());
 
     /* Check maximum amount of texture units and hopefully it's enough :D */
     int max_tex_units = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
-    if (max_tex_units < 32)
+    if (max_tex_units < MAX_TEXTURES)
     {
-        GFX_INFO("Application supports only %d/16 texture units.", max_tex_units);
+        GFX_INFO("Application supports only %d/%d texture units.", max_tex_units, MAX_TEXTURES);
     }
     else
     {
-        GFX_INFO("Application supports more than the recommended 16 (%d) texture units! Nice.", max_tex_units);
+        GFX_INFO("Application supports more than the recommended %d (%d) texture units! Nice.", MAX_TEXTURES, max_tex_units);
     }
 
     /* Init sprite buffer */
@@ -89,6 +93,8 @@ Renderer::~Renderer()
 
 void Renderer::draw(const Renderer::InstanceVertex& data) { m_instance_data.push_back(data); }
 
+void Renderer::draw(InstanceVertex&& data) { m_instance_data.emplace_back(data); }
+
 void Renderer::submit_work()
 {
     /* Write data to GPU */
@@ -103,6 +109,7 @@ void Renderer::submit_work()
     /* Prepare state (only needs to bind VAO since it knows about it's resources already. Also bind all textures to their
      *  respective texture units (from 0 an onward. */
     prog->use();
+    m_ubo.bind(0);
     glBindVertexArray(m_vao);
     glBindTextures(0, m_textures.size(), m_textures.data());
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
