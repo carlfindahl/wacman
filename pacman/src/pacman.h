@@ -44,6 +44,8 @@ public:
 
     Pacman(glm::ivec2 position);
 
+    ~Pacman();
+
     /* Level can update pacman as it sees fit */
     friend class Level;
 

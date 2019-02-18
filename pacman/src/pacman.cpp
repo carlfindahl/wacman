@@ -32,6 +32,8 @@ pac::Pacman::Pacman(glm::ivec2 position) : m_position(position)
     input::get_input().push(std::move(pacman_input));
 }
 
+Pacman::~Pacman() { input::get_input().pop(); }
+
 void Pacman::turn(glm::ivec2 new_direction)
 {
     if (!is_opposite(new_direction))
