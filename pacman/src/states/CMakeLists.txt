@@ -9,4 +9,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/game_state.h
     ${CMAKE_CURRENT_LIST_DIR}/game_state.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/main_menu_state.h
+    ${CMAKE_CURRENT_LIST_DIR}/main_menu_state.cpp
 )
