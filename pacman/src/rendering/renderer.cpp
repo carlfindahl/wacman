@@ -9,6 +9,8 @@
 #include <cstring>
 #include <cglutil.h>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace pac
 {
@@ -21,6 +23,7 @@ Renderer::Renderer(unsigned max_sprites)
                                                  {5u, 1u, 1, GL_UNSIGNED_INT, offsetof(InstanceVertex, texture_id), 1u}}})
 {
     init(max_sprites);
+    m_ubo.update(glm::ortho<float>(0.f, SCREEN_W, SCREEN_H, 0.f), glm::mat4(1.f));
 }
 
 void Renderer::init(unsigned max_sprites)
@@ -106,6 +109,7 @@ void Renderer::submit_work()
     /* Prepare state (only needs to bind VAO since it knows about it's resources already. Also bind all textures to their
      *  respective texture units (from 0 an onward. */
     prog->use();
+    m_ubo.bind(0);
     glBindVertexArray(m_vao);
     glBindTextures(0, m_textures.size(), m_textures.data());
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));

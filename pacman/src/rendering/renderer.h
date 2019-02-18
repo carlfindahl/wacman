@@ -2,6 +2,7 @@
 
 #include "shader_program.h"
 #include "vertex_array_object.h"
+#include "uniform_buffer_object.h"
 
 #include <vector>
 #include <memory>
@@ -12,9 +13,19 @@
 #include <cglutil.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace pac
 {
+namespace detail
+{
+struct MatrixData
+{
+    glm::mat4 proj_matrix = glm::mat4(1.f);
+    glm::mat4 view_matrix = glm::mat4(1.f);
+};
+}  // namespace detail
+
 /*!
  * \brief The TextureID struct represents a texture ID. Supports up to 16 textures with up to 64 animation frames each.
  */
@@ -78,6 +89,9 @@ private:
     /* Shader program (unique_ptr) since it has no default Ctor */
     std::unique_ptr<ShaderProgram> prog = nullptr;
 
+    /* Matrix UBO */
+    UniformBuffer<detail::MatrixData> m_ubo = {};
+
 public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
@@ -112,8 +126,7 @@ public:
      * \param relative_fp is the relative file path
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
-    TextureID load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
-                                     int count);
+    TextureID load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */
