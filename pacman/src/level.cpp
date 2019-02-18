@@ -288,6 +288,7 @@ void Level::update_ghost(float dt, Ghost& g)
         if (m_pacman_kill_timer > seconds(0.f))
         {
             g.die();
+            g.set_ai_state(Ghost::EState::Scattering);
             g.set_path(new Path(*this, g.position(), g.home()));
             m_score += 200;  // TODO : Fix this so it doubles per ghost
         }
