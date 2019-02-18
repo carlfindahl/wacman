@@ -19,6 +19,20 @@ Level::Level(std::string_view fp) : Level() { load(fp); }
 
 void Level::update(float dt)
 {
+    /* Chase timer */
+    m_chasetime -= seconds(dt);
+    if (m_chasetime <= seconds(0.f))
+    {
+        for (auto& ghost : m_ghosts)
+        {
+            ghost.set_ai_state(Ghost::EState::Scattering);
+            m_chasetime = seconds(30.f);
+        }
+    }
+
+    /* Pacman kill timer */
+    m_pacman_kill_timer -= seconds(dt);
+
     /* Update all ghosts, first internally, then with level context */
     for (auto& ghost : m_ghosts)
     {
@@ -75,14 +89,14 @@ void Level::load(std::string_view fp)
 
     /* Read level size from stream. NOTE: I mostly use regex here for fun since it's the first time I am using the <regex>
      * header, so it's a bit experimental, but it works and is actually quite nice, so yeah! */
-    auto pat = std::regex(R"((\d+)x(\d+))");
+    auto lvl_size_pattern = std::regex(R"((\d+)x(\d+))");
     std::smatch matches{};
 
     /* Map size should always be in first line, so we get it out of the stream to pattern match */
     std::string first_line = {};
     std::getline(level_stream, first_line);
 
-    if (!std::regex_match(first_line.cbegin(), first_line.cend(), matches, pat) || matches.empty())
+    if (!std::regex_match(first_line.cbegin(), first_line.cend(), matches, lvl_size_pattern) || matches.empty())
     {
         GFX_ERROR("Failed to find level size in level file (%s) with format (WxH).", fp.data());
     }
@@ -128,13 +142,15 @@ void Level::load(std::string_view fp)
 
     level_stream.ignore(1);
 
+    /* Matches either Pacman or Ghost followed by an X and Y coordinate with any number of spaces between */
+    const auto entity_pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
+
     /* Parse entities listed after the map */
     std::string entity_line = {};
     while (std::getline(level_stream, entity_line))
     {
-        const auto pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
         std::smatch match{};
-        if (!std::regex_match(entity_line, match, pattern) || match.empty())
+        if (!std::regex_match(entity_line, match, entity_pattern) || match.empty())
         {
             GFX_WARN("The entity (%s) is not correct, or has unsupported entity type!", entity_line.c_str());
             continue;
@@ -142,6 +158,7 @@ void Level::load(std::string_view fp)
 
         GFX_INFO("Spawning Entity %s at %d:%d", match[1], match[2], match[3]);
 
+        /* Use knowledge about the subgroups in the regex to interpret the data on the line */
         if (match[1] == "Pacman")
         {
             m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match[2]), std::stoi(match[3])});
@@ -216,7 +233,7 @@ void Level::update_pacman()
 
             /* In Pacman Dossier, it is said that Pacman get's a speed boost around corners. This simulates that.
              * And also stops player from doing 180 degree turns! */
-            m_pacman->m_move_progress += 0.15f;
+            m_pacman->m_move_progress += 0.2f;
         }
     }
 
