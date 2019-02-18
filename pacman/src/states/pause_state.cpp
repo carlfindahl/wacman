@@ -25,7 +25,7 @@ bool PauseState::update(float dt) { return false; }
 bool PauseState::draw()
 {
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_splash});
-    return true;
+    return false;
 }
 
 }  // namespace pac

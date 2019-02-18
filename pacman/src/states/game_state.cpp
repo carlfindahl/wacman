@@ -20,6 +20,7 @@ void GameState::on_enter()
 
     input::InputState game_input(true);
     game_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_owner->push<PauseState>(); });
+    game_input.set_binding(GLFW_KEY_P, [this] { m_owner->push<PauseState>(); });
 
     auto& input_manager = input::get_input();
     input_manager.push(std::move(game_input));
