@@ -71,6 +71,11 @@ void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, G
 
 }  // namespace detail
 
+std::string native_absolute_path(std::string_view relative_path)
+{
+    return detail::convert_path_separator(detail::get_executable_dir() + "/" + relative_path.data());
+}
+
 std::string read_entire_file(std::string_view fp)
 {
     const auto native_path = detail::convert_path_separator(fp);

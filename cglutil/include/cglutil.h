@@ -11,6 +11,8 @@ struct GLFWwindow;
  * IMPLEMENTATION DETAIL STUFF:
  *  - Contains various utilities for getting absolute file paths and other code that users should not care
  *  about.
+ *  - Also conatins one public function -> native_absolute_path that takes a relative path and produces an absolute
+ *  path on the native format. Assuming relative to the executable directory.
  */
 namespace cgl
 {
@@ -37,6 +39,10 @@ std::string convert_path_separator(std::string_view str);
 void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message,
                        const void* userParam);
 }  // namespace detail
+
+
+std::string native_absolute_path(std::string_view relative_path);
+
 }  // namespace cgl
 
 /*
