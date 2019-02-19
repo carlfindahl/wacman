@@ -123,26 +123,13 @@ void Game::init_imgui()
     /* Load Font */
     ImGuiIO& io = ImGui::GetIO();
     const auto abs_path = cgl::native_absolute_path("res/ATI_9x16.ttf");
-    ImFont* font1 = io.Fonts->AddFontFromFileTTF(abs_path.c_str(), 16.f);
+    io.Fonts->AddFontFromFileTTF(abs_path.c_str(), 16.f);
 
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 }
 
-void Game::update(float dt)
-{
-    m_state_manager.update(dt);
-
-    /* ImGui Stuff */
-    ImGui::Begin("Rendering");
-    static bool vsync = false;
-    if (ImGui::Checkbox("Vsync", &vsync))
-    {
-        GFX_INFO("Toggled, V-Sync. Is now %s", vsync ? "ON" : "OFF");
-        glfwSwapInterval(vsync ? 1 : 0);
-    }
-    ImGui::End();
-}
+void Game::update(float dt) { m_state_manager.update(dt); }
 
 void Game::draw()
 {
