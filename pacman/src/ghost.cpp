@@ -154,6 +154,8 @@ void Ghost::set_ai_state(Ghost::EState ai_state) { m_ai_state = ai_state; }
 
 glm::ivec2 Ghost::position() const { return m_position; }
 
+void Ghost::set_position(glm::ivec2 pos) { m_position = pos; }
+
 glm::ivec2 Ghost::home() const { return m_home; }
 
 void Ghost::set_path(Path* path_on_heap)

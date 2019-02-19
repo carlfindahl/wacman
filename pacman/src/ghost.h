@@ -97,6 +97,8 @@ public:
      */
     glm::ivec2 position() const;
 
+    void set_position(glm::ivec2 pos);
+
     /*!
      * \brief home get the home position of the Ghost
      * \return the home position

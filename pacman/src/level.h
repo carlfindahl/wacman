@@ -56,6 +56,9 @@ private:
     /* Ghost vector */
     std::vector<Ghost> m_ghosts = {};
 
+    /* Pacman spawn */
+    glm::ivec2 m_pacman_spawn = {};
+
     /* Score on this level */
     unsigned m_score = 0u;
 
@@ -108,5 +111,7 @@ private:
     void update_pacman();
 
     void update_ghost(float dt, Ghost& g);
+
+    glm::ivec2 find_sensible_escape_point(Ghost& g);
 };
 }  // namespace pac

@@ -162,6 +162,7 @@ void Level::load(std::string_view fp)
         if (match[1] == "Pacman")
         {
             m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match[2]), std::stoi(match[3])});
+            m_pacman_spawn = {std::stoi(match[2]), std::stoi(match[3])};
         }
         else
         {
@@ -253,10 +254,10 @@ void Level::update_pacman()
         case ETileType::GhostKiller:
             m_score += 50;
             m_pacman_kill_timer = seconds(10.f);
-            //            for(auto& g : m_ghosts)
-            //            {
-            //                g.set_ai_state(Ghost::EState::Scared);
-            //            }
+            for (auto& g : m_ghosts)
+            {
+                g.set_ai_state(Ghost::EState::Scared);
+            }
             break;
         case ETileType::Banana:
         case ETileType::Orange:
@@ -275,7 +276,7 @@ void Level::update_ghost(float dt, Ghost& g)
     {
         switch (g.ai_state())
         {
-        case Ghost::EState::Scared: break;
+        case Ghost::EState::Scared: g.set_path(new Path(*this, g.position(), find_sensible_escape_point(g))); break;
         case Ghost::EState::Chasing: g.set_path(new Path(*this, g.position(), m_pacman->m_position)); break;
         case Ghost::EState::Scattering: g.set_path(new Path(*this, g.position(), g.home())); break;
         default: break;
@@ -292,11 +293,50 @@ void Level::update_ghost(float dt, Ghost& g)
             g.set_path(new Path(*this, g.position(), g.home()));
             m_score += 200;  // TODO : Fix this so it doubles per ghost
         }
+        /* Take life from pacman and move to spawn */
         else
         {
             m_pacman->m_lives = glm::max(0, m_pacman->m_lives - 1);
+            m_pacman->m_position = m_pacman_spawn;
+            for (auto& g : m_ghosts)
+            {
+                g.set_position(g.home());
+            }
         }
     }
+}
+
+glm::ivec2 Level::find_sensible_escape_point(Ghost& g)
+{
+    static auto dist = [](glm::ivec2 a, glm::ivec2 b) -> int { return std::abs(a.x - b.x) + std::abs(a.y - b.y); };
+
+    /* TODO : Make this work better */
+    glm::ivec2 furthest_away = g.home();
+    for (int y = g.position().y - 3; y < g.position().y + 3; ++y)
+    {
+        for (int x = g.position().x - 3; x < g.position().x + 3; ++x)
+        {
+            /* Bounds check */
+            if (y < 0 || y >= static_cast<int>(m_tiles.size()) || x < 0 || x >= static_cast<int>(m_tiles[y].size()))
+            {
+                continue;
+            }
+
+            /* Wall check */
+            if (get_tile({x, y}).type == ETileType::Wall || get_tile({x, y}).type == ETileType::Blank)
+            {
+                continue;
+            }
+
+            /* Distance check */
+            if (dist(glm::ivec2(x, y), m_pacman->m_position) > dist(furthest_away, m_pacman->m_position))
+            {
+                furthest_away = {x, y};
+            }
+        }
+    }
+
+    return furthest_away;
 }
 
 }  // namespace pac
