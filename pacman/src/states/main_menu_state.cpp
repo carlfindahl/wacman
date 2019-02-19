@@ -1,6 +1,7 @@
 #include "main_menu_state.h"
 #include "game_state.h"
 #include "high_score_state.h"
+#include "respawn_state.h"
 #include "state_manager.h"
 #include "config.h"
 
@@ -27,6 +28,7 @@ bool pac::MainMenuState::update(float dt)
     if (ImGui::Button("Start Game", {150, 50}))
     {
         m_owner->push<GameState>();
+        m_owner->push<RespawnState>();
     }
 
     if (ImGui::Button("High Scores", {150, 50}))
