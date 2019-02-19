@@ -52,7 +52,7 @@ void Game::run()
         /* ImGui Stuff */
         ImGui::Text("FPS: %5.1f", ImGui::GetIO().Framerate);
         ImGui::SameLine(0.f, 25.f);
-        ImGui::Text("Frame Time: %6.4fms", dt);
+        ImGui::Text("Frame Time: %6.4fms", dt * 1000.f);
 
         glfwPollEvents();
         update(dt);
@@ -119,12 +119,12 @@ void Game::init_imgui()
     colors[ImGuiCol_Button] = ImVec4(0.01f, 0.00f, 0.78f, 0.40f);
     colors[ImGuiCol_ButtonHovered] = ImVec4(0.02f, 0.00f, 1.00f, 1.00f);
     colors[ImGuiCol_ButtonActive] = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
-    
+
     /* Load Font */
     ImGuiIO& io = ImGui::GetIO();
     const auto abs_path = cgl::native_absolute_path("res/ATI_9x16.ttf");
     ImFont* font1 = io.Fonts->AddFontFromFileTTF(abs_path.c_str(), 16.f);
-    
+
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 }
