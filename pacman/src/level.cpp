@@ -44,9 +44,12 @@ void Level::update(float dt)
     m_pacman->update(dt);
     update_pacman();
 
-    /* ImGui Stuff */
-    ImGui::Text("Pacman has %d lives", m_pacman->m_lives);
-    ImGui::Text("SCORE: %u", m_score);
+    /* Use ImGui to display the score */
+    ImGui::SetNextWindowSize({100.f, 16.f});
+    ImGui::SetNextWindowPos({120.f, 11.f});
+    ImGui::Begin("ScoreWindow", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+    ImGui::Text("%u", m_score);
+    ImGui::End();
 }
 
 void Level::draw()
