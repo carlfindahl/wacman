@@ -65,6 +65,8 @@ private:
     /* Number of seconds left before pacman is no longer a killer */
     seconds m_pacman_kill_timer{0.f};
 
+    /* seconds m_strawberry_timer = 60.f; - When it goes to zero, spawn a fruit :D */
+
 public:
     Level();
 

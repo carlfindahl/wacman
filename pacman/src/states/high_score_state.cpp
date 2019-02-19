@@ -84,7 +84,7 @@ void HighScoreState::load_entries_from_file()
         case 0: e.name = line; break;
         case 1:
             e.score = std::stoi(line);
-            m_entries.push_back(std::move(e));
+            m_entries.push_back(std::move(e));  // It is fine to move here, since we always assign values again before moving next
             break;
         }
 
