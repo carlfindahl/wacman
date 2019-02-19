@@ -1,5 +1,6 @@
 #include "main_menu_state.h"
 #include "game_state.h"
+#include "high_score_state.h"
 #include "state_manager.h"
 #include "config.h"
 
@@ -30,8 +31,7 @@ bool pac::MainMenuState::update(float dt)
 
     if (ImGui::Button("High Scores", {150, 50}))
     {
-        GFX_INFO("I will start high score screen.");
-        /* Push hi-score state */
+        m_owner->push<HighScoreState>();
     }
 
     if (ImGui::Button("Exit", {150, 50}))

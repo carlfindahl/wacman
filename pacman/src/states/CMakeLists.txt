@@ -15,4 +15,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/main_menu_state.h
     ${CMAKE_CURRENT_LIST_DIR}/main_menu_state.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/high_score_state.h
+    ${CMAKE_CURRENT_LIST_DIR}/high_score_state.cpp
 )
