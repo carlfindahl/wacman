@@ -12,6 +12,8 @@ private:
     /* The level / world */
     Level m_level = {};
 
+    TextureID m_overlay{};
+
 public:
     GameState() = default;
 

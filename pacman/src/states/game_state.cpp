@@ -26,6 +26,8 @@ void GameState::on_enter()
     input_manager.push(std::move(game_input));
 
     m_level.load("res/level0");
+
+    m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 }
 
 void GameState::on_exit() { input::get_input().pop(); }
@@ -39,6 +41,7 @@ bool GameState::update(float dt)
 bool GameState::draw()
 {
     m_level.draw();
+    get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
     return false;
 }
 }  // namespace pac
