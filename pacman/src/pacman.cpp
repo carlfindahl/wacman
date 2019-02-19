@@ -77,6 +77,15 @@ void Pacman::draw()
                          {TILE_SIZE<float>, TILE_SIZE<float>},
                          {1.f, 1.f, 1.f},
                          m_textures[m_current_direction]});
+
+    for (int i = 0; i < m_lives; ++i)
+    {
+        get_renderer().draw({glm::vec2(TILE_SIZE<float> / 2.f, TILE_SIZE<float> / 2.f) +
+                                 glm::vec2(1 * (i + 1), SCREEN_H / TILE_SIZE<int> - 2) * TILE_SIZE<float>,
+                             {TILE_SIZE<float>, TILE_SIZE<float>},
+                             {1.f, 1.f, 1.f},
+                             m_textures[m_current_direction]});
+    }
 }
 
 glm::ivec2 Pacman::current_direction() const { return m_current_direction; }
