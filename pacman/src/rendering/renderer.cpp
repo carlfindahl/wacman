@@ -121,7 +121,7 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
     /* If texture is loaded already, return it */
     if (auto out = check_texture_is_loaded(relative_fp))
     {
-        GFX_DEBUG("Skip reload of texture %d", relative_fp.data());
+        GFX_DEBUG("Skip reload of texture [%s]", relative_fp.data());
         return *out;
     }
 
