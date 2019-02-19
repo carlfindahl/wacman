@@ -45,7 +45,7 @@ void Level::update(float dt)
     update_pacman();
 
     /* ImGui Stuff */
-    ImGui::Text("Pacman has %u lives", m_pacman->m_lives);
+    ImGui::Text("Pacman has %d lives", m_pacman->m_lives);
     ImGui::Text("SCORE: %u", m_score);
 }
 
@@ -294,7 +294,7 @@ void Level::update_ghost(float dt, Ghost& g)
         }
         else
         {
-            --m_pacman->m_lives;
+            m_pacman->m_lives = glm::max(0, m_pacman->m_lives - 1);
         }
     }
 }
