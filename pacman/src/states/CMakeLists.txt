@@ -10,6 +10,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/game_state.h
     ${CMAKE_CURRENT_LIST_DIR}/game_state.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/game_over_state.h
+    ${CMAKE_CURRENT_LIST_DIR}/game_over_state.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/respawn_state.h
     ${CMAKE_CURRENT_LIST_DIR}/respawn_state.cpp
 
