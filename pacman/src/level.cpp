@@ -2,6 +2,7 @@
 #include "pathfinding.h"
 #include "states/state_manager.h"
 #include "states/respawn_state.h"
+#include "states/game_over_state.h"
 #include "config.h"
 
 #include <regex>
@@ -61,7 +62,7 @@ void Level::update(float dt)
     ImGui::SetNextWindowSize({100.f, 16.f});
     ImGui::SetNextWindowPos({120.f, 11.f});
     ImGui::Begin("ScoreWindow", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    ImGui::Text("%u", m_score);
+    ImGui::Text("%d", m_score);
     ImGui::End();
 }
 
@@ -330,6 +331,7 @@ void Level::update_ghost(float dt, Ghost& g)
             /* Game over state */
             else
             {
+                m_context.state_manager->push<GameOverState>(m_context, m_score);
             }
         }
     }

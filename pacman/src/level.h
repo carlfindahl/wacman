@@ -7,6 +7,7 @@
 #include <chrono>
 #include <vector>
 #include <memory>
+#include <cstdint>
 #include <string_view>
 
 namespace pac
@@ -57,7 +58,7 @@ private:
     TextureID m_tileset_texture = {};
 
     /* Score on this level */
-    unsigned m_score = 0u;
+    int32_t m_score = 0u;
 
     /* Pacman spawn */
     glm::ivec2 m_pacman_spawn = {};
