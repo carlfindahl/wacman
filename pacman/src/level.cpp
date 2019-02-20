@@ -174,17 +174,17 @@ void Level::load(std::string_view fp)
             continue;
         }
 
-        GFX_INFO("Spawning Entity %s at %d:%d", match[1], match[2], match[3]);
+        GFX_INFO("Spawning Entity %s at %s:%s", match.str(1).c_str(), match.str(2).c_str(), match.str(3).c_str());
 
         /* Use knowledge about the subgroups in the regex to interpret the data on the line */
-        if (match[1] == "Pacman")
+        if (match.str(1) == "Pacman")
         {
-            m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match[2]), std::stoi(match[3])});
-            m_pacman_spawn = {std::stoi(match[2]), std::stoi(match[3])};
+            m_pacman = std::make_unique<Pacman>(glm::ivec2{std::stoi(match.str(2)), std::stoi(match.str(3))});
+            m_pacman_spawn = {std::stoi(match.str(2)), std::stoi(match.str(3))};
         }
         else
         {
-            m_ghosts.emplace_back(glm::ivec2(std::stoi(match[2]), std::stoi(match[3])));
+            m_ghosts.emplace_back(glm::ivec2(std::stoi(match.str(2)), std::stoi(match.str(3))));
         }
     }
 }
