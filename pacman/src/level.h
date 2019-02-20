@@ -32,14 +32,6 @@ public:
         GhostKiller
     };
 
-    enum class ELevelState : int32_t
-    {
-        Playing,
-        Respawning,
-        Won,
-        Lost
-    };
-
     /*!
      * \brief The Tile struct contains data needed to draw and know the type of each tile
      */
@@ -88,7 +80,7 @@ public:
      * \param dt is the delta time
      * \return game status
      */
-    ELevelState update(float dt);
+    void update(float dt);
 
     /*!
      * \brief draw draws the level (food, tiles and blank tiles
