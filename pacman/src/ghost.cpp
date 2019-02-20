@@ -19,9 +19,9 @@ Ghost::Ghost(glm::ivec2 position) : m_home(position), m_position(position)
 }
 
 Ghost::Ghost(const Ghost& other)
-    : m_textures(other.m_textures), m_position(other.m_position), m_direction(other.m_direction),
+    : m_textures(other.m_textures), m_home(other.m_home), m_position(other.m_position), m_direction(other.m_direction),
       m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
-      m_ai_state(other.m_ai_state), m_home(other.m_home)
+      m_ai_state(other.m_ai_state)
 {
     m_path = new Path(*other.m_path);
 }
@@ -52,9 +52,9 @@ Ghost& Ghost::operator=(const Ghost& other)
 }
 
 Ghost::Ghost(Ghost&& other) noexcept
-    : m_textures(std::move(other.m_textures)), m_position(other.m_position), m_direction(other.m_direction),
+    : m_textures(std::move(other.m_textures)), m_home(other.m_home), m_position(other.m_position), m_direction(other.m_direction),
       m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
-      m_ai_state(other.m_ai_state), m_home(other.m_home)
+      m_ai_state(other.m_ai_state)
 {
     m_path = other.m_path;
     other.m_path = nullptr;
