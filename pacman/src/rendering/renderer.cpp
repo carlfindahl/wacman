@@ -34,7 +34,7 @@ void Renderer::init(unsigned max_sprites)
 
     /* Create Shader Program */
     prog = std::make_unique<ShaderProgram>(
-        std::vector<cgl::ShaderStage>{{GL_VERTEX_SHADER, "res/sprite.vert"}, {GL_FRAGMENT_SHADER, "res/sprite.frag"}});
+        std::vector<cgl::ShaderStage>{ { GL_VERTEX_SHADER, "res/sprite.vert" }, { GL_FRAGMENT_SHADER, "res/sprite.frag" }});
 
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
@@ -59,9 +59,9 @@ void Renderer::init(unsigned max_sprites)
     glCreateBuffers(1, &m_sprite_buffer);
 
     /* Quad is centered, so origin is at {0, 0}, will be scaled in instance data to reach proper size */
-    std::array<Vertex, 4> sprite_quad = {Vertex{{-0.5f, -0.5f}, {0.f, 0.f}}, Vertex{{0.5f, -0.5f}, {1.f, 0.f}},
-                                         Vertex{{0.5f, 0.5f}, {1.f, 1.f}}, Vertex{{-0.5f, 0.5f}, {0.f, 1.f}}};
-    std::array<GLuint, 6> sprite_indices = {0, 1, 2, 2, 3, 0};
+    std::array<Vertex, 4> sprite_quad = { Vertex{{-0.5f, -0.5f}, {0.f, 0.f}}, Vertex{{0.5f, -0.5f}, {1.f, 0.f}},
+                                         Vertex{{0.5f, 0.5f}, {1.f, 1.f}}, Vertex{{-0.5f, 0.5f}, {0.f, 1.f}} };
+    std::array<GLuint, 6> sprite_indices = { 0, 1, 2, 2, 3, 0 };
 
     /* Combine vertex and index data into one array and store everything in a single buffer (for locality) */
     std::array<GLubyte, cgl::size_bytes(sprite_indices) + cgl::size_bytes(sprite_quad)> data = {};
@@ -73,7 +73,10 @@ void Renderer::init(unsigned max_sprites)
 
     /* Create and allocate space for max_sprites number of sprites */
     glCreateBuffers(1, &m_instance_buffer);
-    glNamedBufferStorage(m_instance_buffer, max_sprites * sizeof(InstanceVertex), nullptr, GL_MAP_WRITE_BIT);
+    glNamedBufferStorage(m_instance_buffer, max_sprites * sizeof(InstanceVertex), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+
+    /* Immediately map the buffer persistently */
+    m_mapped_instance_buffer = glMapNamedBufferRange(m_instance_buffer, 0, max_sprites * sizeof(InstanceVertex), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
     /* Pre-Bind IBO and VBOs for the VAO */
     glVertexArrayElementBuffer(m_vao, m_sprite_buffer);
@@ -86,6 +89,8 @@ void Renderer::init(unsigned max_sprites)
 
 Renderer::~Renderer()
 {
+    /* Unmap the buffer when the renderer is destroyed */
+    glUnmapNamedBuffer(m_instance_buffer);
     glDeleteBuffers(1, &m_sprite_buffer);
     glDeleteBuffers(1, &m_instance_buffer);
     glDeleteTextures(m_textures.size(), m_textures.data());
@@ -97,14 +102,10 @@ void Renderer::draw(InstanceVertex&& data) { m_instance_data.emplace_back(data);
 
 void Renderer::submit_work()
 {
-    /* Write data to GPU */
-    void* data = glMapNamedBufferRange(m_instance_buffer, 0, cgl::size_bytes(m_instance_data), GL_MAP_WRITE_BIT);
-    if (data)
-    {
-        memcpy(data, m_instance_data.data(), cgl::size_bytes(m_instance_data));
-        glUnmapNamedBuffer(m_instance_buffer);
-        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
-    }
+    /* Write data to GPU (The buffer is persistently mapped and explicitly flushed after profiling showed that mapping every frame
+     * was very expensive) */
+    memcpy(m_mapped_instance_buffer, m_instance_data.data(), cgl::size_bytes(m_instance_data));
+    glFlushMappedNamedBufferRange(m_instance_buffer, 0, cgl::size_bytes(m_instance_data));
 
     /* Prepare state (only needs to bind VAO since it knows about it's resources already. Also bind all textures to their
      *  respective texture units (from 0 an onward. */

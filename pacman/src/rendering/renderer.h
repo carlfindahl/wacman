@@ -68,6 +68,8 @@ private:
         uint32_t texture_id = {};
     };
 
+    void* m_mapped_instance_buffer = nullptr;
+
     /* Buffer that contains sprite data, vertices and indices like [INDEX DATA ... VERTEX DATA] */
     unsigned m_sprite_buffer = 0u;
 

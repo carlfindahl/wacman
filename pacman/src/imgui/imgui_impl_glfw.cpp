@@ -254,8 +254,9 @@ static void ImGui_ImplGlfw_UpdateMouseCursor()
     else
     {
         // Show OS mouse cursor
-        // FIXME-PLATFORM: Unfocused windows seems to fail changing the mouse cursor with GLFW 3.2, but 3.3 works here.
-        glfwSetCursor(g_Window, g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
+        // Commented this out as it only gives a "typing cursor" over the high score entry field and costs about 700 FPS (which is hardly
+        // necessary to maintain since we are already over 4000, but hey, it's not a major inconvenience either, so let's go with it
+        // glfwSetCursor(g_Window, g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
         glfwSetInputMode(g_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
