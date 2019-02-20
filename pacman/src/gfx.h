@@ -169,6 +169,10 @@ Gfx::Detail::Log(stdout, "INFO", Gfx::Detail::TERMINAL_COLOR_FG_WHITE, __FILE__,
 ///     can be turned off by defining LOG_NO_DEBUG
 ///     before including gfx.h
 ///////////////////////////////////////////////////////////
+#ifdef NDEBUG
+#define GFX_NO_DEBUG
+#endif
+
 #ifndef GFX_NO_DEBUG
 #define GFX_DEBUG(fmt, ...) \
 Gfx::Detail::Log(stdout, "DEBUG", Gfx::Detail::TERMINAL_COLOR_FG_CYAN, __FILE__, __func__, __LINE__, fmt, ##__VA_ARGS__);
