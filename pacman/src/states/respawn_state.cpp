@@ -7,6 +7,11 @@
 
 namespace pac
 {
+RespawnState::RespawnState(GameContext context, float wait_seconds, std::string_view prefix_msg)
+    : State(context), m_respawn_timer(wait_seconds), m_prefix_msg(prefix_msg)
+{
+}
+
 void RespawnState::on_enter()
 {
     /* Add input state that is blocking so no other input works */
@@ -20,16 +25,16 @@ bool RespawnState::update(float dt)
 {
     /* When timer goes to zero, then remove the state */
     m_respawn_timer -= std::chrono::duration<float>(dt);
-    if (m_respawn_timer <= std::chrono::duration<float>(0.f))
+    if (m_respawn_timer < std::chrono::duration<float>(0.f))
     {
         m_context.state_manager->pop();
     }
 
     /* Show respawn text */
-    ImGui::SetNextWindowSize({230.f, 16.f});
+    ImGui::SetNextWindowSize({270.f, 16.f});
     ImGui::SetNextWindowPos({SCREEN_W / 2.f, SCREEN_H / 2.f + 60.f}, 0, {.5f, .5f});
     ImGui::Begin("RespawnWindow", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    ImGui::Text("STARTING IN %3.1f SECONDS!", m_respawn_timer.count());
+    ImGui::Text("%s IN %3.1f SECONDS!", m_prefix_msg.c_str(), m_respawn_timer.count());
     ImGui::End();
     return false;
 }

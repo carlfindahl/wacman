@@ -326,7 +326,7 @@ void Level::update_ghost(float dt, Ghost& g)
             }
             if (m_pacman->m_lives > 0)
             {
-                m_context.state_manager->push<RespawnState>(m_context);
+                m_context.state_manager->push<RespawnState>(m_context, 1.5f, "RESPAWNING");
             }
             /* Game over state */
             else
