@@ -112,9 +112,15 @@ void Ghost::update(float dt)
         {
             m_direction = m_path->get();
         }
+
+        if (m_position == m_home && m_dead)
+        {
+            m_ai_state = EState::Scared;
+            m_dead = false;
+        }
+
         if (m_position == m_home && m_ai_state == EState::Scattering)
         {
-            m_dead = false;
             m_ai_state = EState::Chasing;
         }
     }

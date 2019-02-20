@@ -1,6 +1,8 @@
 #include "level.h"
 #include "pathfinding.h"
-#include <config.h>
+#include "states/state_manager.h"
+#include "states/respawn_state.h"
+#include "config.h"
 
 #include <regex>
 #include <sstream>
@@ -31,8 +33,18 @@ Level::ELevelState Level::update(float dt)
         }
     }
 
-    /* Pacman kill timer */
+    /* Update Pacman kill timer. Then also make ghosts not scared after the kill timer expires */
     m_pacman_kill_timer -= seconds(dt);
+    if (m_pacman_kill_timer <= seconds(0.f))
+    {
+        for (auto& ghost : m_ghosts)
+        {
+            if (ghost.ai_state() == Ghost::EState::Scared)
+            {
+                ghost.set_ai_state(Ghost::EState::Chasing);
+            }
+        }
+    }
 
     /* Update all ghosts, first internally, then with level context */
     for (auto& ghost : m_ghosts)
@@ -304,11 +316,20 @@ void Level::update_ghost(float dt, Ghost& g)
         /* Take life from pacman and move to spawn */
         else
         {
+            m_chasetime = seconds(30.f);
             m_pacman->m_lives = glm::max(0, m_pacman->m_lives - 1);
             m_pacman->m_position = m_pacman_spawn;
             for (auto& g : m_ghosts)
             {
                 g.set_position(g.home());
+            }
+            if (m_pacman->m_lives > 0)
+            {
+                m_context.state_manager->push<RespawnState>(m_context);
+            }
+            /* Game over state */
+            else
+            {
             }
         }
     }
@@ -319,7 +340,7 @@ glm::ivec2 Level::find_sensible_escape_point(Ghost& g)
     static auto dist = [](glm::ivec2 a, glm::ivec2 b) -> int { return std::abs(a.x - b.x) + std::abs(a.y - b.y); };
 
     /* TODO : Make this work better */
-    glm::ivec2 furthest_away = g.home();
+    glm::ivec2 furthest_away = g.position() == g.home() ? m_pacman_spawn : g.home();
     for (int y = g.position().y - 3; y < g.position().y + 3; ++y)
     {
         for (int x = g.position().x - 3; x < g.position().x + 3; ++x)
