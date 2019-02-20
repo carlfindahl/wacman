@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+#include <string>
 #include <cstdint>
 
 #include <glm/vec2.hpp>
@@ -31,4 +33,26 @@ struct GameContext
 {
     StateManager* state_manager = nullptr;
 };
+
+/*!
+ * \brief The Entry struct represents a single entry in the high score table
+ */
+struct ScoreEntry
+{
+    std::string name = {};
+    int score = 0;
+};
+
+/*!
+ * \brief load_entries_from_file loads high score entries from highscores.txt in order to display them in the menu
+ * \return a vector of entries
+ */
+std::vector<ScoreEntry> load_high_score_entries_from_file(const char* filepath = "res/highscores.txt");
+
+/*!
+ * \brief write_high_score_entries_to_file writes all high scores in the vector to the given file
+ * \param entries are the entries to write
+ * \param filepath is the file to write to
+ */
+void write_high_score_entries_to_file(const std::vector<ScoreEntry>& entries, const char* filepath = "res/highscores.txt");
 }  // namespace pac
