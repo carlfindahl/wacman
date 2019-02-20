@@ -22,7 +22,7 @@ bool RespawnState::update(float dt)
     m_respawn_timer -= std::chrono::duration<float>(dt);
     if (m_respawn_timer <= std::chrono::duration<float>(0.f))
     {
-        m_owner->pop();
+        m_context.state_manager->pop();
     }
 
     /* Show respawn text */

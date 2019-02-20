@@ -7,20 +7,20 @@
 
 namespace pac
 {
-PauseState::PauseState(StateManager& owner) : State(owner) { m_splash = get_renderer().load_texture("res/pause_screen.png"); }
-
 void PauseState::on_enter()
 {
+    m_splash = get_renderer().load_texture("res/pause_screen.png");
+
     input::InputState pause_input(true);
 
     /* Resume game */
-    pause_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_owner->pop(); });
-    pause_input.set_binding(GLFW_KEY_P, [this] { m_owner->pop(); });
+    pause_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
+    pause_input.set_binding(GLFW_KEY_P, [this] { m_context.state_manager->pop(); });
 
     /* Quit to main menu */
     pause_input.set_binding(GLFW_KEY_Q, [this] {
-        m_owner->clear();
-        m_owner->push<MainMenuState>();
+        m_context.state_manager->clear();
+        m_context.state_manager->push<MainMenuState>(m_context);
     });
 
     input::get_input().push(std::move(pause_input));

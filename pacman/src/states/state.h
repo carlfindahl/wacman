@@ -1,6 +1,7 @@
 #pragma once
 
-#include <input.h>
+#include "common.h"
+#include "input.h"
 
 #include <utility>
 #include <functional>
@@ -18,12 +19,13 @@ class StateManager;
 class State
 {
 protected:
-    StateManager* m_owner = nullptr;
+    /* The context of the state */
+    GameContext m_context{};
 
 public:
     State() = default;
 
-    State(StateManager& owner) : m_owner(&owner) {}
+    State(GameContext owner) : m_context(owner) {}
 
     State(const State&) = delete;
 

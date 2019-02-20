@@ -1,7 +1,7 @@
 #pragma once
-
 #include "ghost.h"
 #include "pacman.h"
+#include "common.h"
 #include "rendering/renderer.h"
 
 #include <chrono>
@@ -35,6 +35,7 @@ public:
     enum class ELevelState : int32_t
     {
         Playing,
+        Respawning,
         Won,
         Lost
     };
@@ -50,6 +51,8 @@ public:
 
 private:
     using seconds = std::chrono::duration<float>;
+
+    GameContext m_context{};
 
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
@@ -78,9 +81,7 @@ private:
     /* seconds m_strawberry_timer = 60.f; - When it goes to zero, spawn a fruit :D */
 
 public:
-    Level();
-
-    Level(std::string_view fp);
+    Level(GameContext context);
 
     /*!
      * \brief update update the state of tiles and the level

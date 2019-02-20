@@ -27,9 +27,7 @@ private:
     std::vector<Entry> m_entries = {};
 
 public:
-    HighScoreState() = default;
-
-    explicit HighScoreState(StateManager& owner);
+    using State::State;
 
     void on_enter() override;
 

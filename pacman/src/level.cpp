@@ -13,9 +13,10 @@
 
 namespace pac
 {
-Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20); }
-
-Level::Level(std::string_view fp) : Level() { load(fp); }
+Level::Level(GameContext context) : m_context(context)
+{
+    m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
+}
 
 Level::ELevelState Level::update(float dt)
 {

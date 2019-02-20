@@ -12,9 +12,7 @@ private:
     TextureID m_splash{};
 
 public:
-    PauseState() = default;
-
-    explicit PauseState(StateManager& owner);
+    using State::State;
 
     void on_enter() override;
 

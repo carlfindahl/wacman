@@ -37,6 +37,13 @@ private:
 public:
     Game(std::string_view title, glm::uvec2 window_size);
 
+    Game(const Game&) = delete;
+
+    Game(Game&&) = delete;
+
+    Game& operator=(const Game&) = delete;
+    Game& operator=(Game&&) = delete;
+
     ~Game() noexcept;
 
     void run();

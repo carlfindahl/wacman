@@ -6,6 +6,8 @@
 
 namespace pac
 {
+class StateManager;
+
 namespace detail
 {
 /*!
@@ -21,4 +23,12 @@ struct custom_ivec2_hash
     }
 };
 }  // namespace detail
+
+/*!
+ * \brief The Context struct hold relevant context information about the Game that various sub systems might care about.
+ */
+struct GameContext
+{
+    StateManager* state_manager = nullptr;
+};
 }  // namespace pac

@@ -12,9 +12,7 @@ private:
     TextureID m_splash_texture{};
 
 public:
-    MainMenuState() = default;
-
-    explicit MainMenuState(StateManager& owner);
+    using State::State;
 
     void on_enter() override;
 

@@ -10,15 +10,12 @@
 
 namespace pac
 {
-HighScoreState::HighScoreState(StateManager& owner) : State(owner)
-{
-    m_splash_texture = get_renderer().load_texture("res/hiscore_screen.png");
-}
-
 void HighScoreState::on_enter()
 {
+    m_splash_texture = get_renderer().load_texture("res/hiscore_screen.png");
+
     input::InputState hs_input_state(true);
-    hs_input_state.set_binding(GLFW_KEY_ESCAPE, [this] { m_owner->pop(); });
+    hs_input_state.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
     input::get_input().push(std::move(hs_input_state));
 
     load_entries_from_file();
@@ -55,7 +52,7 @@ bool HighScoreState::update(float dt)
     ImGui::Columns();
     if (ImGui::Button("Back"))
     {
-        m_owner->pop();
+        m_context.state_manager->pop();
     }
 
     ImGui::End();

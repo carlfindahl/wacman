@@ -1,5 +1,6 @@
 #include "game.h"
 #include "input.h"
+#include "common.h"
 #include "states/game_state.h"
 #include "states/main_menu_state.h"
 #include "rendering/shader_program.h"
@@ -20,7 +21,6 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
-    m_state_manager.push<MainMenuState>();
 }
 
 Game::~Game() noexcept
@@ -34,6 +34,9 @@ Game::~Game() noexcept
 
 void Game::run()
 {
+    /* Add initial state to the stack */
+    m_state_manager.push<MainMenuState>({&m_state_manager});
+
     /* Create variables for tracking frame-times */
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();

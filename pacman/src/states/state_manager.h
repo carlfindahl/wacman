@@ -1,6 +1,7 @@
 #pragma once
 
 #include "state.h"
+#include "common.h"
 
 #include <memory>
 #include <vector>
@@ -47,9 +48,9 @@ public:
      * \param new_state is the state to push, is unique ptr to hint that we are transferring ownership
      */
     template<typename State_>
-    void push()
+    void push(GameContext context)
     {
-        m_pending_commands.emplace_back(std::make_unique<State_>(*this), ECommandType::Push);
+        m_pending_commands.emplace_back(std::make_unique<State_>(context), ECommandType::Push);
     }
 
     /*!

@@ -10,12 +10,7 @@
 
 namespace pac
 {
-MainMenuState::MainMenuState(StateManager& owner) : State(owner)
-{
-    m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
-}
-
-void pac::MainMenuState::on_enter() {}
+void pac::MainMenuState::on_enter() { m_splash_texture = get_renderer().load_texture("res/splash_screen.png"); }
 
 void pac::MainMenuState::on_exit() {}
 
@@ -27,18 +22,18 @@ bool pac::MainMenuState::update(float dt)
 
     if (ImGui::Button("Start Game", {150, 50}))
     {
-        m_owner->push<GameState>();
-        m_owner->push<RespawnState>();
+        m_context.state_manager->push<GameState>(m_context);
+        m_context.state_manager->push<RespawnState>(m_context);
     }
 
     if (ImGui::Button("High Scores", {150, 50}))
     {
-        m_owner->push<HighScoreState>();
+        m_context.state_manager->push<HighScoreState>(m_context);
     }
 
     if (ImGui::Button("Exit", {150, 50}))
     {
-        m_owner->pop();
+        m_context.state_manager->pop();
     }
 
     ImGui::End();

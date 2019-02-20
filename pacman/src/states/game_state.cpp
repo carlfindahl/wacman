@@ -10,24 +10,20 @@
 
 namespace pac
 {
-GameState::~GameState() noexcept = default;
-
-GameState::GameState(StateManager& owner) : State(owner) {}
+GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
 
 void GameState::on_enter()
 {
-    GFX_INFO("Entering GameState");
+    m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
     input::InputState game_input(true);
-    game_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_owner->push<PauseState>(); });
-    game_input.set_binding(GLFW_KEY_P, [this] { m_owner->push<PauseState>(); });
+    game_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
+    game_input.set_binding(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
 
     auto& input_manager = input::get_input();
     input_manager.push(std::move(game_input));
 
     m_level.load("res/level0");
-
-    m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 }
 
 void GameState::on_exit() { input::get_input().pop(); }

@@ -10,16 +10,13 @@ class GameState : public State
 {
 private:
     /* The level / world */
-    Level m_level = {};
+    Level m_level;
 
+    /* Game overlay */
     TextureID m_overlay{};
 
 public:
-    GameState() = default;
-
-    GameState(StateManager& owner);
-
-    ~GameState() noexcept override;
+    GameState(GameContext owner);
 
     void on_enter() override;
 
