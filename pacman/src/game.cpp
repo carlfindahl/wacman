@@ -53,9 +53,11 @@ void Game::run()
         last_frame = delta_clock.now();
 
         /* ImGui Stuff */
+#ifndef NDEBUG
         ImGui::Text("FPS: %5.1f", ImGui::GetIO().Framerate);
         ImGui::SameLine(0.f, 25.f);
         ImGui::Text("Frame Time: %6.4fms", dt * 1000.f);
+#endif
 
         glfwPollEvents();
         update(dt);

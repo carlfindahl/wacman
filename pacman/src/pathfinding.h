@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include <glm/vec2.hpp>
+#include <cglutil.h>
 
 namespace pac
 {
@@ -30,6 +31,12 @@ public:
      */
     Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target);
 
+    Path(const Path&) = default;
+    Path(Path&&) = default;
+    Path& operator=(const Path&) = default;
+    Path& operator=(Path&&) = default;
+
+    CGL_NEVER_INLINE ~Path() noexcept;
     /*!
      * \brief get the next direction from the path
      * \return the next direction to move to get to your target
@@ -55,7 +62,7 @@ private:
      * \param origin is where we want to pathfind from
      * \param target is the desired target position
      */
-    void pathfind_bfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target);
+    void pathfind_bfs(const Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept;
 
     /*!
      * \brief pathfind_astar uses A* to find a suitable path
@@ -63,7 +70,7 @@ private:
      * \param origin is where we want to pathfind from
      * \param target is the desired target position
      */
-    void pathfind_astar(const Level& graph, glm::ivec2 origin, glm::ivec2 target);
+    void pathfind_astar(const Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept;
 
     /*!
      * \brief heuristic compute manhattan distance between two points, used in astar as a heuristic
@@ -71,6 +78,6 @@ private:
      * \param to
      * \return manhattan distance
      */
-    int heuristic(glm::ivec2 from, glm::ivec2 to);
+    int heuristic(glm::ivec2 from, glm::ivec2 to) const noexcept;
 };
 }  // namespace pac

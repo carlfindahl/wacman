@@ -14,6 +14,8 @@ pac::Path::Path(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) :
     pathfind_astar(graph, origin, target);
 }
 
+pac::Path::~Path() noexcept {}
+
 glm::ivec2 pac::Path::get()
 {
     if (!m_directions.empty())
@@ -30,7 +32,7 @@ bool pac::Path::empty() const { return m_directions.empty(); }
 
 bool pac::Path::outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(90); }
 
-void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target)
+void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept
 {
     /* Get neighbours and try all paths until we find target, or if we don't the Path will be empty */
     std::queue<glm::ivec2> next_node = {};
@@ -66,7 +68,7 @@ void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::iv
     }
 }
 
-void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target)
+void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept
 {
     /* Get neighbours and try all paths until we find target, or if we don't the Path will be empty */
     using priority_pair = std::pair<int, glm::ivec2>;
@@ -112,4 +114,7 @@ void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::
     }
 }
 
-int pac::Path::heuristic(glm::ivec2 from, glm::ivec2 to) { return std::abs(from.x - to.x) + std::abs(from.y - to.y); }
+int pac::Path::heuristic(glm::ivec2 from, glm::ivec2 to) const noexcept
+{
+    return std::abs(from.x - to.x) + std::abs(from.y - to.y);
+}
