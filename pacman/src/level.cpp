@@ -17,7 +17,7 @@ Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/
 
 Level::Level(std::string_view fp) : Level() { load(fp); }
 
-void Level::update(float dt)
+Level::ELevelState Level::update(float dt)
 {
     /* Chase timer */
     m_chasetime -= seconds(dt);
@@ -50,6 +50,8 @@ void Level::update(float dt)
     ImGui::Begin("ScoreWindow", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
     ImGui::Text("%u", m_score);
     ImGui::End();
+
+    return ELevelState::Playing;
 }
 
 void Level::draw()
@@ -214,6 +216,8 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
     GFX_ASSERT(coordinate.x >= 0 && coordinate.x < static_cast<int>(m_tiles[coordinate.y].size()), "X Coordinate out of bounds!");
     return m_tiles[coordinate.y][coordinate.x];
 }
+
+unsigned Level::score() const { return m_score; }
 
 void Level::update_pacman()
 {

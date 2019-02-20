@@ -32,6 +32,13 @@ public:
         GhostKiller
     };
 
+    enum class ELevelState : int32_t
+    {
+        Playing,
+        Won,
+        Lost
+    };
+
     /*!
      * \brief The Tile struct contains data needed to draw and know the type of each tile
      */
@@ -78,8 +85,9 @@ public:
     /*!
      * \brief update update the state of tiles and the level
      * \param dt is the delta time
+     * \return game status
      */
-    void update(float dt);
+    ELevelState update(float dt);
 
     /*!
      * \brief draw draws the level (food, tiles and blank tiles
@@ -106,6 +114,8 @@ public:
      * \return A vector of tile coordinates
      */
     std::vector<glm::ivec2> get_neighbours(glm::ivec2 pos) const;
+
+    unsigned score() const;
 
 private:
     void update_pacman();
