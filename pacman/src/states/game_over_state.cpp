@@ -12,7 +12,14 @@
 
 namespace pac
 {
-void GameOverState::on_enter() { m_playername.fill('\0'); }
+void GameOverState::on_enter()
+{
+    m_playername.fill('\0');
+
+    /* Add input state that is blocking so no other input works */
+    input::InputState pause_input(true);
+    input::get_input().push(std::move(pause_input));
+}
 
 void GameOverState::on_exit()
 {
@@ -21,6 +28,8 @@ void GameOverState::on_exit()
     entries.push_back({m_playername.data(), m_score});
     std::sort(entries.begin(), entries.end(), [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
     write_high_score_entries_to_file(entries);
+
+    input::get_input().pop();
 }
 
 bool GameOverState::update(float dt)
