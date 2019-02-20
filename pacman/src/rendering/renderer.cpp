@@ -48,11 +48,11 @@ void Renderer::init(unsigned max_sprites)
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
     if (max_tex_units < MAX_TEXTURES)
     {
-        GFX_INFO("Application supports only %d/%d texture units.", max_tex_units, MAX_TEXTURES);
+        GFX_DEBUG("Application supports only %d/%d texture units.", max_tex_units, MAX_TEXTURES);
     }
     else
     {
-        GFX_INFO("Application supports more than the recommended %d (%d) texture units! Nice.", MAX_TEXTURES, max_tex_units);
+        GFX_DEBUG("Application supports more than the recommended %d (%d) texture units! Nice.", MAX_TEXTURES, max_tex_units);
     }
 
     /* Init sprite buffer */

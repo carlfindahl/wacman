@@ -52,25 +52,23 @@ public:
 private:
     using seconds = std::chrono::duration<float>;
 
-    GameContext m_context{};
-
-    /* The level tileset texture */
-    TextureID m_tileset_texture = {};
-
     /* The tiles in the level (basically the map) */
     std::vector<std::vector<Tile>> m_tiles = {};
-
-    /* Pacman, starts bottom center */
-    std::unique_ptr<Pacman> m_pacman = nullptr;
 
     /* Ghost vector */
     std::vector<Ghost> m_ghosts = {};
 
-    /* Pacman spawn */
-    glm::ivec2 m_pacman_spawn = {};
+    /* Pacman, starts bottom center */
+    std::unique_ptr<Pacman> m_pacman = nullptr;
+
+    /* The level tileset texture */
+    TextureID m_tileset_texture = {};
 
     /* Score on this level */
     unsigned m_score = 0u;
+
+    /* Pacman spawn */
+    glm::ivec2 m_pacman_spawn = {};
 
     /* How long will ghosts chase before scattering */
     seconds m_chasetime{10.f};
@@ -79,6 +77,8 @@ private:
     seconds m_pacman_kill_timer{0.f};
 
     /* seconds m_strawberry_timer = 60.f; - When it goes to zero, spawn a fruit :D */
+
+    GameContext m_context{};
 
 public:
     Level(GameContext context);
