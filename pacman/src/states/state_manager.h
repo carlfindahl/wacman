@@ -47,10 +47,10 @@ public:
      * \brief push push a new state on the state stack
      * \param new_state is the state to push, is unique ptr to hint that we are transferring ownership
      */
-    template<typename State_>
-    void push(GameContext context)
+    template<typename State_, typename... CtorArgs_>
+    void push(GameContext context, CtorArgs_&&... args)
     {
-        m_pending_commands.emplace_back(std::make_unique<State_>(context), ECommandType::Push);
+        m_pending_commands.emplace_back(std::make_unique<State_>(context, std::forward<CtorArgs_>(args)...), ECommandType::Push);
     }
 
     /*!
