@@ -40,7 +40,6 @@ void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned sev
                        const void* userParam);
 }  // namespace detail
 
-
 std::string native_absolute_path(std::string_view relative_path);
 
 }  // namespace cgl
@@ -306,14 +305,6 @@ ScopeGuardWithExceptions<typename std::decay_t<Func>, false> operator+(detail::S
     return ScopeGuardWithExceptions<typename std::decay_t<Func>, false>(std::forward<Func>(f));
 }
 }  // namespace detail
-
-#define CGL_DETAIL_CONCAT_IMPL(s1, s2) s1##s2
-#define CGL_DETAIL_CONCAT(s1, s2) CGL_DETAIL_CONCAT_IMPL(s1, s2)
-#define CGL_DETAIL_ANON_VAR(name) CGL_DETAIL_CONCAT(name, __COUNTER__)
-
-#define SCOPE_EXIT auto CGL_DETAIL_ANON_VAR(SCOPE_EXIT_STATE) = cgl::detail::ScopeGuardOnExit() + [&]()
-#define SCOPE_FAIL auto CGL_DETAIL_ANON_VAR(SCOPE_FAIL_STATE) = cgl::detail::ScopeGuardOnFail() + [&]() noexcept
-#define SCOPE_SUCCESS auto CGL_DETAIL_ANON_VAR(SCOPE_SUCCESS_STATE) = cgl::detail::ScopeGuardOnSuccess() + [&]()
 }  // namespace cgl
 
 /*
@@ -323,3 +314,24 @@ ScopeGuardWithExceptions<typename std::decay_t<Func>, false> operator+(detail::S
 namespace cgl
 {
 }  // namespace cgl
+
+/*
+ * MACROS:
+ *  Contains macros related to CGL functionality and other useful macros to be used in the program*
+ */
+
+#define CGL_DETAIL_CONCAT_IMPL(s1, s2) s1##s2
+#define CGL_DETAIL_CONCAT(s1, s2) CGL_DETAIL_CONCAT_IMPL(s1, s2)
+#define CGL_DETAIL_ANON_VAR(name) CGL_DETAIL_CONCAT(name, __COUNTER__)
+
+#define SCOPE_EXIT auto CGL_DETAIL_ANON_VAR(SCOPE_EXIT_STATE) = cgl::detail::ScopeGuardOnExit() + [&]()
+#define SCOPE_FAIL auto CGL_DETAIL_ANON_VAR(SCOPE_FAIL_STATE) = cgl::detail::ScopeGuardOnFail() + [&]() noexcept
+#define SCOPE_SUCCESS auto CGL_DETAIL_ANON_VAR(SCOPE_SUCCESS_STATE) = cgl::detail::ScopeGuardOnSuccess() + [&]()
+
+#ifdef _MSC_VER
+#define CGL_ALWAYS_INLINE __forceinline
+#define CGL_NEVER_INLINE __declspec(noinline)
+#else
+#define CGL_ALWAYS_INLINE inline __attribute__((__always_inline__))
+#define CGL_NEVER_INLINE __attribute__((__noinline__))
+#endif
