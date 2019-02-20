@@ -20,7 +20,7 @@ Level::Level(GameContext context) : m_context(context)
     m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
 }
 
-Level::ELevelState Level::update(float dt)
+void Level::update(float dt)
 {
     /* Chase timer */
     m_chasetime -= seconds(dt);
@@ -63,8 +63,6 @@ Level::ELevelState Level::update(float dt)
     ImGui::Begin("ScoreWindow", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
     ImGui::Text("%u", m_score);
     ImGui::End();
-
-    return ELevelState::Playing;
 }
 
 void Level::draw()
@@ -193,6 +191,7 @@ std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
 {
     std::vector<glm::ivec2> out{};
 
+    /* Check all directions and make sure they are not walls. If they are not, add them to out vector and return it. */
     if (pos.x > 0 && get_tile(pos + glm::ivec2{-1, 0}).type != ETileType::Wall)
     {
         out.push_back(pos + glm::ivec2{-1, 0});
@@ -319,6 +318,7 @@ void Level::update_ghost(float dt, Ghost& g)
             m_chasetime = seconds(30.f);
             m_pacman->m_lives = glm::max(0, m_pacman->m_lives - 1);
             m_pacman->m_position = m_pacman_spawn;
+            m_pacman->m_current_direction = {0, -1};
             for (auto& g : m_ghosts)
             {
                 g.set_position(g.home());
@@ -337,7 +337,7 @@ void Level::update_ghost(float dt, Ghost& g)
 
 glm::ivec2 Level::find_sensible_escape_point(Ghost& g)
 {
-    static auto dist = [](glm::ivec2 a, glm::ivec2 b) -> int { return std::abs(a.x - b.x) + std::abs(a.y - b.y); };
+    static constexpr auto dist = [](glm::ivec2 a, glm::ivec2 b) -> int { return std::abs(a.x - b.x) + std::abs(a.y - b.y); };
 
     /* TODO : Make this work better */
     glm::ivec2 furthest_away = g.position() == g.home() ? m_pacman_spawn : g.home();
