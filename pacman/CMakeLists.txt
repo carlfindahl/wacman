@@ -15,8 +15,8 @@ find_package(glm REQUIRED)
 target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
-    # Manually link asan on GCC since it doesn't do it automatically (MUST BE FIRST IN THE LIST!)
-    $<IF:$<CXX_COMPILER_ID:GNU>,asan,>
+    # Manually link asan on GCC in Debug mode since it doesn't do it automatically (MUST BE FIRST IN THE LIST OR WON'T WORK!)
+    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
     $<$<PLATFORM_ID:Linux>:dl>      # Required by glad on Linux
     OpenGL::GL                      # For OpenGL
@@ -30,8 +30,8 @@ target_compile_options(
     ${EXEC_NAME}
     PRIVATE
 
-    # On Clang or GCC, Enable address sanitizer to detect nasty bugs
-    $<IF:$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>,-fsanitize=address,>
+    # On GCC in Debug mode Enable address sanitizer to detect nasty bugs
+    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:-fsanitize=address>
 )
 
 # Explicitly tell what features are required to maximize compiler support
@@ -47,5 +47,3 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res ${CMAKE_CURRENT_BINARY_DIR}/res
     COMMAND ${CMAKE_COMMAND} -E echo "Copied resource directory to binary directory."
 )
-
-
