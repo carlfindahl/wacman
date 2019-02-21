@@ -138,6 +138,12 @@ public:
      */
     bool dead() const;
 
+    /*!
+     * \brief add_speed adds speed to the ghosts
+     * \param delta is the speed delta to add
+     */
+    void add_speed(float delta);
+
 private:
     /*!
      * \brief is_opposite checks if the given direction is the opposite of the given because pacman can not do a 180

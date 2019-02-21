@@ -73,6 +73,9 @@ private:
 
     GameContext m_context{};
 
+    /* When you kill a ghost, the score is multiplied with this amount */
+    int32_t m_ghost_kill_multiplier = 1;
+
 public:
     Level(GameContext context);
 

@@ -189,5 +189,7 @@ void Ghost::die() { m_dead = true; }
 
 bool Ghost::dead() const { return m_dead; }
 
+void Ghost::add_speed(float delta) { m_speed += delta; }
+
 bool Ghost::is_opposite(glm::ivec2 dir) { return dir == -m_direction; }
 }  // namespace pac

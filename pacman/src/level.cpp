@@ -33,7 +33,7 @@ void Level::update(float dt)
             {
                 ghost.set_ai_state(Ghost::EState::Scattering);
             }
-            m_chasetime = seconds(30.f);
+            m_chasetime = seconds(GHOST_CHASE_TIME);
         }
     }
 
@@ -41,6 +41,7 @@ void Level::update(float dt)
     m_pacman_kill_timer -= seconds(dt);
     if (m_pacman_kill_timer <= seconds(0.f))
     {
+        m_ghost_kill_multiplier = 1;
         for (auto& ghost : m_ghosts)
         {
             if (ghost.ai_state() == Ghost::EState::Scared)
@@ -82,7 +83,7 @@ void Level::draw()
             if (t.type != ETileType::Blank)
             {
                 /* Draw tile */
-                r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
+                r.draw({{HALF_TILE + x * TILE_SIZE<float>, HALF_TILE + y * TILE_SIZE<float>},
                         {TILE_SIZE<float>, TILE_SIZE<float>},
                         {1.f, 1.f, 1.f},
                         t.texture});
@@ -266,23 +267,36 @@ void Level::update_pacman()
         m_pacman->m_move_progress = 0.f;
     }
 
-    /* Consume food / powerups */
-    if (static_cast<int>(get_tile(m_pacman->m_position).type) >= 15)
+    /* Consume food / powerup (tile types with enum values 15 and above are all pickup-ables) */
+    if (static_cast<int>(get_tile(m_pacman->m_position).type) >= static_cast<int>(ETileType::Strawberry))
     {
         switch (get_tile(m_pacman->m_position).type)
         {
-        case ETileType::Food: m_score += 10; break;
+        /* Regular food yields 10 points as per the Pacman Dossier */
+        case ETileType::Food: m_score += FOOD_SCORE; break;
+
+        /* The ghost killer gives 50 points and lasts for 10 seconds */
         case ETileType::GhostKiller:
-            m_score += 50;
-            m_pacman_kill_timer = seconds(10.f);
+            m_score += GHOST_KILLER_SCORE;
+            m_pacman_kill_timer = seconds(GHOST_KILLER_TIME);
             for (auto& g : m_ghosts)
             {
                 g.set_ai_state(Ghost::EState::Scared);
             }
             break;
+
+        /* As a twist to the original game, when you pick up the powerups, all ghosts become slightly faster, and picking up a
+         * powerup after you killed a ghost or more, increases the score you get from it. Therefore they also yield 500 points
+         * instead of the original 200 now. To compensate, pacman also gains some corner cutting speed. */
         case ETileType::Banana:
         case ETileType::Orange:
-        case ETileType::Strawberry: m_score += 200; break;  // TODO: Update this
+        case ETileType::Strawberry:
+            m_score += POWERUP_SCORE * m_ghost_kill_multiplier;
+            for (auto& g : m_ghosts)
+            {
+                g.add_speed(GHOST_POWERUP_SPEED_DELTA);
+            }
+            break;
         default: break;
         }
 
@@ -312,7 +326,7 @@ void Level::update_ghost(float dt, Ghost& g)
             g.die();
             g.set_ai_state(Ghost::EState::Scattering);
             g.set_path(new Path(*this, g.position(), g.home()));
-            m_score += 200;  // TODO : Fix this so it doubles per ghost
+            m_score += GHOST_KILL_SCORE * m_ghost_kill_multiplier++;
         }
         /* Take life from pacman and move to spawn */
         else
