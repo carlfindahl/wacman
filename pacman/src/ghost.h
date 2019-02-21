@@ -33,14 +33,14 @@ private:
     /* Animation Textures */
     std::unordered_map<glm::ivec2, TextureID, detail::custom_ivec2_hash> m_textures{};
 
-    /* Home position */
-    glm::ivec2 m_home = {};
-
     /* Grid position of Pacman */
     glm::ivec2 m_position = {};
 
     /* Ghost movement direction */
     glm::ivec2 m_direction = {0, 0};
+
+    /* Home position */
+    glm::ivec2 m_home = {};
 
     /* Interpolation between current grid position and next */
     float m_move_progress = 0.f;
@@ -97,7 +97,17 @@ public:
      */
     glm::ivec2 position() const;
 
+    /*!
+     * \brief set_position set the position of the ghost
+     * \param pos is the new position
+     */
     void set_position(glm::ivec2 pos);
+
+    /*!
+     * \brief direction get current direction of ghost
+     * \return the direction the ghost is moving in
+     */
+    glm::ivec2 direction() const;
 
     /*!
      * \brief home get the home position of the Ghost
@@ -122,6 +132,10 @@ public:
      */
     void die();
 
+    /*!
+     * \brief dead checks if ghost is dead
+     * \return true if ghost is dead
+     */
     bool dead() const;
 
 private:

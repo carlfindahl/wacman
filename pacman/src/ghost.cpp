@@ -162,6 +162,8 @@ glm::ivec2 Ghost::position() const { return m_position; }
 
 void Ghost::set_position(glm::ivec2 pos) { m_position = pos; }
 
+glm::ivec2 Ghost::direction() const { return m_direction; }
+
 glm::ivec2 Ghost::home() const { return m_home; }
 
 void Ghost::set_path(Path* path_on_heap)
@@ -176,7 +178,12 @@ void Ghost::set_path(Path* path_on_heap)
     m_direction = m_path->get();
 }
 
-bool Ghost::requires_path_update() const { return m_path == nullptr || m_path->outdated(); }
+bool Ghost::requires_path_update() const
+{
+    /* We require an update if we don't have a path, or the path is updated. But also only if we have not started to move on our
+     * current path (to avoid Ghosts flipping directions at random) */
+    return (m_path == nullptr || m_path->outdated()) && m_move_progress <= 0.05f;
+}
 
 void Ghost::die() { m_dead = true; }
 

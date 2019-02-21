@@ -29,7 +29,10 @@ void Level::update(float dt)
     {
         for (auto& ghost : m_ghosts)
         {
-            ghost.set_ai_state(Ghost::EState::Scattering);
+            if (ghost.ai_state() != Ghost::EState::Scared || ghost.dead())
+            {
+                ghost.set_ai_state(Ghost::EState::Scattering);
+            }
             m_chasetime = seconds(30.f);
         }
     }
@@ -75,17 +78,15 @@ void Level::draw()
         {
             const Tile& t = m_tiles[y][x];
 
-            /* Skip blank tiles */
-            if (t.type == ETileType::Blank)
+            /* Only draw non-blank tiles. Most tiles are non-blank so the if is likely to happen. */
+            if (t.type != ETileType::Blank)
             {
-                continue;
+                /* Draw tile */
+                r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
+                        {TILE_SIZE<float>, TILE_SIZE<float>},
+                        {1.f, 1.f, 1.f},
+                        t.texture});
             }
-
-            /* Draw tile */
-            r.draw({{12.5f + x * TILE_SIZE<float>, 12.5f + y * TILE_SIZE<float>},
-                    {TILE_SIZE<float>, TILE_SIZE<float>},
-                    {1.f, 1.f, 1.f},
-                    t.texture});
         }
     }
 
@@ -337,37 +338,52 @@ void Level::update_ghost(float dt, Ghost& g)
     }
 }
 
+bool Level::bounds_check(glm::ivec2 pos) const
+{
+    return pos.y >= 0 && pos.y < static_cast<int>(m_tiles.size()) && pos.x >= 0 &&
+           pos.x < static_cast<int>(m_tiles[pos.y].size());
+}
+
 glm::ivec2 Level::find_sensible_escape_point(Ghost& g)
 {
-    static constexpr auto dist = [](glm::ivec2 a, glm::ivec2 b) -> int { return std::abs(a.x - b.x) + std::abs(a.y - b.y); };
+    /* Compute direction to pacman so we can prefer some directions to others */
+    const auto pacman_delta = m_pacman->m_position - g.position();
 
-    /* TODO : Make this work better */
-    glm::ivec2 furthest_away = g.position() == g.home() ? m_pacman_spawn : g.home();
-    for (int y = g.position().y - 3; y < g.position().y + 3; ++y)
+    /* Get all possible movement directions */
+    auto directions = get_neighbours(g.position());
+
+    /* Delete the reverse direction since we can not move 180 degrees */
+    auto e_itr = std::remove_if(directions.begin(), directions.end(),
+                                [&g](glm::ivec2 elem) { return (elem - g.position()) == -g.direction(); });
+    directions.erase(e_itr, directions.end());
+
+    /* Put directions going away from pacman in the front of the collection */
+    std::partition(directions.begin(), directions.end(), [&pacman_delta, &g](glm::ivec2 v) {
+        return (v.x - g.position().x) == -pacman_delta.x || (v.y - g.position().y) == -pacman_delta.y;
+    });
+
+    /* Now choose a direction to move in and go as far as possible in that way */
+    std::vector<glm::ivec2> possible_targets = {};
+    for (const auto& dir : directions)
     {
-        for (int x = g.position().x - 3; x < g.position().x + 3; ++x)
+        glm::ivec2 movement_vector = dir - g.position();
+        glm::ivec2 target_tile = dir;
+        while (bounds_check(target_tile + movement_vector) && get_tile(target_tile + movement_vector).type != ETileType::Wall)
         {
-            /* Bounds check */
-            if (y < 0 || y >= static_cast<int>(m_tiles.size()) || x < 0 || x >= static_cast<int>(m_tiles[y].size()))
-            {
-                continue;
-            }
-
-            /* Wall check */
-            if (get_tile({x, y}).type == ETileType::Wall || get_tile({x, y}).type == ETileType::Blank)
-            {
-                continue;
-            }
-
-            /* Distance check */
-            if (dist(glm::ivec2(x, y), m_pacman->m_position) > dist(furthest_away, m_pacman->m_position))
-            {
-                furthest_away = {x, y};
-            }
+            target_tile += movement_vector;
         }
+
+        possible_targets.push_back(target_tile);
     }
 
-    return furthest_away;
+    /* Find one with largest distance in as few moves as possible */
+    std::nth_element(possible_targets.begin(), possible_targets.begin(), possible_targets.end(),
+                     [pos = m_pacman->m_position](glm::ivec2 a, glm::ivec2 b) {
+                         return manhattan_distance(a, pos) > manhattan_distance(b, pos);
+                     });
+
+    /* We know this is the point furthest away from pacman after nth-element */
+    return possible_targets[0];
 }
 
 }  // namespace pac

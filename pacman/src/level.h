@@ -116,6 +116,8 @@ private:
 
     void update_ghost(float dt, Ghost& g);
 
+    bool bounds_check(glm::ivec2 pos) const;
+
     glm::ivec2 find_sensible_escape_point(Ghost& g);
 };
 }  // namespace pac
