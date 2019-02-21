@@ -28,7 +28,7 @@ Renderer::Renderer(unsigned max_sprites)
 
 void Renderer::init(unsigned max_sprites)
 {
-    /* Enable required OpenGL State (Texture alpha blending etc) */
+    /* Enable required OpenGL State (texture alpha blending) */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -42,18 +42,6 @@ void Renderer::init(unsigned max_sprites)
     std::vector<int> tmp(MAX_TEXTURES);
     std::iota(tmp.begin(), tmp.end(), 0u);
     glUniform1iv(0, tmp.size(), tmp.data());
-
-    /* Check maximum amount of texture units and hopefully it's enough :D */
-    int max_tex_units = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
-    if (max_tex_units < MAX_TEXTURES)
-    {
-        GFX_DEBUG("Application supports only %d/%d texture units.", max_tex_units, MAX_TEXTURES);
-    }
-    else
-    {
-        GFX_DEBUG("Application supports more than the recommended %d (%d) texture units! Nice.", MAX_TEXTURES, max_tex_units);
-    }
 
     /* Init sprite buffer */
     glCreateBuffers(1, &m_sprite_buffer);
