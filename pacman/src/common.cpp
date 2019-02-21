@@ -42,4 +42,6 @@ void write_high_score_entries_to_file(const std::vector<ScoreEntry>& entries, co
     }
 }
 
+int manhattan_distance(glm::ivec2 from, glm::ivec2 to) noexcept { return std::abs(from.x - to.x) + std::abs(from.y - to.y); }
+
 }  // namespace pac

@@ -30,7 +30,10 @@ glm::ivec2 pac::Path::get()
 
 bool pac::Path::empty() const { return m_directions.empty(); }
 
-bool pac::Path::outdated() const { return (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(90); }
+bool pac::Path::outdated() const
+{
+    return m_directions.empty() || (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(120);
+}
 
 void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept
 {
@@ -102,7 +105,7 @@ void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::
             {
                 cost_so_far[next] = new_cost;
                 traceback[next] = current;
-                next_node.push(priority_pair(new_cost + heuristic(next, target), next));
+                next_node.push(priority_pair(new_cost + manhattan_distance(next, target), next));
             }
         }
     }
@@ -112,9 +115,4 @@ void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::
     {
         m_directions.push(it - traceback.at(it));
     }
-}
-
-int pac::Path::heuristic(glm::ivec2 from, glm::ivec2 to) const noexcept
-{
-    return std::abs(from.x - to.x) + std::abs(from.y - to.y);
 }

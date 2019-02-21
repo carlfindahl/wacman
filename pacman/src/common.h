@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -55,4 +56,12 @@ std::vector<ScoreEntry> load_high_score_entries_from_file(const char* filepath =
  * \param filepath is the file to write to
  */
 void write_high_score_entries_to_file(const std::vector<ScoreEntry>& entries, const char* filepath = "res/highscores.txt");
+
+/*!
+ * \brief manhattan_distance compute manhattan distance between two points, used in astar as a heuristic for example
+ * \param from is point A
+ * \param to is point B
+ * \return manhattan distance between points A and B
+ */
+int manhattan_distance(glm::ivec2 from, glm::ivec2 to) noexcept;
 }  // namespace pac

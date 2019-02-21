@@ -71,13 +71,5 @@ private:
      * \param target is the desired target position
      */
     void pathfind_astar(const Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept;
-
-    /*!
-     * \brief heuristic compute manhattan distance between two points, used in astar as a heuristic
-     * \param from
-     * \param to
-     * \return manhattan distance
-     */
-    int heuristic(glm::ivec2 from, glm::ivec2 to) const noexcept;
 };
 }  // namespace pac
