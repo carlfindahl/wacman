@@ -256,7 +256,10 @@ static void ImGui_ImplGlfw_UpdateMouseCursor()
         // Show OS mouse cursor
         // Commented this out as it only gives a "typing cursor" over the high score entry field and costs about 700 FPS (which is hardly
         // necessary to maintain since we are already over 4000, but hey, it's not a major inconvenience either, so let's go with it
-        // glfwSetCursor(g_Window, g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
+        // Also, this is only expensive on Windows, so on anything else, this is fine to do
+#ifndef WIN32
+         glfwSetCursor(g_Window, g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
+#endif
         glfwSetInputMode(g_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }

@@ -8,7 +8,7 @@ find_package(glfw3 3.2)
 
 # Define CGL_USE_GLFW if we have access to GLFW
 if(${glfw3_FOUND})
-    message(status "Adding GLFW support to CGL.")
+    message(STATUS "Adding GLFW support to CGL.")
     target_compile_definitions(${CGL_UTIL_NAME}
                                PUBLIC
                                CGL_USE_GLFW
