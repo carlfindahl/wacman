@@ -20,14 +20,14 @@ pac::Pacman::Pacman(glm::ivec2 position) : m_position(position)
 
     /* Add pacman input to the stack (if more time, do this in scripting instead of hard coding it) */
     input::InputState pacman_input{};
-    pacman_input.set_binding(GLFW_KEY_W, [this] { this->turn({0, -1}); });
-    pacman_input.set_binding(GLFW_KEY_A, [this] { this->turn({-1, 0}); });
-    pacman_input.set_binding(GLFW_KEY_S, [this] { this->turn({0, 1}); });
-    pacman_input.set_binding(GLFW_KEY_D, [this] { this->turn({1, 0}); });
-    pacman_input.set_binding(GLFW_KEY_UP, [this] { this->turn({0, -1}); });
-    pacman_input.set_binding(GLFW_KEY_LEFT, [this] { this->turn({-1, 0}); });
-    pacman_input.set_binding(GLFW_KEY_DOWN, [this] { this->turn({0, 1}); });
-    pacman_input.set_binding(GLFW_KEY_RIGHT, [this] { this->turn({1, 0}); });
+    pacman_input.set_binding(GLFW_KEY_W, [this] { turn({0, -1}); });
+    pacman_input.set_binding(GLFW_KEY_A, [this] { turn({-1, 0}); });
+    pacman_input.set_binding(GLFW_KEY_S, [this] { turn({0, 1}); });
+    pacman_input.set_binding(GLFW_KEY_D, [this] { turn({1, 0}); });
+    pacman_input.set_binding(GLFW_KEY_UP, [this] { turn({0, -1}); });
+    pacman_input.set_binding(GLFW_KEY_LEFT, [this] { turn({-1, 0}); });
+    pacman_input.set_binding(GLFW_KEY_DOWN, [this] { turn({0, 1}); });
+    pacman_input.set_binding(GLFW_KEY_RIGHT, [this] { turn({1, 0}); });
 
     input::get_input().push(std::move(pacman_input));
 }
