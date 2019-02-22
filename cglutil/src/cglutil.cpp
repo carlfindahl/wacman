@@ -114,6 +114,7 @@ std::string read_entire_file(std::string_view fp)
 
     /* Also, fopen is weird with fs::path on windows since it uses wchar_t for me, so we use ifstream */
     std::ifstream file{path.c_str()};
+    file.sync_with_stdio(false);
 
     std::string out = {};
     std::string line = {};
