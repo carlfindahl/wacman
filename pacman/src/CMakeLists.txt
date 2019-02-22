@@ -38,6 +38,12 @@ target_include_directories(
 # Compile Options
 option(PACMAN_BUILD_BENCHMARKS OFF)
 
+target_compile_definitions(
+    ${EXEC_NAME}
+    PRIVATE
+    $<$<BOOL:${PACMAN_BUILD_BENCHMARKS}>:PACMAN_USE_BENCHMARKS>
+)
+
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/config.h.in
     config.h
@@ -48,3 +54,4 @@ include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/states/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/benchmarks/CMakeLists.txt)
