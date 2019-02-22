@@ -4,7 +4,12 @@
 #include <string>
 
 #include <GLFW/glfw3.h>
+
+#ifdef NDEBGUG
+#ifdef PACMAN_USE_BENCHMARKS
 #include <benchmark/benchmark.h>
+#endif
+#endif
 
 using namespace std::string_literals;
 
@@ -27,7 +32,7 @@ int main(int argc, char* argv[])
     /* Run game if we are not benchmarking */
     glfwInit();
 
-    const auto title_string = std::string("OpenGL Pacman ") + pac::VERSION_STRING;
+    const auto title_string = "OpenGL Pacman "s + pac::VERSION_STRING;
     pac::Game game(title_string, {pac::SCREEN_W, pac::SCREEN_H});
     game.run();
 
