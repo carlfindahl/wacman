@@ -4,8 +4,9 @@
 #include <string>
 #include <unordered_map>
 
-#include <AL/al.h>
-#include <AL/alc.h>
+/* Forward Declarations */
+typedef struct ALCcontext_struct ALCcontext;
+typedef struct ALCdevice_struct ALCdevice;
 
 namespace pac
 {
@@ -35,8 +36,9 @@ public:
     /*!
      * \brief play the sound with the given name
      * \param sound_name is the name of the sound to play
+     * \param looped true if you want the sound to loop forever (like a music track maybe?)
      */
-    void play(const std::string& sound_name);
+    void play(const std::string& sound_name, bool looped = false);
 
     ~SoundManager();
 

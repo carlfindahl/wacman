@@ -7,6 +7,8 @@
 
 #include <gfx.h>
 #include <cglutil.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace pac
 {
@@ -53,7 +55,7 @@ pac::SoundManager::SoundManager()
     alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f);
 }
 
-void SoundManager::play(const std::string& sound_name)
+void SoundManager::play(const std::string& sound_name, bool looped)
 {
     /* Before we play anything, move finished active sources back to the inactive pool. We only need to do this whenever a new
      * sound is requested playing, since otherwise no state will have changed since last time */
@@ -66,7 +68,6 @@ void SoundManager::play(const std::string& sound_name)
 
     m_active_sources.erase(itrs.second, m_active_sources.end());
 
-    GFX_DEBUG("Currently %u active and %u inactive sources playing audio.", m_active_sources.size(), m_inactive_sources.size());
     GFX_ASSERT(!m_inactive_sources.empty(), "No available sound sources to play audio!");
 
     /* Get an available source */
@@ -74,11 +75,13 @@ void SoundManager::play(const std::string& sound_name)
     m_inactive_sources.pop_back();
 
     /* Queue it up */
+    alSourcei(source, AL_LOOPING, static_cast<int>(looped));
     alSourcei(source, AL_BUFFER, m_sound_buffers.at(sound_name));
     alSourcePlay(source);
 
     /* Add it to the active sources */
     m_active_sources.push_back(source);
+    GFX_DEBUG("USED %u  AVIAIL: %u - audio sources", m_active_sources.size(), m_inactive_sources.size());
 }
 
 SoundManager::~SoundManager()
