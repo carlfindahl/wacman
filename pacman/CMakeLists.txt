@@ -10,9 +10,6 @@ find_package(glfw3 3.2 REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenAL)  # Not mandatory, but needed for sound
 
-# Add this so it can specify source files and include directories local to it's own directory
-include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
-
 target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
@@ -26,6 +23,9 @@ target_link_libraries(
     glm                               # For Maths
     cgl                               # OpenGL utilities (custom library build in-source in this project)
 )
+
+# Add this so it can specify source files and include directories local to it's own directory
+include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 
 # Enable address sanitizer for debug builds that run on GCC or Clang
 target_compile_options(
