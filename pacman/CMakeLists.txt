@@ -4,13 +4,14 @@
 set(EXEC_NAME pacman)
 add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
-# Add this so it can specify source files and include directories local to it's own directory
-include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
-
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.2 REQUIRED)
 find_package(glm REQUIRED)
+find_package(OpenAL)  # Not mandatory, but needed for sound
+
+# Add this so it can specify source files and include directories local to it's own directory
+include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 
 target_link_libraries(
     ${EXEC_NAME}
@@ -18,11 +19,12 @@ target_link_libraries(
     # Manually link asan on GCC in Debug mode since it doesn't do it automatically (MUST BE FIRST IN THE LIST OR WON'T WORK!)
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
-    $<$<PLATFORM_ID:Linux>:dl>      # Required by glad on Linux
-    OpenGL::GL                      # For OpenGL
-    glfw                            # For window integration
-    glm                             # For Maths
-    cgl                             # OpenGL utilities (custom library build in-source in this project)
+    $<$<PLATFORM_ID:Linux>:dl>        # Required by glad on Linux
+    $<$<BOOL:${OpenAL_FOUND}>:openal> # OpenAL, but only if found
+    OpenGL::GL                        # For OpenGL
+    glfw                              # For window integration
+    glm                               # For Maths
+    cgl                               # OpenGL utilities (custom library build in-source in this project)
 )
 
 # Enable address sanitizer for debug builds that run on GCC or Clang

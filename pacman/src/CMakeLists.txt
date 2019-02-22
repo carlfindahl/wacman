@@ -50,6 +50,7 @@ configure_file(
 )
 
 # Add any subdirectories with source files
+include(${CMAKE_CURRENT_LIST_DIR}/audio/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/benchmarks/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/encrypt/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
