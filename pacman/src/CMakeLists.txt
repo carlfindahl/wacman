@@ -36,7 +36,7 @@ target_include_directories(
 )
 
 # Compile Options
-set(PACMAN_TILE_SIZE 25 CACHE STRING "The tile size of each tile in the game. Affects the screen size. Default recommended for 1080p.")
+option(PACMAN_BUILD_BENCHMARKS OFF)
 
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/config.h.in
