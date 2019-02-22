@@ -4,7 +4,7 @@
 #include "config.h"
 
 #include <vector>
-#include <string>
+#include <cstring>
 #include <algorithm>
 
 #include <cglutil.h>
@@ -25,9 +25,13 @@ void GameOverState::on_exit()
 {
     /* Load and sort entries, then write back to file */
     std::vector<ScoreEntry> entries = load_high_score_entries_from_file();
-    entries.push_back({m_playername.data(), m_score});
-    std::sort(entries.begin(), entries.end(), [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
-    write_high_score_entries_to_file(entries);
+
+    if (strlen(m_playername.data()) > 0)
+    {
+        entries.push_back({m_playername.data(), m_score});
+        std::sort(entries.begin(), entries.end(), [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
+        write_high_score_entries_to_file(entries);
+    }
 
     input::get_input().pop();
 }
@@ -40,7 +44,7 @@ bool GameOverState::update(float dt)
 
     ImGui::Columns(3, nullptr, false);
     ImGui::NextColumn();
-    ImGui::Text("Game Over!");
+    ImGui::Text("%s", m_title);
     ImGui::NextColumn();
     ImGui::NextColumn();
     ImGui::Columns(1);

@@ -24,6 +24,12 @@ Level::Level(GameContext context) : m_context(context)
 
 void Level::update(float dt)
 {
+    /* We win */
+    if (m_remaining_food == 0)
+    {
+        m_context.state_manager->push<GameOverState>(m_context, m_score, "YOU WIN!");
+    }
+
     /* Chase timer */
     m_chasetime -= seconds(dt);
     if (m_chasetime <= seconds(0.f))
@@ -156,6 +162,10 @@ void Level::load(std::string_view fp)
             {
                 /* This works since the Enum values have been set to match the tile index in the tileset for the level */
                 col.type = static_cast<ETileType>(tmp_val);
+                if (col.type == ETileType::Food)
+                {
+                    ++m_remaining_food;
+                }
             }
         }
     }
@@ -276,6 +286,7 @@ void Level::update_pacman()
         /* Regular food yields 10 points as per the Pacman Dossier */
         case ETileType::Food:
             m_score += FOOD_SCORE;
+            --m_remaining_food;
             get_sound().play("food_pickup");
             break;
 
@@ -353,7 +364,7 @@ void Level::update_ghost(float dt, Ghost& g)
             /* Game over state */
             else
             {
-                m_context.state_manager->push<GameOverState>(m_context, m_score);
+                m_context.state_manager->push<GameOverState>(m_context, m_score, "GAME OVER!");
                 get_sound().play("game_over");
             }
         }

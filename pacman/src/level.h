@@ -60,6 +60,9 @@ private:
     /* Score on this level */
     int32_t m_score = 0u;
 
+    /* Number of remaining food items (used to track progress) */
+    int32_t m_remaining_food = 0;
+
     /* Pacman spawn */
     glm::ivec2 m_pacman_spawn = {};
 
@@ -68,8 +71,6 @@ private:
 
     /* Number of seconds left before pacman is no longer a killer */
     seconds m_pacman_kill_timer{0.f};
-
-    /* seconds m_strawberry_timer = 60.f; - When it goes to zero, spawn a fruit :D */
 
     GameContext m_context{};
 
