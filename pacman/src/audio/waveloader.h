@@ -15,9 +15,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#ifdef LOADIO_OPENAL
 #include <AL/al.h>
-#endif
 
 namespace loadio
 {
@@ -29,8 +27,8 @@ namespace detail
  */
 struct HeaderRiff
 {
-    uint8_t chunkID[4]{};
-    uint32_t chunkSize{};
+    uint8_t chunk_ID[4]{};
+    uint32_t chunk_size{};
     uint8_t format[4]{};
 };
 
@@ -49,12 +47,12 @@ struct Header
  */
 struct HeaderFmt
 {
-    uint16_t audioFormat{};
-    uint16_t numChannels{};
-    uint32_t sampleRate{};
-    uint32_t byteRate{};
-    uint16_t blockAlign{};
-    uint16_t bitsPerSample{};
+    uint16_t audio_format{};
+    uint16_t num_channels{};
+    uint32_t sample_rate{};
+    uint32_t byte_rate{};
+    uint16_t block_align{};
+    uint16_t bits_per_sample{};
 };
 
 using HeaderData = std::vector<uint8_t>;
@@ -94,35 +92,33 @@ public:
         fread(&riff, sizeof riff, 1, f);
 
         /* Local storage to check for completion, and reading next header */
-        detail::Header nextHeader;
-        bool bFMT{false}, bDATA{false};
+        detail::Header next_header;
+        bool b_fmt{false}, b_data{false};
 
         do
         {
-            fread(&nextHeader, sizeof nextHeader, 1, f);
+            fread(&next_header, sizeof next_header, 1, f);
 
             /* Read FMT */
-            if (nextHeader.ID[0] == 102 && nextHeader.ID[1] == 109 && nextHeader.ID[2] == 116 &&
-                nextHeader.ID[3] == 32)
+            if (next_header.ID[0] == 102 && next_header.ID[1] == 109 && next_header.ID[2] == 116 && next_header.ID[3] == 32)
             {
-                fread(&m_fmt, nextHeader.size, 1, f);
-                bFMT = true;
+                fread(&m_fmt, next_header.size, 1, f);
+                b_fmt = true;
             }
             /* Read DATA */
-            else if (nextHeader.ID[0] == 100 && nextHeader.ID[1] == 97 && nextHeader.ID[2] == 116 &&
-                     nextHeader.ID[3] == 97)
+            else if (next_header.ID[0] == 100 && next_header.ID[1] == 97 && next_header.ID[2] == 116 && next_header.ID[3] == 97)
             {
-                m_data.resize(nextHeader.size);
-                fread(m_data.data(), nextHeader.size, 1, f);
-                bDATA = true;
+                m_data.resize(next_header.size);
+                fread(m_data.data(), next_header.size, 1, f);
+                b_data = true;
             }
             /* Just move on otherwise (MUST SUPPORT COMPRESSED WAV IN FUTURE) */
             else
             {
-                detail::HeaderData junk(nextHeader.size);
-                fread(junk.data(), nextHeader.size, 1, f);
+                detail::HeaderData junk(next_header.size);
+                fread(junk.data(), next_header.size, 1, f);
             }
-        } while (!(bFMT && bDATA));
+        } while (!(b_fmt && b_data));
 
         fclose(f);
     }
@@ -143,9 +139,8 @@ public:
      * \brief frequency gets the frequency of the wave file
      * \return the frequency
      */
-    uint32_t frequency() const { return m_fmt.sampleRate; }
+    uint32_t frequency() const { return m_fmt.sample_rate; }
 
-#ifdef LOADIO_OPENAL
     /*!
      * \brief getALformat gets one of the four supported OpenAL formats. STEREO16, MONO16, STEREO8 and MONO8
      * If another format has been loaded this function will thrown a runtime_error
@@ -155,29 +150,24 @@ public:
      */
     ALenum getALformat() const
     {
-        if (m_fmt.numChannels == 2 && m_fmt.bitsPerSample == 16)
+        if (m_fmt.num_channels == 2 && m_fmt.bits_per_sample == 16)
         {
             return AL_FORMAT_STEREO16;
         }
-        else if (m_fmt.numChannels == 2 && m_fmt.bitsPerSample == 8)
+        else if (m_fmt.num_channels == 2 && m_fmt.bits_per_sample == 8)
         {
             return AL_FORMAT_STEREO8;
         }
-        else if (m_fmt.numChannels == 1 && m_fmt.bitsPerSample == 16)
+        else if (m_fmt.num_channels == 1 && m_fmt.bits_per_sample == 16)
         {
             return AL_FORMAT_MONO16;
         }
-        else if (m_fmt.numChannels == 1 && m_fmt.bitsPerSample == 8)
+        else if (m_fmt.num_channels == 1 && m_fmt.bits_per_sample == 8)
         {
             return AL_FORMAT_MONO8;
         }
 
-#ifdef LOADIO_USE_EXCEPTIONS
-        throw std::runtime_error("Non Supported OpenAL Format (#CH: " + std::to_string(m_fmt.numChannels) +
-                                 " BPS: " + std::to_string(m_fmt.bitsPerSample) + ")");
-#else
-     return 0;
-#endif
+        return 0;
     }
 
     /*!
@@ -192,7 +182,6 @@ public:
         alBufferData(buf, getALformat(), data(), size(), frequency());
         return buf;
     }
-#endif
 };
 
 }  // namespace loadio
