@@ -24,6 +24,9 @@ constexpr int GHOST_KILLER_SCORE = 50;
 constexpr int POWERUP_SCORE = 500;
 constexpr int GHOST_KILL_SCORE = 200;
 
+/* Encryption String (very secure) */
+inline const char * ENCRYPTION_STRING = "PACMAN";
+
 /* Gameplay */
 constexpr float GHOST_KILLER_TIME = 10.f;
 constexpr float GHOST_POWERUP_SPEED_DELTA = 0.1f;
