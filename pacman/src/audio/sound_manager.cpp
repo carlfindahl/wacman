@@ -35,8 +35,8 @@ pac::SoundManager::SoundManager()
 
     GFX_INFO("Loaded %u sound effects / music tracks.", m_sound_buffers.size());
 
-    /* Generate some sources for multiple playback */
-    constexpr int num_sources = 16;
+    /* Generate a reasonable number of sources for multiple SFX playback and overlap */
+    constexpr int num_sources = 12;
     m_inactive_sources.resize(num_sources);
     alGenSources(num_sources, m_inactive_sources.data());
 
@@ -45,6 +45,7 @@ pac::SoundManager::SoundManager()
     {
         alSource3f(source, AL_POSITION, 0.f, 0.f, 0.f);
         alSource3f(source, AL_VELOCITY, 0.f, 0.f, 0.f);
+        alSourcei(source, AL_LOOPING, 0);
     }
 
     /* Set listener position and velocity to 0 */
@@ -65,6 +66,7 @@ void SoundManager::play(const std::string& sound_name)
 
     m_active_sources.erase(itrs.second, m_active_sources.end());
 
+    GFX_DEBUG("Currently %u active and %u inactive sources playing audio.", m_active_sources.size(), m_inactive_sources.size());
     GFX_ASSERT(!m_inactive_sources.empty(), "No available sound sources to play audio!");
 
     /* Get an available source */
@@ -72,7 +74,7 @@ void SoundManager::play(const std::string& sound_name)
     m_inactive_sources.pop_back();
 
     /* Queue it up */
-    alSourceQueueBuffers(source, 1, &m_sound_buffers.at(sound_name));
+    alSourcei(source, AL_BUFFER, m_sound_buffers.at(sound_name));
     alSourcePlay(source);
 
     /* Add it to the active sources */
