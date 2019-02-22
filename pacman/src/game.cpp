@@ -5,6 +5,7 @@
 #include "states/main_menu_state.h"
 #include "rendering/shader_program.h"
 #include "rendering/renderer.h"
+#include "audio/sound_manager.h"
 
 #include <chrono>
 
@@ -40,6 +41,9 @@ void Game::run()
     /* Create variables for tracking frame-times */
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();
+
+    /* Force construction of singleton so all audio is loaded before main loop */
+    get_sound().play("pacman");
 
     do
     {
