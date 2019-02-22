@@ -1,5 +1,6 @@
 #include "level.h"
 #include "pathfinding.h"
+#include "audio/sound_manager.h"
 #include "states/state_manager.h"
 #include "states/respawn_state.h"
 #include "states/game_over_state.h"
@@ -273,7 +274,10 @@ void Level::update_pacman()
         switch (get_tile(m_pacman->m_position).type)
         {
         /* Regular food yields 10 points as per the Pacman Dossier */
-        case ETileType::Food: m_score += FOOD_SCORE; break;
+        case ETileType::Food:
+            m_score += FOOD_SCORE;
+            get_sound().play("food_pickup");
+            break;
 
         /* The ghost killer gives 50 points and lasts for 10 seconds */
         case ETileType::GhostKiller:
@@ -283,6 +287,7 @@ void Level::update_pacman()
             {
                 g.set_ai_state(Ghost::EState::Scared);
             }
+            get_sound().play("powerup_pickup");
             break;
 
         /* As a twist to the original game, when you pick up the powerups, all ghosts become slightly faster, and picking up a
@@ -296,6 +301,7 @@ void Level::update_pacman()
             {
                 g.add_speed(GHOST_POWERUP_SPEED_DELTA);
             }
+            get_sound().play("powerup_pickup");
             break;
         default: break;
         }
@@ -327,6 +333,7 @@ void Level::update_ghost(float dt, Ghost& g)
             g.set_ai_state(Ghost::EState::Scattering);
             g.set_path(new Path(*this, g.position(), g.home()));
             m_score += GHOST_KILL_SCORE * m_ghost_kill_multiplier++;
+            get_sound().play("ghost_die");
         }
         /* Take life from pacman and move to spawn */
         else
@@ -347,6 +354,7 @@ void Level::update_ghost(float dt, Ghost& g)
             else
             {
                 m_context.state_manager->push<GameOverState>(m_context, m_score);
+                get_sound().play("game_over");
             }
         }
     }
