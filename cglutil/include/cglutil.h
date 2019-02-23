@@ -331,7 +331,11 @@ namespace cgl
 #ifdef _MSC_VER
 #define CGL_ALWAYS_INLINE __forceinline
 #define CGL_NEVER_INLINE __declspec(noinline)
+#define CGL_LIKELY(x) (x)
+#define CGL_UNLIKELY(x) (x)
 #else
 #define CGL_ALWAYS_INLINE inline __attribute__((__always_inline__))
 #define CGL_NEVER_INLINE __attribute__((__noinline__))
+#define CGL_LIKELY(x) __builtin_expect((bool)(x), 1)
+#define CGL_UNLIKELY(x) __builtin_expect((bool)(x), 0)
 #endif
