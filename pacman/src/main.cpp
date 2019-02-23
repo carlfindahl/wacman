@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
-#ifdef NDEBGUG
+#ifdef NDEBUG
 #ifdef PACMAN_USE_BENCHMARKS
 #include <benchmark/benchmark.h>
 #endif
