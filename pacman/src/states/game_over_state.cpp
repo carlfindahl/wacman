@@ -61,13 +61,8 @@ bool GameOverState::update(float dt)
         m_context.state_manager->push<MainMenuState>(m_context);
     }
 
-    /* Center score text too */
-    ImGui::Columns(3, nullptr, false);
-    ImGui::NextColumn();
+    /* Score text */
     ImGui::TextColored({1.f, 1.f, 0.f, 1.f}, "You scored %d points.", m_score);
-    ImGui::NextColumn();
-    ImGui::NextColumn();
-    ImGui::Columns(1);
 
     ImGui::End();
     return false;
