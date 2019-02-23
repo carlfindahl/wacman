@@ -42,6 +42,7 @@ bool GameOverState::update(float dt)
     ImGui::SetNextWindowSize({375.f, 80.f});
     ImGui::Begin("New Hi-Score", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
+    /* Print title centered */
     ImGui::Columns(3, nullptr, false);
     ImGui::NextColumn();
     ImGui::Text("%s", m_title);
@@ -49,15 +50,24 @@ bool GameOverState::update(float dt)
     ImGui::NextColumn();
     ImGui::Columns(1);
 
+    /* Print submission form */
+    ImGui::Text("Name");
+    ImGui::SameLine();
+    ImGui::InputText("", m_playername.data(), m_playername.size());
+    ImGui::SameLine();
     if (ImGui::Button("Submit"))
     {
         m_context.state_manager->clear();
         m_context.state_manager->push<MainMenuState>(m_context);
     }
-    ImGui::SameLine();
-    ImGui::InputText("Name", m_playername.data(), m_playername.size());
 
-    ImGui::Text("You scored %d points.", m_score);
+    /* Center score text too */
+    ImGui::Columns(3, nullptr, false);
+    ImGui::NextColumn();
+    ImGui::TextColored({1.f, 1.f, 0.f, 1.f}, "You scored %d points.", m_score);
+    ImGui::NextColumn();
+    ImGui::NextColumn();
+    ImGui::Columns(1);
 
     ImGui::End();
     return false;
