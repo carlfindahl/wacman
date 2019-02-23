@@ -19,11 +19,7 @@ namespace detail
  */
 struct custom_ivec2_hash
 {
-    std::size_t operator()(const glm::ivec2& vec) const noexcept
-    {
-        const uint64_t hash = (static_cast<uint64_t>(vec.x) << 32u) | vec.y;
-        return hash;
-    }
+    std::size_t operator()(const glm::ivec2& vec) const noexcept { return std::hash<int>()(vec.x) ^ std::hash<int>()(vec.y); }
 };
 }  // namespace detail
 
