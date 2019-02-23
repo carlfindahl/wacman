@@ -56,5 +56,5 @@ include(${CMAKE_CURRENT_LIST_DIR}/encrypt/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/robinhood/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/states/CMakeLists.txt)
-

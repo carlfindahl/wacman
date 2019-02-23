@@ -23,7 +23,7 @@ pac::SoundManager::SoundManager()
     alcMakeContextCurrent(m_audio_context);
 
     /* Iterate all files in resource folder */
-    const auto res_path = std::filesystem::path("res/");
+    const auto res_path = std::filesystem::path(cgl::native_absolute_path("res/"));
     for (auto entry = std::filesystem::directory_iterator(res_path); entry != std::filesystem::directory_iterator(); ++entry)
     {
         /* If file is a .wav file, load it! */
