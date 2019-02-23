@@ -3,16 +3,17 @@
 #include <string_view>
 
 #include <gfx.h>
+#include <cglutil.h>
 
 namespace pac
 {
-VignereEncryption::VignereEncryption(const char *key)
+VignereEncryption::VignereEncryption(const char* key)
 {
     GFX_ASSERT(key, "Vignere Encryption key must not be nullptr.");
 
     /* Convert key to uppercase */
     std::string new_key(key);
-    for (auto &letter : new_key)
+    for (auto& letter : new_key)
     {
         if (isalpha(letter))
         {
@@ -26,7 +27,7 @@ VignereEncryption::VignereEncryption(const char *key)
 void VignereEncryption::encrypt(std::string& str)
 {
     std::size_t key_idx = 0;
-    for (auto &letter : str)
+    for (auto& letter : str)
     {
         bool was_uppercase = isupper(letter);
         letter = toupper(letter);
@@ -54,7 +55,7 @@ void VignereEncryption::encrypt(std::string& str)
 void VignereEncryption::decrypt(std::string& str)
 {
     std::size_t key_idx = 0;
-    for (auto &letter : str)
+    for (auto& letter : str)
     {
         bool was_uppercase = isupper(letter);
         letter = toupper(letter);
@@ -70,7 +71,7 @@ void VignereEncryption::decrypt(std::string& str)
                 key_idx = 0;
             }
         }
-        
+
         /* Put letter back to original case */
         if (!was_uppercase)
         {
@@ -78,4 +79,4 @@ void VignereEncryption::decrypt(std::string& str)
         }
     }
 }
-} // namespace pac
+}  // namespace pac
