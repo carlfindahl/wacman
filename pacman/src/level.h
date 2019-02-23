@@ -78,6 +78,8 @@ private:
     int32_t m_ghost_kill_multiplier = 1;
 
 public:
+    Level() = default;
+
     Level(GameContext context);
 
     /*!
