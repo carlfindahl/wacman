@@ -349,17 +349,23 @@ void Level::update_ghost(float dt, Ghost& g)
         /* Take life from pacman and move to spawn */
         else
         {
-            m_chasetime = seconds(30.f);
             m_pacman->m_lives = glm::max(0, m_pacman->m_lives - 1);
-            m_pacman->m_position = m_pacman_spawn;
-            m_pacman->m_current_direction = {0, -1};
+            /* Only respawn if pacman is still alive */
+            if (m_pacman->m_lives > 0)
+            {
+                /* Reset ghosts */
             for (auto& g : m_ghosts)
             {
                 g.set_position(g.home());
             }
-            if (m_pacman->m_lives > 0)
-            {
+
+                /* Reset Pacman and add Respawn state */
+                m_chasetime = seconds(30.f);
+                m_pacman->m_position = m_pacman_spawn;
+                m_pacman->m_current_direction = {0, -1};
+                m_pacman->m_desired_direction = {0, -1};
                 m_context.state_manager->push<RespawnState>(m_context, 1.5f, "RESPAWNING");
+                get_sound().play("ghost_die");
             }
             /* Game over state */
             else
