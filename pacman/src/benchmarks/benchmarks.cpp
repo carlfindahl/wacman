@@ -1,53 +1,40 @@
 #include "encrypt/vignere_encryptor.h"
+#include "states/state_manager.h"
+#include "pathfinding.h"
+#include "level.h"
 
 #include <benchmark/benchmark.h>
 
-/* TEST ENCRYPTION FUNCTION AND DECRYPTION FUNCTION ON SHORT / LONG STRINGS TO BE ABLE TO OPTIMIZE IT */
+#include <glm/vec2.hpp>
 
-static void bench_encrypt_short(benchmark::State& state)
+static void bench_pathfinding_bfs(benchmark::State& state)
 {
-    pac::VignereEncryption enc("PACMAN");
-    std::string short_string("Hello you.");
+    pac::Level lvl{};
+    lvl.load("res/level0");
+
+    glm::ivec2 start = {1, 3};
+    glm::ivec2 end = {13, 25};
     for (auto _ : state)
     {
-        enc.encrypt(short_string);
+        auto p = pac::Path(lvl, start, end, pac::Path::BFS{});
+        benchmark::DoNotOptimize(p);
     }
 }
 
-BENCHMARK(bench_encrypt_short);
+BENCHMARK(bench_pathfinding_bfs);
 
-static void bench_encrypt_long(benchmark::State& state)
+static void bench_pathfinding_astar(benchmark::State& state)
 {
-    pac::VignereEncryption enc("PACMAN");
-    std::string long_string("I am the most beaufitful person in the world and your name is pacman, but I do not care about it.");
+    pac::Level lvl{};
+    lvl.load("res/level0");
+
+    glm::ivec2 start = {1, 3};
+    glm::ivec2 end = {13, 25};
     for (auto _ : state)
     {
-        enc.encrypt(long_string);
+        auto p = pac::Path(lvl, start, end, pac::Path::ASTAR{});
+        benchmark::DoNotOptimize(p);
     }
 }
 
-BENCHMARK(bench_encrypt_long);
-
-static void bench_decrypt_short(benchmark::State& state)
-{
-    pac::VignereEncryption enc("PACMAN");
-    std::string short_string("Hello you.");
-    for (auto _ : state)
-    {
-        enc.decrypt(short_string);
-    }
-}
-
-BENCHMARK(bench_decrypt_short);
-
-static void bench_decrypt_long(benchmark::State& state)
-{
-    pac::VignereEncryption enc("PACMAN");
-    std::string long_string("I am the most beaufitful person in the world and your name is pacman, but I do not care about it.");
-    for (auto _ : state)
-    {
-        enc.decrypt(long_string);
-    }
-}
-
-BENCHMARK(bench_decrypt_long);
+BENCHMARK(bench_pathfinding_astar);

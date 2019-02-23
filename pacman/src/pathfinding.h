@@ -24,12 +24,21 @@ private:
     std::chrono::steady_clock::time_point m_creation_time = {};
 
 public:
+    /* Tags for algorithm choice */
+    enum class BFS
+    {
+    };
+    enum class ASTAR
+    {
+    };
+
     Path() = delete;
 
     /*!
-     * \brief Construct  a Path from a type of Graph
+     * \brief Construct  a Path from a type of Graph, using a tag to choose algorithm. A* is the default if none is specified.
      */
-    Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target);
+    Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target, ASTAR astartag = {});
+    Path(const Level& graph, glm::ivec2 origin, glm::ivec2 target, BFS bfstag);
 
     Path(const Path&) = default;
     Path(Path&&) = default;

@@ -1,17 +1,23 @@
 #include "pathfinding.h"
 #include "level.h"
 #include "common.h"
+#include "robinhood/robinhood.h"
 
 #include <queue>
 #include <vector>
 #include <type_traits>
-#include <unordered_map>
 
 #include <gfx.h>
 
-pac::Path::Path(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) : m_creation_time(std::chrono::steady_clock::now())
+pac::Path::Path(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target, ASTAR astartag)
+    : m_creation_time(std::chrono::steady_clock::now())
 {
     pathfind_astar(graph, origin, target);
+}
+
+pac::Path::Path(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target, BFS bfstag)
+{
+    pathfind_bfs(graph, origin, target);
 }
 
 pac::Path::~Path() noexcept {}
@@ -41,7 +47,7 @@ void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::iv
     std::queue<glm::ivec2> next_node = {};
     next_node.push(origin);
 
-    std::unordered_map<glm::ivec2, glm::ivec2, detail::custom_ivec2_hash> traceback = {};
+    robin_hood::unordered_map<glm::ivec2, glm::ivec2, detail::custom_ivec2_hash> traceback{};
     traceback[origin] = origin;
 
     while (!next_node.empty())
@@ -81,9 +87,9 @@ void pac::Path::pathfind_astar(const pac::Level& graph, glm::ivec2 origin, glm::
     std::priority_queue<priority_pair, std::vector<priority_pair>, decltype(priority_func)> next_node(priority_func);
     next_node.push(priority_pair(0.0, origin));
 
-    /* Keep a traceback map and a cost map */
-    std::unordered_map<glm::ivec2, glm::ivec2, detail::custom_ivec2_hash> traceback = {};
-    std::unordered_map<glm::ivec2, int, detail::custom_ivec2_hash> cost_so_far = {};
+    /* Keep a traceback map and a cost map (using robin hood hash map as it tested to be 2x the speed of std in this case) */
+    robin_hood::unordered_map<glm::ivec2, glm::ivec2, detail::custom_ivec2_hash> traceback{};
+    robin_hood::unordered_map<glm::ivec2, int, detail::custom_ivec2_hash> cost_so_far{};
     traceback[origin] = origin;
     cost_so_far[origin] = 0;
 
