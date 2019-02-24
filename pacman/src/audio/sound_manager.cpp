@@ -55,7 +55,7 @@ pac::SoundManager::SoundManager()
     alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f);
 }
 
-void SoundManager::play(const std::string& sound_name, bool looped)
+unsigned SoundManager::play(const std::string& sound_name, bool looped)
 {
     /* Before we play anything, move finished active sources back to the inactive pool. We only need to do this whenever a new
      * sound is requested playing, since otherwise no state will have changed since last time */
@@ -71,7 +71,7 @@ void SoundManager::play(const std::string& sound_name, bool looped)
     GFX_ASSERT(!m_inactive_sources.empty(), "No available sound sources to play audio!");
 
     /* Get an available source */
-    auto source = m_inactive_sources.back();
+    const auto source = m_inactive_sources.back();
     m_inactive_sources.pop_back();
 
     /* Queue it up */
@@ -82,7 +82,11 @@ void SoundManager::play(const std::string& sound_name, bool looped)
     /* Add it to the active sources */
     m_active_sources.push_back(source);
     GFX_DEBUG("USED %u  AVIAIL: %u - audio sources", m_active_sources.size(), m_inactive_sources.size());
+
+    return source;
 }
+
+void SoundManager::stop(unsigned sound_id_from_play) { alSourceStop(sound_id_from_play); }
 
 SoundManager::~SoundManager()
 {

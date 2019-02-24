@@ -2,7 +2,8 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
+
+#include "robinhood/robinhood.h"
 
 /* Forward Declarations */
 typedef struct ALCcontext_struct ALCcontext;
@@ -18,7 +19,7 @@ class SoundManager
 {
 private:
     /* Map of sound names to buffers (the name is the filename without an extension) */
-    std::unordered_map<std::string, unsigned> m_sound_buffers = {};
+    robin_hood::unordered_map<std::string, unsigned> m_sound_buffers{};
 
     /* All actively playing sound sources */
     std::vector<unsigned> m_active_sources = {};
@@ -37,8 +38,15 @@ public:
      * \brief play the sound with the given name
      * \param sound_name is the name of the sound to play
      * \param looped true if you want the sound to loop forever (like a music track maybe?)
+     * \return id of sound that started  playing. Use this to later stop the sound.
      */
-    void play(const std::string& sound_name, bool looped = false);
+    unsigned play(const std::string& sound_name, bool looped = false);
+
+    /*!
+     * \brief stop stops a currently playing sound if it is still playing
+     * \param sound_id_from_play is the id of the sound you want to stop that play returned to you
+     */
+    void stop(unsigned sound_id_from_play);
 
     ~SoundManager();
 
