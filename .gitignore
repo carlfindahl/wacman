@@ -6,3 +6,13 @@ build/
 
 # QtCreator IDE specific file - no need to replicate
 CMakeLists.txt.user
+
+# Latex ignores
+presentation/*.aux
+presentation/*.log
+presentation/*.nav
+presentation/*.out
+presentation/*.snm
+presentation/*.toc
+presentation/*.synctex.gz
+presentation/*.pdf
