@@ -24,14 +24,14 @@ Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.
  * OpenGL 4.5 Compliant Driver
  * [GLFW 3.2](http://glfw.org/)
  * [GLM](https://glm.g-truc.net/0.9.9/index.html)
- * [OpenAL 1.1](https://www.openal.org/) *[optional, but very recommended for audio]* 
+ * [OpenAL 1.1](https://www.openal.org/)
  * [Google Benchmark](https://github.com/google/benchmark) *[optional, only if you want to run benchmarks]*
 
-On Linux, CMake should be able to find all of these automatically using `find_package`. On Windows this requires that you have built and installed the required libraries to a folder that is on your system `PATH` environment variable.
+GLFW, GLM and OpenAL are all downloaded and built automatically by CMake using `ExternalProject`. This means you don't have to add any external dependencies manually. All you need is a C++17 compiler and an OpenGL 4.5 capable driver.
 
 #### Building
 
-Run CMake and generate a project, preferably in a `build/` directory. Compile the program with your chosen compiler for your OS/IDE. Then on Linux, just execute the `pacman` file. If you use Visual Studio the relative directories are weird when running so you must manually copy the `res` folder into the same folder as your executable. This does not apply for VSCode on Windows.
+Run CMake and generate a project, preferably in a `build/` directory. Compile the program with your chosen compiler for your OS/IDE. The external dependencies (GLFW, GLM and OpenAL) will be built automatically by CMake in this step too. Then on Linux, just execute the `pacman` file. If you use Visual Studio the relative directories are weird when running so you must manually copy the `res` folder into the same folder as your executable. This does not apply for VSCode or other generators on Windows.
 
 The application works with relative paths where the relativity always starts from the path of the executable on your hard drive, and not your working directory.
 
