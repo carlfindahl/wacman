@@ -31,6 +31,7 @@ inline const char * ENCRYPTION_STRING = "PACMAN";
 constexpr float GHOST_KILLER_TIME = 10.f;
 constexpr float GHOST_POWERUP_SPEED_DELTA = 0.1f;
 constexpr float GHOST_CHASE_TIME = 30.f;
+constexpr float GHOST_DIE_SPEED_BOOST = 2.5f;
 
 /* Version Numbers */
 constexpr int VERSION_MAJOR = @PROJECT_VERSION_MAJOR@;

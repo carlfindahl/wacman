@@ -115,6 +115,7 @@ void Ghost::update(float dt)
 
         if (m_position == m_home && m_dead)
         {
+            m_speed -= GHOST_DIE_SPEED_BOOST;
             m_ai_state = EState::Scared;
             m_dead = false;
         }
