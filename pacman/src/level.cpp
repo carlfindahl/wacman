@@ -48,6 +48,7 @@ void Level::update(float dt)
     m_pacman_kill_timer -= seconds(dt);
     if (m_pacman_kill_timer <= seconds(0.f))
     {
+        m_pacman->m_speed = PACMAN_BASE_SPEED;
         m_ghost_kill_multiplier = 1;
         for (auto& ghost : m_ghosts)
         {
@@ -293,6 +294,7 @@ void Level::update_pacman()
         /* The ghost killer gives 50 points and lasts for 10 seconds */
         case ETileType::GhostKiller:
             m_score += GHOST_KILLER_SCORE;
+            m_pacman->m_speed = PACMAN_KILLER_SPEED;
             m_pacman_kill_timer = seconds(GHOST_KILLER_TIME);
             for (auto& g : m_ghosts)
             {
@@ -303,7 +305,7 @@ void Level::update_pacman()
 
         /* As a twist to the original game, when you pick up the powerups, all ghosts become slightly faster, and picking up a
          * powerup after you killed a ghost or more, increases the score you get from it. Therefore they also yield 500 points
-         * instead of the original 200 now. To compensate, pacman also gains some corner cutting speed. */
+         * instead of the original 200 now. */
         case ETileType::Banana:
         case ETileType::Orange:
         case ETileType::Strawberry:
@@ -355,10 +357,10 @@ void Level::update_ghost(float dt, Ghost& g)
             if (m_pacman->m_lives > 0)
             {
                 /* Reset ghosts */
-            for (auto& g : m_ghosts)
-            {
-                g.set_position(g.home());
-            }
+                for (auto& g : m_ghosts)
+                {
+                    g.set_position(g.home());
+                }
 
                 /* Reset Pacman and add Respawn state */
                 m_chasetime = seconds(30.f);

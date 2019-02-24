@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "config.h"
 #include "rendering/renderer.h"
 
 #include <utility>
@@ -46,7 +47,7 @@ private:
     float m_move_progress = 0.f;
 
     /* Speed - Tiles per second */
-    float m_speed = 3.15f;
+    float m_speed = GHOST_BASE_SPEED;
 
     /* Animation timer */
     float m_animation_time = 0.f;

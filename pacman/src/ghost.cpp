@@ -1,6 +1,5 @@
 #include "ghost.h"
 #include "pathfinding.h"
-#include <config.h>
 
 #include <gfx.h>
 
@@ -8,7 +7,7 @@ namespace pac
 {
 Ghost::Ghost() : Ghost({0, 0}) {}
 
-Ghost::Ghost(glm::ivec2 position) : m_home(position), m_position(position)
+Ghost::Ghost(glm::ivec2 position) : m_position(position), m_home(position)
 {
     /* Load Ghost textures */
     m_textures.emplace(glm::ivec2{0, 0}, get_renderer().load_animation_texture("res/pacman.png", 296, 7 + 1 * 70, 70, 70, 1, 1));
@@ -19,7 +18,7 @@ Ghost::Ghost(glm::ivec2 position) : m_home(position), m_position(position)
 }
 
 Ghost::Ghost(const Ghost& other)
-    : m_textures(other.m_textures), m_home(other.m_home), m_position(other.m_position), m_direction(other.m_direction),
+    : m_textures(other.m_textures), m_position(other.m_position), m_direction(other.m_direction), m_home(other.m_home),
       m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
       m_ai_state(other.m_ai_state)
 {
@@ -52,7 +51,7 @@ Ghost& Ghost::operator=(const Ghost& other)
 }
 
 Ghost::Ghost(Ghost&& other) noexcept
-    : m_textures(std::move(other.m_textures)), m_home(other.m_home), m_position(other.m_position), m_direction(other.m_direction),
+    : m_textures(std::move(other.m_textures)), m_position(other.m_position), m_direction(other.m_direction), m_home(other.m_home),
       m_move_progress(other.m_move_progress), m_speed(other.m_speed), m_animation_time(other.m_animation_time),
       m_ai_state(other.m_ai_state)
 {

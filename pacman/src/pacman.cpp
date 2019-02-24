@@ -1,5 +1,4 @@
 #include "pacman.h"
-#include <config.h>
 #include <input.h>
 
 #include <gfx.h>
