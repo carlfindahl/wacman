@@ -1,17 +1,20 @@
+# Add Google Benchmark and link it only if benchmark library is found and we have enabled them with the option
 
 if (${PACMAN_BUILD_BENCHMARKS})
-    find_package(benchmark 1.4)
+    find_package(benchmark)
 
-    target_link_libraries(
-        ${EXEC_NAME}
-        PRIVATE
-        benchmark
-    )
+    if(${benchmark_FOUND})
+        target_link_libraries(
+            ${EXEC_NAME}
+            PRIVATE
+            benchmark
+        )
 
-    target_sources(
-        ${EXEC_NAME}
-        PRIVATE
+        target_sources(
+            ${EXEC_NAME}
+            PRIVATE
 
-        ${CMAKE_CURRENT_LIST_DIR}/benchmarks.cpp
-    )
+            ${CMAKE_CURRENT_LIST_DIR}/benchmarks.cpp
+        )
+    endif()
 endif()
