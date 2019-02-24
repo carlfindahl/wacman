@@ -36,10 +36,10 @@ Pacman::~Pacman() { input::get_input().pop(); }
 
 void Pacman::turn(glm::ivec2 new_direction)
 {
-    if (!is_opposite(new_direction))
-    {
-        m_desired_direction = new_direction;
-    }
+    //    if (!is_opposite(new_direction))
+    //    {
+    m_desired_direction = new_direction;
+    //    }
 }
 
 void Pacman::update(float dt)
