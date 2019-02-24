@@ -1,4 +1,5 @@
 #include "game_state.h"
+#include "audio/sound_manager.h"
 #include "state_manager.h"
 #include "pause_state.h"
 #include "input.h"
@@ -14,6 +15,8 @@ GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
 
 void GameState::on_enter()
 {
+    m_music_id = get_sound().play("theme", true);
+
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
     input::InputState game_input(true);
@@ -26,7 +29,11 @@ void GameState::on_enter()
     m_level.load("res/level0");
 }
 
-void GameState::on_exit() { input::get_input().pop(); }
+void GameState::on_exit()
+{
+    get_sound().stop(m_music_id);
+    input::get_input().pop();
+}
 
 bool GameState::update(float dt)
 {

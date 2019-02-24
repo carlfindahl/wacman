@@ -1,6 +1,7 @@
 #include "main_menu_state.h"
 #include "game_state.h"
 #include "high_score_state.h"
+#include "audio/sound_manager.h"
 #include "respawn_state.h"
 #include "state_manager.h"
 #include "help_state.h"
@@ -11,7 +12,12 @@
 
 namespace pac
 {
-void pac::MainMenuState::on_enter() { m_splash_texture = get_renderer().load_texture("res/splash_screen.png"); }
+void pac::MainMenuState::on_enter()
+{
+    m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
+    get_sound().play("pacman");
+    m_music_id = get_sound().play("simple_theme");
+}
 
 void pac::MainMenuState::on_exit() {}
 
@@ -24,6 +30,8 @@ bool pac::MainMenuState::update(float dt)
 
     if (ImGui::Button("Start Game", {150, 50}))
     {
+        /* Stop music if still playing to avoid massive music load */
+        get_sound().stop(m_music_id);
         m_context.state_manager->push<GameState>(m_context);
         m_context.state_manager->push<RespawnState>(m_context);
     }

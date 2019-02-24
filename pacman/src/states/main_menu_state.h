@@ -11,6 +11,9 @@ private:
     /* Splash screen texture */
     TextureID m_splash_texture{};
 
+    /* Music id */
+    unsigned m_music_id = 0u;
+
 public:
     using State::State;
 

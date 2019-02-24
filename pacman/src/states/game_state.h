@@ -15,6 +15,9 @@ private:
     /* Game overlay */
     TextureID m_overlay{};
 
+    /* ID of music track */
+    unsigned m_music_id = 0u;
+
 public:
     GameState(GameContext owner);
 

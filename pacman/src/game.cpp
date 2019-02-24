@@ -42,9 +42,6 @@ void Game::run()
     std::chrono::steady_clock delta_clock = {};
     auto last_frame = delta_clock.now();
 
-    /* Force construction of singleton so all audio is loaded before main loop */
-    get_sound().play("pacman");
-
     do
     {
         /* Set ImGui up for a new frame */
