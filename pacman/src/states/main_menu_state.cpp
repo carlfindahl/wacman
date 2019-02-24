@@ -3,6 +3,7 @@
 #include "high_score_state.h"
 #include "respawn_state.h"
 #include "state_manager.h"
+#include "help_state.h"
 #include "config.h"
 
 #include <gfx.h>
@@ -17,6 +18,7 @@ void pac::MainMenuState::on_exit() {}
 bool pac::MainMenuState::update(float dt)
 {
     /* Begin Main Menu Window, and center it */
+    ImGui::SetNextWindowSize({160, 220});
     ImGui::SetNextWindowPos({SCREEN_W / 2.f, SCREEN_H / 2.f}, 0, {0.5f, 0.5f});
     ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
@@ -29,6 +31,11 @@ bool pac::MainMenuState::update(float dt)
     if (ImGui::Button("High Scores", {150, 50}))
     {
         m_context.state_manager->push<HighScoreState>(m_context);
+    }
+
+    if (ImGui::Button("Help / Credits", {150, 50}))
+    {
+        m_context.state_manager->push<HelpState>(m_context);
     }
 
     if (ImGui::Button("Exit", {150, 50}))

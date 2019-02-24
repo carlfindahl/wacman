@@ -72,6 +72,7 @@ private:
     /* Number of seconds left before pacman is no longer a killer */
     seconds m_pacman_kill_timer{0.f};
 
+    /* Context in which level exists */
     GameContext m_context{};
 
     /* When you kill a ghost, the score is multiplied with this amount */
