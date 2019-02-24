@@ -10,6 +10,8 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include <gfx.h>
+
 namespace pac
 {
 pac::SoundManager::SoundManager()
@@ -21,6 +23,9 @@ pac::SoundManager::SoundManager()
     m_audio_context = alcCreateContext(m_audio_device, nullptr);
     GFX_ASSERT(m_audio_device, "Audio context failed to initialize.");
     alcMakeContextCurrent(m_audio_context);
+
+    const auto* device_name = alcGetString(m_audio_device, ALC_DEVICE_SPECIFIER);
+    GFX_INFO("Using audio device: %s", device_name);
 
     /* Iterate all files in resource folder */
     const auto res_path = std::filesystem::path(cgl::native_absolute_path("res/"));

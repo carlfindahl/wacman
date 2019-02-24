@@ -4,11 +4,14 @@
 set(EXEC_NAME pacman)
 add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
+# Download external libraries and build them so find_package is guaranteed to find the required packages
+include(${CMAKE_SOURCE_DIR}/cmake/MissingAsExternal.cmake)
+
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.2 REQUIRED)
 find_package(glm REQUIRED)
-find_package(OpenAL)  # Not mandatory, but needed for sound
+find_package(OpenAL REQUIRED)
 
 target_link_libraries(
     ${EXEC_NAME}
@@ -17,7 +20,7 @@ target_link_libraries(
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
     $<$<PLATFORM_ID:Linux>:dl>        # Required by glad on Linux
-    $<$<BOOL:${OpenAL_FOUND}>:openal> # OpenAL, but only if found
+    openal                            # For OpenAL Audio
     OpenGL::GL                        # For OpenGL
     glfw                              # For window integration
     glm                               # For Maths
