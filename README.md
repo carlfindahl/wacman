@@ -27,7 +27,7 @@ Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.
  * [OpenAL 1.1](https://www.openal.org/)
  * [Google Benchmark](https://github.com/google/benchmark) *[optional, only if you want to run benchmarks]*
 
-GLFW, GLM and OpenAL are all downloaded and built automatically by CMake using `ExternalProject`. This means you don't have to add any external dependencies manually. All you need is a C++17 compiler and an OpenGL 4.5 capable driver.
+GLFW, GLM and OpenAL are required to play. I use `find_package` to locate these libraries so on Linux it should be a matter of installing them via the terminal and then running CMake. On Windows you should specify these directories manually unless you have installed the libraries in a way that they can be found on the `PATH` variable.
 
 #### Building
 
