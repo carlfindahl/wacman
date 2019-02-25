@@ -6,11 +6,9 @@ add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.2)
-find_package(OpenAL)
-find_package(glm)
-
-include(${CMAKE_SOURCE_DIR}/cmake/BuildNotFound.cmake)
+find_package(glfw3 3.2 REQUIRED)
+find_package(glm REQUIRED)
+find_package(OpenAL REQUIRED)
 
 target_link_libraries(
     ${EXEC_NAME}

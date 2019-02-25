@@ -4,11 +4,14 @@ set(CGL_UTIL_NAME "cgl")
 add_library(${CGL_UTIL_NAME} ${CMAKE_BUILD_SHARED_LIBS} "")
 
 find_package(OpenGL REQUIRED)
-# find_package(glfw3 3.2)
+find_package(glfw3 3.2)
 
 # Define CGL_USE_GLFW if we have access to GLFW
-# if(${glfw3_FOUND})
+if(glfw3_FOUND)
 option(CGL_USE_GLFW ON)
+else()
+option(CGL_USE_GLFW OFF)
+endif()
 
 if(CGL_USE_GLFW)
     message(STATUS "Adding GLFW support to CGL.")
