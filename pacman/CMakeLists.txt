@@ -4,14 +4,13 @@
 set(EXEC_NAME pacman)
 add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
-# Download external libraries and build them so find_package is guaranteed to find the required packages
-include(${CMAKE_SOURCE_DIR}/cmake/MissingAsExternal.cmake)
-
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.2 REQUIRED)
-find_package(glm REQUIRED)
-find_package(OpenAL REQUIRED)
+find_package(glfw3 3.2)
+find_package(OpenAL)
+find_package(glm)
+
+include(${CMAKE_SOURCE_DIR}/cmake/BuildNotFound.cmake)
 
 target_link_libraries(
     ${EXEC_NAME}

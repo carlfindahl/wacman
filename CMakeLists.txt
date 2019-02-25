@@ -1,10 +1,12 @@
 # CMakeLists.txt for the GFX Pacman Assignment - Spring 2019
-cmake_minimum_required(VERSION 3.10)
+# 3.11 is needed for FetchContent
+cmake_minimum_required(VERSION 3.11)
 
 project(imt2531_assignment01 VERSION 1.0.0)
 
 # CMake Complains if this is not set
 set(OpenGL_GL_PREFERENCE GLVND)
 
+add_subdirectory(dependencies)
 add_subdirectory(pacman)
 add_subdirectory(cglutil)
