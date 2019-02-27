@@ -16,4 +16,3 @@ void main()
     vs_uv = uvs[gl_VertexID];
     gl_Position = vec4(positions[gl_VertexID], 0.f, 1.f);
 }
-

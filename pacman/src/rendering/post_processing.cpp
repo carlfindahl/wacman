@@ -4,6 +4,7 @@
 #include <gfx.h>
 #include <cglutil.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace pac
 {
@@ -39,7 +40,11 @@ PostProcessor::~PostProcessor()
     glDeleteTextures(1, &m_framebuffer.texture);
 }
 
-void PostProcessor::capture() { glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer.framebuffer); }
+void PostProcessor::capture()
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer.framebuffer);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
 
 void PostProcessor::process()
 {
@@ -47,6 +52,7 @@ void PostProcessor::process()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0u);
 
     glUseProgram(m_shader);
+    glUniform1f(1, glfwGetTime());
     glBindTextureUnit(0, m_framebuffer.texture);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
