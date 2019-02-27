@@ -11,6 +11,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 namespace pac
 {
@@ -102,9 +104,11 @@ void Renderer::submit_work()
     prog->use();
     m_ubo.bind(0);
     glBindVertexArray(m_vao);
-    m_post_processor.capture();
     glBindTextures(0, m_textures.size(), m_textures.data());
+    m_post_processor.capture();
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     m_post_processor.process();
     m_instance_data.clear();
 }

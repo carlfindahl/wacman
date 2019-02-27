@@ -144,9 +144,6 @@ void Game::draw()
     m_state_manager.draw();
     get_renderer().submit_work();
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
     glfwSwapBuffers(m_window);
 }
 
