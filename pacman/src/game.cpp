@@ -131,6 +131,8 @@ void Game::init_imgui()
     const auto abs_path = cgl::native_absolute_path("res/ATI_9x16.ttf");
     io.Fonts->AddFontFromFileTTF(abs_path.c_str(), 16.f);
 
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init();
 }

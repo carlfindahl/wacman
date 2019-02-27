@@ -226,7 +226,7 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                 }
 
                 // Bind texture, Draw
-                glBindTextureUnit(0, (uintptr_t)(pcmd->TextureId));
+                glBindTextureUnit(0, reinterpret_cast<uintptr_t>(pcmd->TextureId));
                 glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
                                sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
             }
