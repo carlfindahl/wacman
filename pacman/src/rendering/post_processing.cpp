@@ -51,13 +51,11 @@ void PostProcessor::process()
     /* Reset framebuffer state */
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0u);
 
-    glUseProgram(m_shader);
-    glUniform1f(1, glfwGetTime());
+    m_shader.use();
+    glProgramUniform1f(m_shader, 1, glfwGetTime());
+    glProgramUniform1i(m_shader, 0, 0);
     glBindTextureUnit(0, m_framebuffer.texture);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-    glBlitNamedFramebuffer(m_framebuffer.framebuffer, GL_FRAMEBUFFER_DEFAULT, 0, 0, 0, 0, SCREEN_W, SCREEN_H, SCREEN_W, SCREEN_H,
-                           GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 }  // namespace pac

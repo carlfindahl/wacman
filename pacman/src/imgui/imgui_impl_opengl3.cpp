@@ -142,10 +142,6 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
     // Backup GL state
-#ifdef GL_SAMPLER_BINDING
-    GLint last_sampler;
-    glGetIntegerv(GL_SAMPLER_BINDING, &last_sampler);
-#endif
 #ifdef GL_POLYGON_MODE
     GLint last_polygon_mode[2];
     glGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
@@ -154,27 +150,11 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     glGetIntegerv(GL_VIEWPORT, last_viewport);
     GLint last_scissor_box[4];
     glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
-    GLenum last_blend_src_rgb;
-    glGetIntegerv(GL_BLEND_SRC_RGB, (GLint*)&last_blend_src_rgb);
-    GLenum last_blend_dst_rgb;
-    glGetIntegerv(GL_BLEND_DST_RGB, (GLint*)&last_blend_dst_rgb);
-    GLenum last_blend_src_alpha;
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, (GLint*)&last_blend_src_alpha);
-    GLenum last_blend_dst_alpha;
-    glGetIntegerv(GL_BLEND_DST_ALPHA, (GLint*)&last_blend_dst_alpha);
-    GLenum last_blend_equation_rgb;
-    glGetIntegerv(GL_BLEND_EQUATION_RGB, (GLint*)&last_blend_equation_rgb);
-    GLenum last_blend_equation_alpha;
-    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, (GLint*)&last_blend_equation_alpha);
-    GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
     GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
-    GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
-    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
     bool clip_origin_lower_left = true;
 #ifdef GL_CLIP_ORIGIN
     GLenum last_clip_origin = 0;
-    glGetIntegerv(GL_CLIP_ORIGIN,
-                  (GLint*)&last_clip_origin);  // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
+    glGetIntegerv(GL_CLIP_ORIGIN, (GLint*)&last_clip_origin);  // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
     if (last_clip_origin == GL_UPPER_LEFT)
     {
         clip_origin_lower_left = false;
@@ -183,9 +163,6 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 
     // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon
     // fill
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
@@ -225,60 +202,41 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 
         glNamedBufferData(g_ElementsHandle, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                           (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
-        
+
         glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
         glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, 0u, sizeof(ImDrawVert));
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
             const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-            if (pcmd->UserCallback)
+            ImVec4 clip_rect =
+                ImVec4(pcmd->ClipRect.x - pos.x, pcmd->ClipRect.y - pos.y, pcmd->ClipRect.z - pos.x, pcmd->ClipRect.w - pos.y);
+            if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
             {
-                // User callback (registered via ImDrawList::AddCallback)
-                pcmd->UserCallback(cmd_list, pcmd);
-            }
-            else
-            {
-                ImVec4 clip_rect = ImVec4(pcmd->ClipRect.x - pos.x, pcmd->ClipRect.y - pos.y, pcmd->ClipRect.z - pos.x,
-                                          pcmd->ClipRect.w - pos.y);
-                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
+                // Apply scissor/clipping rectangle
+                if (clip_origin_lower_left)
                 {
-                    // Apply scissor/clipping rectangle
-                    if (clip_origin_lower_left)
-                    {
-                        glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w), (int)(clip_rect.z - clip_rect.x),
-                                  (int)(clip_rect.w - clip_rect.y));
-                    }
-                    else
-                    {
-                        glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z,
-                                  (int)clip_rect.w);  // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
-                    }
-
-                    // Bind texture, Draw
-                    glBindTextureUnit(0, (GLuint)(intptr_t)pcmd->TextureId);
-                    glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
-                                   sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+                    glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w), (int)(clip_rect.z - clip_rect.x),
+                              (int)(clip_rect.w - clip_rect.y));
                 }
+                else
+                {
+                    glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z,
+                              (int)clip_rect.w);  // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
+                }
+
+                // Bind texture, Draw
+                glBindTextureUnit(0, (GLuint)(intptr_t)pcmd->TextureId);
+                glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
+                               sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+                glBindVertexArray(0u);
+                glBindBuffer(GL_ARRAY_BUFFER, 0u);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
             }
             idx_buffer_offset += pcmd->ElemCount;
         }
     }
 
-    // Restore modified GL state
-#ifdef GL_SAMPLER_BINDING
-    glBindSampler(0, last_sampler);
-#endif
-    glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
-    glBlendFuncSeparate(last_blend_src_rgb, last_blend_dst_rgb, last_blend_src_alpha, last_blend_dst_alpha);
-    if (last_enable_blend)
-    {
-        glEnable(GL_BLEND);
-    }
-    else
-    {
-        glDisable(GL_BLEND);
-    }
     if (last_enable_cull_face)
     {
         glEnable(GL_CULL_FACE);
@@ -287,22 +245,7 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     {
         glDisable(GL_CULL_FACE);
     }
-    if (last_enable_depth_test)
-    {
-        glEnable(GL_DEPTH_TEST);
-    }
-    else
-    {
-        glDisable(GL_DEPTH_TEST);
-    }
-    if (last_enable_scissor_test)
-    {
-        glEnable(GL_SCISSOR_TEST);
-    }
-    else
-    {
-        glDisable(GL_SCISSOR_TEST);
-    }
+    glDisable(GL_SCISSOR_TEST);
 #ifdef GL_POLYGON_MODE
     glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
 #endif
@@ -396,8 +339,7 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
 
     glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationPosition, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, pos));
     glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationUV, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, uv));
-    glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationColor, 4, GL_UNSIGNED_BYTE, GL_TRUE,
-                              IM_OFFSETOF(ImDrawVert, col));
+    glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, IM_OFFSETOF(ImDrawVert, col));
 
     glEnableVertexArrayAttrib(g_VaoHandle, 0);
     glEnableVertexArrayAttrib(g_VaoHandle, 1);
