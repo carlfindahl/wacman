@@ -13,4 +13,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/vertex_array_object.h
     ${CMAKE_CURRENT_LIST_DIR}/vertex_array_object.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/post_processing.h
+    ${CMAKE_CURRENT_LIST_DIR}/post_processing.cpp
 )

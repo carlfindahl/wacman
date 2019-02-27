@@ -3,6 +3,7 @@
 #include "shader_program.h"
 #include "vertex_array_object.h"
 #include "uniform_buffer_object.h"
+#include "post_processing.h"
 
 #include <vector>
 #include <memory>
@@ -84,6 +85,9 @@ private:
 
     /* Instance data, added as you draw, and drawn once you submit the draw */
     std::vector<InstanceVertex> m_instance_data = {};
+
+    /* Post processor for applying post effects */
+    PostProcessor m_post_processor = {};
 
     /* Vertex attribute layout */
     VertexArray m_vao = {};
