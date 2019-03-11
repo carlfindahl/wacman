@@ -23,7 +23,7 @@ vec2 radial_distortion(vec2 coord, float distort) {
 void main()
 {
     vec4 out_color = texture(rendered_tex, radial_distortion(vs_uv, 0.5f));
-    vec4 ca_color = texture(rendered_tex, radial_distortion(vs_uv, 0.49f));
+    vec4 ca_color = texture(rendered_tex, radial_distortion(vs_uv, 0.49f + (fract(sin(u_time) * 250.f) / 50.f)));
     
     /* Vertical Lines */
     out_color = out_color * (max(0.7f, (int(gl_FragCoord.x) % 2)));
