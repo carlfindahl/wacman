@@ -6,10 +6,10 @@
 
 Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
 
-**1.0.2:** Add Post processing effects
-**1.0.0:** Final game with final music sounds and final logic / gameplay adjustments
-**0.9.0:** Except final tweaks, has all major gameplay features, but not final audio.
-**0.1.0:** Every version before that
+ * **1.0.2:** Add Post processing effects
+ * **1.0.0:** Final game with final music sounds and final logic / gameplay adjustments
+ * **0.9.0:** Except final tweaks, has all major gameplay features, but not final audio.
+ * **0.1.0:** Every version before that
 
 ### Build and Run
 
@@ -36,7 +36,7 @@ The application works with relative paths where the relativity always starts fro
 
 #### Running
 
-The game has all extras except multiple levels at the moment. It attempts to be as true to the original as possible, with a few tweaks and a more modern feel overall. For example, the theme is remixed and there are some interesting new rules. Check out the `Help / Credits` section of the Main Menu in order to see the rules and controls.
+The game has does not have multiple levels at the moment. It attempts to be as true to the original as possible, with a few tweaks and a more modern feel overall. For example, the theme is remixed and there are some interesting new rules. Check out the `Help / Credits` section of the Main Menu in order to see the rules and controls.
 
 When you play, your goal is to eat all the tiny food objects without dying. When you do, you win. A high score is recorded locally and as long as you play on the same PC, you can compete with others. (*Future idea: Sync high scores online*)
 
