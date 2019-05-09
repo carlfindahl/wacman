@@ -10,7 +10,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <entt/entity/prototype.hpp>
-#include <entt/core/hashed_string.hpp>
 
 namespace pac
 {
@@ -53,13 +52,57 @@ bool GameState::draw()
 
 void GameState::create_prototypes()
 {
-    auto pacman_up = get_renderer().load_animation_texture("res/textures/")
+    auto pacman_dn = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 0, 70, 70, 4, 4);
+    auto pacman_up = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 70, 70, 70, 4, 4);
+    auto pacman_lt = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 140, 70, 70, 4, 4);
+    auto pacman_rt = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 210, 70, 70, 4, 4);
 
+    /* Pacman Prototype */
     auto pacman = entt::prototype{m_registry};
     pacman.set<CPlayer>();
     pacman.set<CPosition>();
-    pacman.set<CMovement>();
+    pacman.set<CMovement>(glm::ivec2{}, glm::ivec2{}, 3.f);
     pacman.set<CCollision>();
-    pacman.set<CAnimationSprite>({entt::hashed_string("up", )})
+    pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
+        {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});
+
+    /* Food Prototype */
+    auto tileset_tex = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 20);
+    tileset_tex.frame_number = 18;
+
+    auto food = entt::prototype{m_registry};
+    food.set<CPosition>();
+    food.set<CSprite>(tileset_tex);
+    food.set<CPickup>(50);
+
+    /* Strawberry Prototype */
+    tileset_tex.frame_number = 15;
+    auto strawberry = entt::prototype{m_registry};
+    strawberry.set<CPosition>();
+    strawberry.set<CSprite>(tileset_tex);
+    strawberry.set<CPickup>(250);
+
+    /* Banana Properties */
+    tileset_tex.frame_number = 16;
+    auto banana = entt::prototype{m_registry};
+    banana.set<CPosition>();
+    banana.set<CSprite>(tileset_tex);
+    banana.set<CPickup>(250);
+
+    /* Orange Properties */
+    tileset_tex.frame_number = 17;
+    auto orange = entt::prototype{m_registry};
+    orange.set<CPosition>();
+    orange.set<CSprite>(tileset_tex);
+    orange.set<CPickup>(250);
+
+    /* Wall Properties */
+    tileset_tex.frame_number = 17;
+    auto wall = entt::prototype{m_registry};
+    wall.set<CPosition>();
+    wall.set<CSprite>(tileset_tex);
+    wall.set<CPickup>(250);
+    wall.set<CCollision>();
+
 }
 }  // namespace pac

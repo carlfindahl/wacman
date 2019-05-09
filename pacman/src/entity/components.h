@@ -5,7 +5,6 @@
 
 #include <glm/vec2.hpp>
 #include <robinhood/robinhood.h>
-#include <entt/core/hashed_string.hpp>
 
 namespace pac
 {
@@ -33,7 +32,7 @@ struct CMovement
 struct CAnimationSprite
 {
     /* Available animations (accessible by hash of their name */
-    robin_hood::unordered_map<entt::hashed_string, TextureID> available_animations{};
+    robin_hood::unordered_map<std::string, TextureID> available_animations{};
 
     /* The active animation sprite (from the map) */
     TextureID active_animation{};
