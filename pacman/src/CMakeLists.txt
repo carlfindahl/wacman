@@ -35,15 +35,6 @@ target_include_directories(
     ${CMAKE_CURRENT_BINARY_DIR} # for the configured file (config.h)
 )
 
-# Compile Options
-option(PACMAN_BUILD_BENCHMARKS OFF)
-
-target_compile_definitions(
-    ${EXEC_NAME}
-    PRIVATE
-    $<$<BOOL:${PACMAN_BUILD_BENCHMARKS}>:PACMAN_USE_BENCHMARKS>
-)
-
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/config.h.in
     config.h
@@ -51,8 +42,8 @@ configure_file(
 
 # Add any subdirectories with source files
 include(${CMAKE_CURRENT_LIST_DIR}/audio/CMakeLists.txt)
-include(${CMAKE_CURRENT_LIST_DIR}/benchmarks/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/encrypt/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/entity/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)
