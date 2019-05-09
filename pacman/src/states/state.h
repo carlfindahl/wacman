@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "input.h"
+#include "input/input.h"
 
 #include <utility>
 #include <functional>

@@ -1,7 +1,7 @@
 #include "high_score_state.h"
 #include "state_manager.h"
 #include "config.h"
-#include "input.h"
+#include "input/input.h"
 
 #include <fstream>
 
@@ -14,14 +14,14 @@ void HighScoreState::on_enter()
 {
     m_splash_texture = get_renderer().load_texture("res/hiscore_screen.png");
 
-    input::InputState hs_input_state(true);
-    hs_input_state.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
-    input::get_input().push(std::move(hs_input_state));
+    InputState hs_input_state(true);
+    hs_input_state.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
+    get_input().push(std::move(hs_input_state));
 
     m_entries = load_high_score_entries_from_file();
 }
 
-void HighScoreState::on_exit() { input::get_input().pop(); }
+void HighScoreState::on_exit() { get_input().pop(); }
 
 bool HighScoreState::update(float dt)
 {

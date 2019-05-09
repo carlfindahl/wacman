@@ -1,6 +1,6 @@
 #include "game.h"
-#include "input.h"
 #include "common.h"
+#include "input/input.h"
 #include "states/game_state.h"
 #include "states/main_menu_state.h"
 #include "rendering/shader_program.h"

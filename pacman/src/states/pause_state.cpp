@@ -11,22 +11,22 @@ void PauseState::on_enter()
 {
     m_splash = get_renderer().load_texture("res/pause_screen.png");
 
-    input::InputState pause_input(true);
+    InputState pause_input(true);
 
     /* Resume game */
-    pause_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
-    pause_input.set_binding(GLFW_KEY_P, [this] { m_context.state_manager->pop(); });
+    pause_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
+    pause_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->pop(); });
 
     /* Quit to main menu */
-    pause_input.set_binding(GLFW_KEY_Q, [this] {
+    pause_input.bind_key(GLFW_KEY_Q, [this] {
         m_context.state_manager->clear();
         m_context.state_manager->push<MainMenuState>(m_context);
     });
 
-    input::get_input().push(std::move(pause_input));
+    get_input().push(std::move(pause_input));
 }
 
-void PauseState::on_exit() { input::get_input().pop(); }
+void PauseState::on_exit() { get_input().pop(); }
 
 bool PauseState::update(float dt) { return false; }
 

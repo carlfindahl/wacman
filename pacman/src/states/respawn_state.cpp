@@ -15,11 +15,11 @@ RespawnState::RespawnState(GameContext context, float wait_seconds, std::string_
 void RespawnState::on_enter()
 {
     /* Add input state that is blocking so no other input works */
-    input::InputState pause_input(true);
-    input::get_input().push(std::move(pause_input));
+    InputState pause_input(true);
+    get_input().push(std::move(pause_input));
 }
 
-void RespawnState::on_exit() { input::get_input().pop(); }
+void RespawnState::on_exit() { get_input().pop(); }
 
 bool RespawnState::update(float dt)
 {

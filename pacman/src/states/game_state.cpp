@@ -2,7 +2,7 @@
 #include "audio/sound_manager.h"
 #include "state_manager.h"
 #include "pause_state.h"
-#include "input.h"
+#include "input/input.h"
 #include "config.h"
 
 #include <gfx.h>
@@ -19,11 +19,11 @@ void GameState::on_enter()
 
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
-    input::InputState game_input(true);
-    game_input.set_binding(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
-    game_input.set_binding(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
+    InputState game_input(true);
+    game_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
+    game_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
 
-    auto& input_manager = input::get_input();
+    auto& input_manager = get_input();
     input_manager.push(std::move(game_input));
 
     m_level.load("res/level0");
@@ -32,7 +32,7 @@ void GameState::on_enter()
 void GameState::on_exit()
 {
     get_sound().stop(m_music_id);
-    input::get_input().pop();
+    get_input().pop();
 }
 
 bool GameState::update(float dt)

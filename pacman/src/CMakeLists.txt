@@ -3,17 +3,8 @@ target_sources(
     ${EXEC_NAME}
     PRIVATE
 
-    ${CMAKE_CURRENT_LIST_DIR}/input.h
-    ${CMAKE_CURRENT_LIST_DIR}/input.cpp
-
     ${CMAKE_CURRENT_LIST_DIR}/game.h
     ${CMAKE_CURRENT_LIST_DIR}/game.cpp
-
-    ${CMAKE_CURRENT_LIST_DIR}/pacman.h
-    ${CMAKE_CURRENT_LIST_DIR}/pacman.cpp
-
-    ${CMAKE_CURRENT_LIST_DIR}/ghost.h
-    ${CMAKE_CURRENT_LIST_DIR}/ghost.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/level.h
     ${CMAKE_CURRENT_LIST_DIR}/level.cpp
@@ -46,6 +37,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/encrypt/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/entity/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/robinhood/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/states/CMakeLists.txt)

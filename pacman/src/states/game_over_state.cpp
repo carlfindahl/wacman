@@ -17,8 +17,8 @@ void GameOverState::on_enter()
     m_playername.fill('\0');
 
     /* Add input state that is blocking so no other input works */
-    input::InputState pause_input(true);
-    input::get_input().push(std::move(pause_input));
+    InputState pause_input(true);
+    get_input().push(std::move(pause_input));
 }
 
 void GameOverState::on_exit()
@@ -33,7 +33,7 @@ void GameOverState::on_exit()
         write_high_score_entries_to_file(entries);
     }
 
-    input::get_input().pop();
+    get_input().pop();
 }
 
 bool GameOverState::update(float dt)
