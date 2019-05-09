@@ -124,23 +124,6 @@ void Level::load(std::string_view fp)
             }
         }
     }
-
-    level_stream.ignore(1);
-
-    /* Matches either Pacman or Ghost followed by an X and Y coordinate with any number of spaces between */
-    const auto entity_pattern = std::regex(R"(^(Pacman|Ghost)\s+(\d+)\s+(\d+))");
-
-    /* Parse entities listed after the map */
-    std::string entity_line = {};
-    while (std::getline(level_stream, entity_line))
-    {
-        std::smatch match{};
-        if (!std::regex_match(entity_line, match, entity_pattern) || match.empty())
-        {
-            GFX_WARN("The entity (%s) is not correct, or has unsupported entity type!", entity_line.c_str());
-            continue;
-        }
-    }
 }
 
 std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
