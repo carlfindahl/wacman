@@ -1,5 +1,6 @@
 #pragma once
 
+#include "input.h"
 #include "rendering/renderer.h"
 
 #include <glm/vec2.hpp>
@@ -48,6 +49,22 @@ struct CSprite
 {
     /* Sprite ID */
     TextureID sprite{};
+};
+
+/* Player component (Pacman) */
+struct CPlayer
+{
+    /* Number of lives */
+    int32_t lives = 3;
+
+    /* Current score */
+    int32_t score = 0;
+};
+
+/* Input Component */
+struct CInput
+{
+    input::InputState input_state{false};
 };
 
 }  // namespace pac
