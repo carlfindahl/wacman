@@ -55,20 +55,8 @@ private:
     /* Number of remaining food items (used to track progress) */
     int32_t m_remaining_food = 0;
 
-    /* Pacman spawn */
-    glm::ivec2 m_pacman_spawn = {};
-
-    /* How long will ghosts chase before scattering */
-    seconds m_chasetime{10.f};
-
-    /* Number of seconds left before pacman is no longer a killer */
-    seconds m_pacman_kill_timer{0.f};
-
     /* Context in which level exists */
     GameContext m_context{};
-
-    /* When you kill a ghost, the score is multiplied with this amount */
-    int32_t m_ghost_kill_multiplier = 1;
 
 public:
     Level() = default;
