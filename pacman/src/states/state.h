@@ -7,6 +7,8 @@
 #include <functional>
 #include <unordered_map>
 
+#include <entt/entity/registry.hpp>
+
 namespace pac
 {
 class StateManager;
@@ -21,6 +23,9 @@ class State
 protected:
     /* The context of the state */
     GameContext m_context{};
+
+    /* Entity Registry */
+    entt::registry m_registry{};
 
 public:
     State() = default;
