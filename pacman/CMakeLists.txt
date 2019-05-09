@@ -9,6 +9,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 3.2 REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenAL REQUIRED)
+find_package(EnTT REQUIRED)
 
 target_link_libraries(
     ${EXEC_NAME}
@@ -16,12 +17,12 @@ target_link_libraries(
     # Manually link asan on GCC in Debug mode since it doesn't do it automatically (MUST BE FIRST IN THE LIST OR WON'T WORK!)
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
-    $<$<PLATFORM_ID:Linux>:dl>        # Required by glad on Linux
-    openal                            # For OpenAL Audio
-    OpenGL::GL                        # For OpenGL
-    glfw                              # For window integration
-    glm                               # For Maths
-    cgl                               # OpenGL utilities (custom library build in-source in this project)
+    $<$<PLATFORM_ID:Linux>:dl>                  # Required by glad on Linux
+    $<IF:$<PLATFORM_ID:Linux>,openal,Openal32>  # For OpenAL Audio
+    OpenGL::GL                                  # For OpenGL
+    glfw                                        # For window integration
+    glm                                         # For Maths
+    cgl                                         # OpenGL utilities (custom library built in-source for this project)
 )
 
 # Add this so it can specify source files and include directories local to it's own directory
