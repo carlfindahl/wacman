@@ -28,5 +28,11 @@ public:
     bool update(float dt) override;
 
     bool draw() override;
+
+private:
+    /*!
+     * \brief create_prototypes creates entity prototypes
+     */
+    void create_prototypes();
 };
 }  // namespace pac

@@ -1,4 +1,5 @@
 #include "game_state.h"
+#include "entity/components.h"
 #include "audio/sound_manager.h"
 #include "state_manager.h"
 #include "pause_state.h"
@@ -8,6 +9,8 @@
 #include <gfx.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <entt/entity/prototype.hpp>
+#include <entt/core/hashed_string.hpp>
 
 namespace pac
 {
@@ -46,5 +49,17 @@ bool GameState::draw()
     m_level.draw();
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
     return false;
+}
+
+void GameState::create_prototypes()
+{
+    auto pacman_up = get_renderer().load_animation_texture("res/textures/")
+
+    auto pacman = entt::prototype{m_registry};
+    pacman.set<CPlayer>();
+    pacman.set<CPosition>();
+    pacman.set<CMovement>();
+    pacman.set<CCollision>();
+    pacman.set<CAnimationSprite>({entt::hashed_string("up", )})
 }
 }  // namespace pac
