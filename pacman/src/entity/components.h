@@ -1,6 +1,6 @@
 #pragma once
 
-#include "input.h"
+#include "input/input.h"
 #include "rendering/renderer.h"
 
 #include <glm/vec2.hpp>
@@ -64,7 +64,21 @@ struct CPlayer
 /* Input Component */
 struct CInput
 {
-    input::InputState input_state{false};
+    InputState input_state{false};
+};
+
+/* Pickup component represents a pickuppable */
+struct CPickup
+{
+    /* Score when picking up */
+    int score = 50;
+
+    /* Other effects */
+};
+
+/* Tag component that represents a collideable thing */
+struct CCollision
+{
 };
 
 }  // namespace pac
