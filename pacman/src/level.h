@@ -1,6 +1,4 @@
 #pragma once
-#include "ghost.h"
-#include "pacman.h"
 #include "common.h"
 #include "rendering/renderer.h"
 
@@ -47,12 +45,6 @@ private:
 
     /* The tiles in the level (basically the map) */
     std::vector<std::vector<Tile>> m_tiles = {};
-
-    /* Ghost vector */
-    std::vector<Ghost> m_ghosts = {};
-
-    /* Pacman, starts bottom center */
-    std::unique_ptr<Pacman> m_pacman = nullptr;
 
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
@@ -119,12 +111,6 @@ public:
     unsigned score() const;
 
 private:
-    void update_pacman();
-
-    void update_ghost(float dt, Ghost& g);
-
     bool bounds_check(glm::ivec2 pos) const;
-
-    glm::ivec2 find_sensible_escape_point(Ghost& g);
 };
 }  // namespace pac
