@@ -15,7 +15,6 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/common.h
     ${CMAKE_CURRENT_LIST_DIR}/common.cpp
 
-    ${CMAKE_CURRENT_LIST_DIR}/gfx.h
     ${CMAKE_CURRENT_LIST_DIR}/single_header_implementations.cpp
 )
 
@@ -35,7 +34,6 @@ configure_file(
 include(${CMAKE_CURRENT_LIST_DIR}/audio/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/encrypt/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/entity/CMakeLists.txt)
-include(${CMAKE_CURRENT_LIST_DIR}/glad/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/imgui/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/rendering/CMakeLists.txt)

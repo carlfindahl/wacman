@@ -7,5 +7,6 @@ project(imt2531_assignment01 VERSION 1.0.2)
 # CMake Complains if this is not set
 set(OpenGL_GL_PREFERENCE GLVND)
 
-add_subdirectory(pacman)
 add_subdirectory(cglutil)
+add_subdirectory(external)
+add_subdirectory(pacman)

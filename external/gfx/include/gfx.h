@@ -30,6 +30,12 @@
 ///     - GLEnumToString (at the end, due to its size)
 ///
 /// Version History
+/// - 2019.02.23 (1.14): - Add asserts to introspection functions
+///                      - Add support for some non-square matrices
+/// - 2019.02.19 (1.13): - Add support for using colorpicker when editing vec3 and vec4
+///                        (Happens on an all or nothing basis as Dear ImGui don't store checkbox state)
+///                      - Add support for 2x2 matrix uniforms
+///                      - Update documentation for turning on and off gfx assert, debug, and introspection
 /// - 2019.01.29 (1.12): - Make all UI modifications to uniforms drag based (ctrl+left click to input manually)
 ///                      - Add support for 3x3 and 4x4 matrix uniforms
 /// - 2019.01.21 (1.11): - #undef min max, and scope disable warnings of sprintf on windows
@@ -125,9 +131,6 @@
 #pragma once
 #include <cstdio>
 #include <cstdlib>
-#include <glad/glad.h>
-
-#define GFX_ENABLE_INTROSPECTION
 
 ///////////////////////////////////////////////////////////
 /// \brief
@@ -138,11 +141,11 @@
 ///     This error is supposed to be used for
 ///     unrecoverable errors.
 ///////////////////////////////////////////////////////////
-#define GFX_ERROR(fmt, ...)                                                                             \
-{                                                                                                       \
-    Gfx::Detail::Log(stderr, "ERROR", Gfx::Detail::TERMINAL_COLOR_FG_RED, __FILE__, __func__, __LINE__, fmt, ##__VA_ARGS__);  \
-    Gfx::Detail::PauseTerminal();                                                                       \
-    std::exit(EXIT_FAILURE);                                                                            \
+#define GFX_ERROR(fmt, ...)                                                                                                     \
+{                                                                                                                               \
+    Gfx::Detail::Log(stderr, "ERROR", Gfx::Detail::TERMINAL_COLOR_FG_RED, __FILE__, __func__, __LINE__, fmt, ##__VA_ARGS__);    \
+    Gfx::Detail::PauseTerminal();                                                                                               \
+    std::exit(EXIT_FAILURE);                                                                                                    \
 }
 
 ///////////////////////////////////////////////////////////
@@ -166,8 +169,8 @@ Gfx::Detail::Log(stdout, "INFO", Gfx::Detail::TERMINAL_COLOR_FG_WHITE, __FILE__,
 ///
 /// \detailed
 ///     Use this for debug related information,
-///     can be turned off by defining LOG_NO_DEBUG
-///     before including gfx.h
+///     can be turned off by defining GFX_NO_DEBUG
+///     on a project wide basis (i.e. in CMake)
 ///////////////////////////////////////////////////////////
 #ifdef NDEBUG
 #define GFX_NO_DEBUG
@@ -280,6 +283,10 @@ namespace Gfx
 /// \brief
 ///     Assertation macro, send expr that is
 ///     expected to be true and also a formatted message.
+///
+/// \detailed
+///     Can be turned off by defining GFX_ASSERT_OFF
+///     on a project wide basis (i.e. in CMake)
 ///////////////////////////////////////////////////////////
 #ifndef GFX_ASSERT_OFF
 #define GFX_ASSERT(expr, fmt, ...)                                          \
@@ -325,7 +332,7 @@ else { GFX_ERROR("Assertion failure: " #expr ": " fmt, ##__VA_ARGS__); }    \
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace Gfx
 {
-    const char* GLEnumToString(GLenum e);
+    const char* GLEnumToString(unsigned e);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -401,15 +408,7 @@ namespace Gfx
 ///
 /// Since the introspection functionality requires Dear ImGui as a dependency
 /// (and since it is under development) it needs to be enabled before it can be used.
-/// To do this define GFX_ENABLE_INTROSPECTION before including gfx.h in the file where
-/// gfx.h is defined (the one containing #define GFX_IMPLEMENTATION).
-/// For example:
-///     #include // some file
-///     #include // some other file
-///     #define GFX_IMPLEMENTATION
-///     #define GFX_ENABLE_INTROSPECTION
-///     #include "gfx.h"
-///
+/// To do this GFX_ENABLE_INTROSPECTION must be defined on a project wide bases (i.e. in CMake)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef GFX_ENABLE_INTROSPECTION
 namespace Gfx
@@ -644,7 +643,7 @@ namespace Gfx
 /// Implementation - Introspection (In development)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef GFX_ENABLE_INTROSPECTION
-#include <imgui/imgui.h>
+#include "imgui.h"
 #include <algorithm>
 #include <vector>
 #include <cinttypes>
@@ -654,19 +653,36 @@ namespace Gfx
     namespace Detail
     {
         // Generator macro to avoid duplicating code all the time.
-        #define GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(cputype, count, gltype, glread, glwrite, imguifunc)  \
-        {                                                                                                       \
-            ImGui::Text(#gltype" %s:", name);                                                                   \
-            cputype value[count];                                                                               \
-            glread(program, location, &value[0]);                                                               \
-            if (imguifunc("", &value[0], 0.25f))                                                                \
-                glwrite(program, location, 1, &value[0]);                                                       \
+        #define GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(cputype, count, gltype, glread, glwrite, imguifunc)          \
+        {                                                                                                               \
+            ImGui::Text(#gltype" %s:", name);                                                                           \
+            cputype value[count];                                                                                       \
+            glread(program, location, &value[0]);                                                                       \
+            if (imguifunc("", &value[0], 0.25f))                                                                        \
+                glwrite(program, location, 1, &value[0]);                                                               \
         }
 
-        // TODO: Add button for toggling if this is a color or not
+        #define GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(cputype, rows, columns, gltype, glread, glwrite, imguifunc)    \
+        {                                                                                                               \
+            ImGui::Text(#gltype" %s:", name);                                                                           \
+            cputype value[rows * columns];                                                                              \
+            int size = rows * columns;                                                                                  \
+            glread(program, location, &value[0]);                                                                       \
+            int modified = 0;                                                                                           \
+            for (int i = 0; i < size; i += rows)                                                                        \
+            {                                                                                                           \
+                ImGui::PushID(i);                                                                                       \
+                modified += imguifunc("", &value[i], 0.25f);                                                            \
+                ImGui::PopID();                                                                                         \
+            }                                                                                                           \
+            if (modified)                                                                                               \
+                glwrite(program, location, 1, GL_FALSE, value);                                                         \
+        }
+
         void
         RenderUniformVariable(GLuint program, GLenum type, const char* name, GLint location)
         {
+            static bool is_color = false;
             switch (type)
             {
                 case GL_FLOAT:
@@ -678,12 +694,27 @@ namespace Gfx
                     break;
 
                 case GL_FLOAT_VEC3:
-                    GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(GLfloat, 3, GL_FLOAT_VEC3, glGetUniformfv, glProgramUniform3fv, ImGui::DragFloat3);
+                {
+                    ImGui::Checkbox("##is_color", &is_color); ImGui::SameLine();
+                    ImGui::Text("GL_FLOAT_VEC3 %s", name); ImGui::SameLine();
+                    float value[3];
+                    glGetUniformfv(program, location, &value[0]);
+                    if ((!is_color && ImGui::DragFloat3("", &value[0])) || (is_color && ImGui::ColorEdit3("Color", &value[0], ImGuiColorEditFlags_NoLabel)))
+                        glProgramUniform3fv(program, location, 1, &value[0]);
+                }
                     break;
 
                 case GL_FLOAT_VEC4:
-                    GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(GLfloat, 4, GL_FLOAT_VEC4, glGetUniformfv, glProgramUniform4fv, ImGui::DragFloat4);
+                {
+                    ImGui::Checkbox("##is_color", &is_color); ImGui::SameLine();
+                    ImGui::Text("GL_FLOAT_VEC4 %s", name); ImGui::SameLine();
+                    float value[4];
+                    glGetUniformfv(program, location, &value[0]);
+                    if ((!is_color && ImGui::DragFloat4("", &value[0])) || (is_color && ImGui::ColorEdit4("Color", &value[0], ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf)))
+                        glProgramUniform4fv(program, location, 1, &value[0]);
+                }
                     break;
+
 
                 case GL_INT:
                     GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(GLint, 1, GL_INT, glGetUniformiv, glProgramUniform1iv, ImGui::DragInt);
@@ -705,36 +736,32 @@ namespace Gfx
                     GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER(GLint, 1, GL_SAMPLER_2D, glGetUniformiv, glProgramUniform1iv, ImGui::DragInt);
                     break;
 
+                case GL_FLOAT_MAT2:
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 2, 2, GL_FLOAT_MAT2, glGetUniformfv, glProgramUniformMatrix2fv, ImGui::DragFloat2);
+                    break;
+
                 case GL_FLOAT_MAT3:
-                {
-                    ImGui::Text("GL_FLOAT_MAT3 %s:", name);
-                    GLfloat value[3 * 3];
-                    glGetUniformfv(program, location, value);
-                    int column = 0;
-                    for (int i = 0; i < 9; i += 3)
-                    {
-                        ImGui::PushID(i);
-                        ImGui::DragFloat3("", &value[i], 0.25f);
-                        ImGui::PopID();
-                    }
-                    glProgramUniformMatrix3fv(program, location, 1, GL_FALSE, value);
-                }
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 3, 3, GL_FLOAT_MAT3, glGetUniformfv, glProgramUniformMatrix3fv, ImGui::DragFloat3);
                     break;
 
                 case GL_FLOAT_MAT4:
-                {
-                    ImGui::Text("GL_FLOAT_MAT4 %s:", name);
-                    GLfloat value[4 * 4];
-                    glGetUniformfv(program, location, value);
-                    int column = 0;
-                    for (int i = 0; i < 16; i += 4)
-                    {
-                        ImGui::PushID(i);
-                        ImGui::DragFloat4("", &value[i], 0.25f);
-                        ImGui::PopID();
-                    }
-                    glProgramUniformMatrix4fv(program, location, 1, GL_FALSE, value);
-                }
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 4, 4, GL_FLOAT_MAT4, glGetUniformfv, glProgramUniformMatrix4fv, ImGui::DragFloat4);
+                    break;
+
+                case GL_FLOAT_MAT2x3:
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 3, 2, GL_FLOAT_MAT2x3, glGetUniformfv, glProgramUniformMatrix2x3fv, ImGui::DragFloat3);
+                    break;
+
+                case GL_FLOAT_MAT2x4:
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 4, 2, GL_FLOAT_MAT2x4, glGetUniformfv, glProgramUniformMatrix2x4fv, ImGui::DragFloat4);
+                    break;
+
+                case GL_FLOAT_MAT3x2:
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 2, 3, GL_FLOAT_MAT3x2, glGetUniformfv, glProgramUniformMatrix3x2fv, ImGui::DragFloat2);
+                    break;
+
+                case GL_FLOAT_MAT3x4:
+                    GFX_INTROSPECTION_GENERATE_MATRIX_RENDER(GLfloat, 4, 3, GL_FLOAT_MAT3x4, glGetUniformfv, glProgramUniformMatrix3x2fv, ImGui::DragFloat4);
                     break;
 
                 default:
@@ -744,6 +771,7 @@ namespace Gfx
         }
 
         #undef GFX_INTROSPECTION_GENERATE_VARIABLE_RENDER
+        #undef GFX_INTROSPECTION_GENERATE_MATRIX_RENDER
 
         float
         GetScrollableHeight()
@@ -755,6 +783,9 @@ namespace Gfx
     void
     IntrospectShader(const char* label, GLuint program)
     {
+        GFX_ASSERT(label != nullptr, "The label supplied with program: %u is nullptr", program);
+        GFX_ASSERT(glIsProgram(program), "The program: %u is not a valid shader program", program);
+
         ImGui::PushID(label);
         if (ImGui::CollapsingHeader(label))
         {
@@ -833,6 +864,9 @@ namespace Gfx
     void
     IntrospectVertexArray(const char* label, GLuint vao)
     {
+        GFX_ASSERT(label != nullptr, "The label supplied with VAO: %u is nullptr", vao);
+        GFX_ASSERT(glIsVertexArray(vao), "The VAO: %u is not a valid vertex array object", vao);
+
         ImGui::PushID(label);
         if (ImGui::CollapsingHeader(label))
         {

@@ -6,8 +6,6 @@ add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.2 REQUIRED)
-find_package(glm REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(EnTT REQUIRED)
 
@@ -20,6 +18,8 @@ target_link_libraries(
     $<$<PLATFORM_ID:Linux>:dl>                  # Required by glad on Linux
     $<IF:$<PLATFORM_ID:Linux>,openal,Openal32>  # For OpenAL Audio
     OpenGL::GL                                  # For OpenGL
+    glad::glad                                  # OpenGL Loader
+    gfx::gfx                                    # Logging mostly
     glfw                                        # For window integration
     glm                                         # For Maths
     cgl                                         # OpenGL utilities (custom library built in-source for this project)
