@@ -1,6 +1,8 @@
 #include "game_state.h"
 #include "entity/components.h"
 #include "audio/sound_manager.h"
+#include "entity/movement_system.h"
+#include "entity/rendering_system.h"
 #include "state_manager.h"
 #include "pause_state.h"
 #include "input/input.h"
@@ -17,6 +19,7 @@ GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
 void GameState::on_enter()
 {
     create_prototypes();
+    add_systems();
 
     m_music_id = get_sound().play("theme", true);
 
@@ -42,6 +45,10 @@ void GameState::on_exit()
 bool GameState::update(float dt)
 {
     m_level.update(dt);
+    for (auto& system : m_systems)
+    {
+        system->update(dt, m_registry);
+    }
     return false;
 }
 
@@ -67,6 +74,7 @@ void GameState::create_prototypes()
     pacman.set<CCollision>();
     pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
         {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});
+    pacman.get<CAnimationSprite>().active_animation = pacman_rt;
 
     m_prototypes.emplace("pacman", std::move(pacman));
 
@@ -76,7 +84,7 @@ void GameState::create_prototypes()
 
     auto food = entt::prototype{m_registry};
     food.set<CPosition>();
-    food.set<CSprite>(tileset_tex);
+    food.set<CSprite>(tileset_tex, glm::vec3(1.f));
     food.set<CPickup>(50);
 
     m_prototypes.emplace("food", std::move(food));
@@ -85,7 +93,7 @@ void GameState::create_prototypes()
     tileset_tex.frame_number = 15;
     auto strawberry = entt::prototype{m_registry};
     strawberry.set<CPosition>();
-    strawberry.set<CSprite>(tileset_tex);
+    strawberry.set<CSprite>(tileset_tex, glm::vec3(1.f));
     strawberry.set<CPickup>(250);
 
     m_prototypes.emplace("strawberry", std::move(strawberry));
@@ -94,7 +102,7 @@ void GameState::create_prototypes()
     tileset_tex.frame_number = 16;
     auto banana = entt::prototype{m_registry};
     banana.set<CPosition>();
-    banana.set<CSprite>(tileset_tex);
+    banana.set<CSprite>(tileset_tex, glm::vec3(1.f));
     banana.set<CPickup>(250);
 
     m_prototypes.emplace("banana", std::move(banana));
@@ -103,9 +111,15 @@ void GameState::create_prototypes()
     tileset_tex.frame_number = 17;
     auto orange = entt::prototype{m_registry};
     orange.set<CPosition>();
-    orange.set<CSprite>(tileset_tex);
+    orange.set<CSprite>(tileset_tex, glm::vec3(1.f));
     orange.set<CPickup>(250);
 
     m_prototypes.emplace("orange", std::move(orange));
+}
+
+void GameState::add_systems()
+{
+    m_systems.emplace_back(std::make_unique<MovementSystem>());
+    m_systems.emplace_back(std::make_unique<RenderingSystem>());
 }
 }  // namespace pac

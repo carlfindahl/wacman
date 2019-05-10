@@ -1,8 +1,11 @@
 #pragma once
 
 #include <level.h>
+#include <entity/system.h>
 #include <rendering/uniform_buffer_object.h>
 #include <states/state.h>
+
+#include <memory>
 
 #include <robinhood/robinhood.h>
 #include <entt/entity/prototype.hpp>
@@ -24,6 +27,9 @@ private:
     /* Prototypes of entities */
     robin_hood::unordered_map<std::string, entt::prototype> m_prototypes{};
 
+    /* Active Systems */
+    std::vector<std::unique_ptr<System>> m_systems{};
+
 public:
     GameState(GameContext owner);
 
@@ -40,5 +46,10 @@ private:
      * \brief create_prototypes creates entity prototypes
      */
     void create_prototypes();
+
+    /*!
+     * \brief add_systems needed by this state
+     */
+    void add_systems();
 };
 }  // namespace pac
