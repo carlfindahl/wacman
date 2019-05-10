@@ -4,6 +4,9 @@
 #include <rendering/uniform_buffer_object.h>
 #include <states/state.h>
 
+#include <robinhood/robinhood.h>
+#include <entt/entity/prototype.hpp>
+
 namespace pac
 {
 class GameState : public State
@@ -17,6 +20,9 @@ private:
 
     /* ID of music track */
     unsigned m_music_id = 0u;
+
+    /* Prototypes of entities */
+    robin_hood::unordered_map<std::string, entt::prototype> m_prototypes{};
 
 public:
     GameState(GameContext owner);

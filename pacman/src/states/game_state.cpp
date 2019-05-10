@@ -9,7 +9,6 @@
 #include <gfx.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <entt/entity/prototype.hpp>
 
 namespace pac
 {
@@ -66,6 +65,8 @@ void GameState::create_prototypes()
     pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
         {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});
 
+    m_prototypes["pacman"] = std::move(pacman);
+
     /* Food Prototype */
     auto tileset_tex = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 20);
     tileset_tex.frame_number = 18;
@@ -75,12 +76,16 @@ void GameState::create_prototypes()
     food.set<CSprite>(tileset_tex);
     food.set<CPickup>(50);
 
+    m_prototypes["food"] = std::move(food);
+
     /* Strawberry Prototype */
     tileset_tex.frame_number = 15;
     auto strawberry = entt::prototype{m_registry};
     strawberry.set<CPosition>();
     strawberry.set<CSprite>(tileset_tex);
     strawberry.set<CPickup>(250);
+
+    m_prototypes["strawberry"] = std::move(strawberry);
 
     /* Banana Properties */
     tileset_tex.frame_number = 16;
@@ -89,6 +94,8 @@ void GameState::create_prototypes()
     banana.set<CSprite>(tileset_tex);
     banana.set<CPickup>(250);
 
+    m_prototypes["banana"] = std::move(banana);
+
     /* Orange Properties */
     tileset_tex.frame_number = 17;
     auto orange = entt::prototype{m_registry};
@@ -96,13 +103,6 @@ void GameState::create_prototypes()
     orange.set<CSprite>(tileset_tex);
     orange.set<CPickup>(250);
 
-    /* Wall Properties */
-    tileset_tex.frame_number = 17;
-    auto wall = entt::prototype{m_registry};
-    wall.set<CPosition>();
-    wall.set<CSprite>(tileset_tex);
-    wall.set<CPickup>(250);
-    wall.set<CCollision>();
-
+    m_prototypes["orange"] = std::move(orange);
 }
 }  // namespace pac
