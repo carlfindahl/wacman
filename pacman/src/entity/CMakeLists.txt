@@ -10,4 +10,7 @@ target_sources(
 
     "${CMAKE_CURRENT_LIST_DIR}/movement_system.h"
     "${CMAKE_CURRENT_LIST_DIR}/movement_system.cpp"
+
+    "${CMAKE_CURRENT_LIST_DIR}/rendering_system.h"
+    "${CMAKE_CURRENT_LIST_DIR}/rendering_system.cpp"
 )
