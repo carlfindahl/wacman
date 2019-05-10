@@ -3,6 +3,7 @@
 #include "audio/sound_manager.h"
 #include "entity/movement_system.h"
 #include "entity/rendering_system.h"
+#include "entity/animation_system.h"
 #include "state_manager.h"
 #include "pause_state.h"
 #include "input/input.h"
@@ -122,6 +123,7 @@ void GameState::create_prototypes()
 void GameState::add_systems()
 {
     m_systems.emplace_back(std::make_unique<MovementSystem>());
+    m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
 }
 }  // namespace pac
