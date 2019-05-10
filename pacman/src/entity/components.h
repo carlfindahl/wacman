@@ -26,6 +26,9 @@ struct CMovement
 
     /* Movement speed in tiles per second */
     float speed = 1.f;
+
+    /* Current move progress */
+    float progress = 0.f;
 };
 
 /* Animated sprite component */
