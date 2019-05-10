@@ -35,7 +35,6 @@ void GameState::on_enter()
     m_level.load("res/level0");
     auto pac = m_prototypes.at("pacman").create(m_registry);
     m_registry.get<CPosition>(pac).position = glm::ivec2(3, 4);
-    m_registry.get<CMovement>(pac).desired_direction = glm::ivec2(1, 0);
     m_registry.get<CMovement>(pac).current_direction = glm::ivec2(1, 0);
 }
 
@@ -73,7 +72,7 @@ void GameState::create_prototypes()
     auto pacman = entt::prototype{m_registry};
     pacman.set<CPlayer>();
     pacman.set<CPosition>();
-    pacman.set<CMovement>(glm::ivec2{}, glm::ivec2{}, 3.f);
+    pacman.set<CMovement>(glm::ivec2{}, glm::ivec2{}, 3.f, 0.f);
     pacman.set<CCollision>();
     pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
         {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});

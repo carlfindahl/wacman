@@ -3,6 +3,7 @@
 #include "components.h"
 #include "rendering/renderer.h"
 
+#include <gfx.h>
 #include <entt/entity/registry.hpp>
 
 namespace pac
@@ -37,7 +38,9 @@ void RenderingSystem::update(float dt, entt::registry& reg)
     auto regular_moving_anim = reg.group<CAnimationSprite>(entt::get<CPosition, CMovement>);
     regular_moving_anim.each([](auto e, const CAnimationSprite& sprite, const CPosition& pos, const CMovement& move) {
         /* Interpolate, then draw */
-        auto interp_pos = glm::vec2(pos.position) + move.progress * glm::vec2(move.current_direction);
+        const auto interp_pos = glm::vec2(pos.position) + move.progress * glm::vec2(move.current_direction);
+
+        GFX_DEBUG("Pos: (%.2f, %.2f)", interp_pos.x, interp_pos.y);
 
         get_renderer().draw({interp_pos * TILE_SIZE<float> - TILE_SIZE<float> * 0.5f,
                              glm::vec2(TILE_SIZE<float>, TILE_SIZE<float>), glm::vec3(1.f), sprite.active_animation});

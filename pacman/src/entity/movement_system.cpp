@@ -1,6 +1,8 @@
 #include "movement_system.h"
 #include "components.h"
 
+#include <gfx.h>
+
 namespace pac
 {
 void MovementSystem::update(float dt, entt::registry& reg)
@@ -9,7 +11,7 @@ void MovementSystem::update(float dt, entt::registry& reg)
     for (auto e : movement_view)
     {
         /* Update the progress based on speed */
-        auto mc = movement_view.get(e);
+        auto& mc = movement_view.get(e);
         mc.progress += dt * mc.speed;
 
         /* When we reach a new tile, then reset progress and update position (required component) */
