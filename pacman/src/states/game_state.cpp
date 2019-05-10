@@ -16,6 +16,8 @@ GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
 
 void GameState::on_enter()
 {
+    create_prototypes();
+
     m_music_id = get_sound().play("theme", true);
 
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
@@ -28,7 +30,7 @@ void GameState::on_enter()
     input_manager.push(std::move(game_input));
 
     m_level.load("res/level0");
-//    m_prototypes["pacman"].create(m_registry);
+    m_prototypes.at("pacman").create(m_registry);
 }
 
 void GameState::on_exit()
@@ -65,9 +67,8 @@ void GameState::create_prototypes()
     pacman.set<CCollision>();
     pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
         {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});
-    pacman.set<CInput>();
 
-//    m_prototypes["pacman"] = std::move(pacman);
+    m_prototypes.emplace("pacman", std::move(pacman));
 
     /* Food Prototype */
     auto tileset_tex = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 20);
@@ -78,7 +79,7 @@ void GameState::create_prototypes()
     food.set<CSprite>(tileset_tex);
     food.set<CPickup>(50);
 
-//    m_prototypes["food"] = std::move(food);
+    m_prototypes.emplace("food", std::move(food));
 
     /* Strawberry Prototype */
     tileset_tex.frame_number = 15;
@@ -87,7 +88,7 @@ void GameState::create_prototypes()
     strawberry.set<CSprite>(tileset_tex);
     strawberry.set<CPickup>(250);
 
-//    m_prototypes["strawberry"] = std::move(strawberry);
+    m_prototypes.emplace("strawberry", std::move(strawberry));
 
     /* Banana Properties */
     tileset_tex.frame_number = 16;
@@ -96,7 +97,7 @@ void GameState::create_prototypes()
     banana.set<CSprite>(tileset_tex);
     banana.set<CPickup>(250);
 
-//    m_prototypes["banana"] = std::move(banana);
+    m_prototypes.emplace("banana", std::move(banana));
 
     /* Orange Properties */
     tileset_tex.frame_number = 17;
@@ -105,6 +106,6 @@ void GameState::create_prototypes()
     orange.set<CSprite>(tileset_tex);
     orange.set<CPickup>(250);
 
-//    m_prototypes["orange"] = std::move(orange);
+    m_prototypes.emplace("orange", std::move(orange));
 }
 }  // namespace pac
