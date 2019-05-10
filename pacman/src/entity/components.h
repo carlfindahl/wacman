@@ -37,6 +37,9 @@ struct CAnimationSprite
     /* Available animations (accessible by hash of their name */
     robin_hood::unordered_map<std::string, TextureID> available_animations{};
 
+    /* Color tint */
+    glm::vec3 tint = glm::vec3(1.f);
+
     /* The active animation sprite (from the map) */
     TextureID active_animation{};
 
@@ -51,6 +54,9 @@ struct CSprite
 {
     /* Sprite ID */
     TextureID sprite{};
+
+    /* Color tint */
+    glm::vec3 tint = glm::vec3(1.f);
 };
 
 /* Player component (Pacman) */

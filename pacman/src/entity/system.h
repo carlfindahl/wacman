@@ -23,7 +23,7 @@ public:
      * \param dt is the delta time
      * \param reg is the current entity registry to work with
      */
-    virtual void update(float dt, entt::registry reg) = 0;
+    virtual void update(float dt, entt::registry& reg) = 0;
 };
 
 }  // namespace pac

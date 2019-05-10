@@ -3,7 +3,7 @@
 
 namespace pac
 {
-void MovementSystem::update(float dt, entt::registry reg)
+void MovementSystem::update(float dt, entt::registry& reg)
 {
     auto movement_view = reg.view<CMovement>();
     for (auto e : movement_view)
