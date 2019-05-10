@@ -33,7 +33,10 @@ void GameState::on_enter()
     input_manager.push(std::move(game_input));
 
     m_level.load("res/level0");
-    m_prototypes.at("pacman").create(m_registry);
+    auto pac = m_prototypes.at("pacman").create(m_registry);
+    m_registry.get<CPosition>(pac).position = glm::ivec2(3, 4);
+    m_registry.get<CMovement>(pac).desired_direction = glm::ivec2(1, 0);
+    m_registry.get<CMovement>(pac).current_direction = glm::ivec2(1, 0);
 }
 
 void GameState::on_exit()
