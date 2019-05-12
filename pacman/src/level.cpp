@@ -168,6 +168,8 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
     return m_tiles[coordinate.y][coordinate.x];
 }
 
+bool Level::will_collide(glm::ivec2 pos, glm::ivec2 direction) const { return get_tile(pos + direction).type == ETileType::Wall; }
+
 unsigned Level::score() const { return m_score; }
 
 bool Level::bounds_check(glm::ivec2 pos) const

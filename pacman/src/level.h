@@ -90,6 +90,14 @@ public:
     const Tile& get_tile(glm::ivec2 coordinate) const;
 
     /*!
+     * \brief will_collide checks if an entity at the given position moveing in the given direction will collide with the level
+     * \param pos is the position of the entity
+     * \param direction is the direction of the entity
+     * \return true if a collision will happen on the next tile, false otherwise
+     */
+    bool will_collide(glm::ivec2 pos, glm::ivec2 direction) const;
+
+    /*!
      * \brief get_neighbours gets all non-wall neighbouring tiles of the tile at pos
      * \param pos the position of the tile to get the neighbours (NESW) of
      * \return A vector of tile coordinates
