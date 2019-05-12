@@ -1,6 +1,7 @@
 #pragma once
 
 #include <level.h>
+#include <entity/events.h>
 #include <entity/system.h>
 #include <rendering/uniform_buffer_object.h>
 #include <states/state.h>
@@ -41,6 +42,8 @@ public:
 
     bool draw() override;
 
+    void recieve(const EvInput& input);
+
 private:
     /*!
      * \brief create_prototypes creates entity prototypes
@@ -51,5 +54,6 @@ private:
      * \brief add_systems needed by this state
      */
     void add_systems();
+
 };
 }  // namespace pac

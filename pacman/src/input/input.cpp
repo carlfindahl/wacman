@@ -1,6 +1,7 @@
 #include "input.h"
 #include "entity/events.h"
 
+#include <gfx.h>
 #include <glm/vec2.hpp>
 #include <GLFW/glfw3.h>
 
@@ -63,8 +64,6 @@ void InputDomain::invoke_live_keys(float dt, GLFWwindow* win)
 }
 
 bool InputDomain::blocking() const { return m_blocking; }
-
-void InputManager::push(const InputDomain& state) { m_waiting_commands.emplace_back(state, ECommandType::Push); }
 
 void InputManager::push(InputDomain&& state) { m_waiting_commands.emplace_back(std::move(state), ECommandType::Push); }
 

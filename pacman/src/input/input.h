@@ -150,8 +150,6 @@ private:
         /* So we can emplace back */
         Command(ECommandType type) : command_type(type) {}
 
-        Command(const InputDomain& state, ECommandType type) : new_state(state), command_type(type) {}
-
         Command(InputDomain&& state, ECommandType type) : new_state(std::move(state)), command_type(type) {}
     };
 

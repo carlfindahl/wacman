@@ -72,7 +72,7 @@ struct CPlayer
 /* Input Component */
 struct CInput
 {
-    InputDomain input_state{false};
+    robin_hood::unordered_map<Action, std::function<void()>> actions{};
 };
 
 /* Pickup component represents a pickuppable */

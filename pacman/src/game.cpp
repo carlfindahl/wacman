@@ -141,7 +141,11 @@ void Game::init_imgui()
     ImGui_ImplOpenGL3_Init();
 }
 
-void Game::update(float dt) { m_state_manager.update(dt); }
+void Game::update(float dt)
+{
+    get_input().update(dt, m_window);
+    m_state_manager.update(dt);
+}
 
 void Game::draw()
 {
