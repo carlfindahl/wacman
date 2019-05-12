@@ -9,6 +9,7 @@
 #include <vector>
 #include <functional>
 
+#include <entt/signal/dispatcher.hpp>
 #include <robinhood/robinhood.h>
 #include <glm/vec2.hpp>
 
@@ -23,6 +24,7 @@ enum Action
 
     /* Core Actions */
     ACTION_QUIT,
+    ACTION_BACK,
     ACTION_TOGGLE_DEBUG,
 
     /* In-Game Actions */
@@ -71,24 +73,11 @@ private:
     /* Map of live keybindings [polling instead of event based] */
     robin_hood::unordered_map<int, Action> m_live_bindings{};
 
-    /* Array of all axis bindings (since there are only 2 axes, we can afford storing it locally */
-    std::array<std::vector<Action>, 2> m_axis_bindings = {};
-
     /* Whether this state is blocking */
     bool m_blocking = false;
 
 public:
     InputDomain() = default;
-
-    /*!
-     * \brief The EAxis enum contains the various input axes that the InputState can handle. It is a regular enum instead of a
-     * scoped enum so we can implicitly convert it to an int.
-     */
-    enum Axis
-    {
-        AXIS_Horizontal,
-        AXIS_Vertical
-    };
 
     /*!
      * \brief InputState
@@ -111,15 +100,6 @@ public:
     void bind_live_key(int key, Action action);
 
     /*!
-     * \brief bind_mouse_axis binds an axis to a function that takes a float. This float is the value of the axis ranging from -N
-     * to N, depending on how much movement is happening in that particular axis. This is made to work with mouse input, and will
-     * be the mouse movement delta by default.
-     * \param axis is the axis you want to bind an action to \param action is the action
-     * you want to bind
-     */
-    void bind_mouse_axis(Axis axis, Action action);
-
-    /*!
      * \brief try_invoke attempts to invoke the given key binding
      * \param key is the key to try to invoke
      */
@@ -131,12 +111,6 @@ public:
      * \param dt is the delta time
      */
     void invoke_live_keys(float dt, GLFWwindow* win);
-
-    /*!
-     * \brief update_axes updates each axis in the Input State
-     * \param axis_values are the axis deltas since the last axis update
-     */
-    void update_axes(float x, float y);
 
     /*!
      * \brief blocking
@@ -152,7 +126,7 @@ class InputManager
 {
 private:
     /* Stack of input_states */
-    std::vector<InputDomain> m_input_states = {};
+    std::vector<InputDomain> m_active_domains = {};
 
     /*!
      * \brief The ECommandType enum represents a command that can be executed by the state manager.

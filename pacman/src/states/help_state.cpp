@@ -12,9 +12,9 @@ void pac::HelpState::on_enter()
     m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
 
     /* Add input state that is blocking so no other input works */
-    InputDomain pause_input(true);
-    pause_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
-    get_input().push(std::move(pause_input));
+    InputDomain pause_domain(true);
+//    pause_domain.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
+    get_input().push(std::move(pause_domain));
 }
 
 void pac::HelpState::on_exit() { get_input().pop(); }

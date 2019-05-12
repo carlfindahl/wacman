@@ -14,14 +14,14 @@ void PauseState::on_enter()
     InputDomain pause_input(true);
 
     /* Resume game */
-    pause_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
-    pause_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->pop(); });
+//    pause_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
+//    pause_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->pop(); });
 
-    /* Quit to main menu */
-    pause_input.bind_key(GLFW_KEY_Q, [this] {
-        m_context.state_manager->clear();
-        m_context.state_manager->push<MainMenuState>(m_context);
-    });
+//    /* Quit to main menu */
+//    pause_input.bind_key(GLFW_KEY_Q, [this] {
+//        m_context.state_manager->clear();
+//        m_context.state_manager->push<MainMenuState>(m_context);
+//    });
 
     get_input().push(std::move(pause_input));
 }

@@ -15,9 +15,13 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <entt/signal/dispatcher.hpp>
 
 namespace pac
 {
+/* The game event queue */
+entt::dispatcher g_event_queue{};
+
 Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);

@@ -32,13 +32,13 @@ void GameState::on_enter()
     m_registry.get<CMovement>(pac).desired_direction = glm::ivec2(1, 0);
 
     InputDomain game_input(true);
-    game_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
-    game_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
+//    game_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
+//    game_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
 
-    game_input.bind_key(GLFW_KEY_UP, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, -1}; });
-    game_input.bind_key(GLFW_KEY_DOWN, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, 1}; });
-    game_input.bind_key(GLFW_KEY_LEFT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {-1, 0}; });
-    game_input.bind_key(GLFW_KEY_RIGHT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {1, 0}; });
+//    game_input.bind_key(GLFW_KEY_UP, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, -1}; });
+//    game_input.bind_key(GLFW_KEY_DOWN, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, 1}; });
+//    game_input.bind_key(GLFW_KEY_LEFT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {-1, 0}; });
+//    game_input.bind_key(GLFW_KEY_RIGHT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {1, 0}; });
 
     get_input().push(std::move(game_input));
 }

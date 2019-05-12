@@ -1,10 +1,13 @@
 #include "input.h"
+#include "entity/events.h"
 
 #include <glm/vec2.hpp>
 #include <GLFW/glfw3.h>
 
 namespace pac
 {
+extern entt::dispatcher g_event_queue;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* Inoke inputs if it's a key press */
@@ -40,16 +43,11 @@ void InputDomain::bind_key(int key, Action action) { m_bindings[key] = action; }
 
 void InputDomain::bind_live_key(int key, Action action) { m_live_bindings[key] = action; }
 
-void InputDomain::bind_mouse_axis(InputDomain::Axis axis, Action action)
-{
-    m_axis_bindings.at(axis).push_back(action);
-}
-
 void InputDomain::try_invoke(int key)
 {
     if (auto it = m_bindings.find(key); it != m_bindings.end())
     {
-        it->second();
+        g_event_queue.enqueue(EvInput{it->second});
     }
 }
 
@@ -59,21 +57,8 @@ void InputDomain::invoke_live_keys(float dt, GLFWwindow* win)
     {
         if (glfwGetKey(win, m_live_binding.first))
         {
-            m_live_binding.second(dt);
+            g_event_queue.enqueue(EvInput{m_live_binding.second});
         }
-    }
-}
-
-void InputDomain::update_axes(float x, float y)
-{
-    for (auto& binding : m_axis_bindings[AXIS_Horizontal])
-    {
-        binding(x);
-    }
-
-    for (auto& binding : m_axis_bindings[AXIS_Vertical])
-    {
-        binding(y);
     }
 }
 
@@ -87,7 +72,7 @@ void InputManager::pop() { m_waiting_commands.emplace_back(ECommandType::Pop); }
 
 void InputManager::invoke(int key)
 {
-    for (auto it = m_input_states.rbegin(); it != m_input_states.rend(); ++it)
+    for (auto it = m_active_domains.rbegin(); it != m_active_domains.rend(); ++it)
     {
         it->try_invoke(key);
         if (it->blocking())
@@ -104,9 +89,9 @@ void InputManager::update(float dt, GLFWwindow* win)
     {
         switch (cmd.command_type)
         {
-        case ECommandType::Push: m_input_states.push_back(std::move(cmd.new_state)); break;
-        case ECommandType::Pop: m_input_states.pop_back(); break;
-        case ECommandType::Clear: m_input_states.clear(); break;
+        case ECommandType::Push: m_active_domains.push_back(std::move(cmd.new_state)); break;
+        case ECommandType::Pop: m_active_domains.pop_back(); break;
+        case ECommandType::Clear: m_active_domains.clear(); break;
         default: break;
         }
     }
@@ -114,7 +99,7 @@ void InputManager::update(float dt, GLFWwindow* win)
     m_waiting_commands.clear();
 
     /* Invoke keys */
-    for (auto it = m_input_states.rbegin(); it != m_input_states.rend(); ++it)
+    for (auto it = m_active_domains.rbegin(); it != m_active_domains.rend(); ++it)
     {
         it->invoke_live_keys(dt, win);
         if (it->blocking())
@@ -124,17 +109,7 @@ void InputManager::update(float dt, GLFWwindow* win)
     }
 }
 
-void InputManager::invoke_axis(float x, float y)
-{
-    for (auto it = m_input_states.rbegin(); it != m_input_states.rend(); ++it)
-    {
-        it->update_axes(x, y);
-        if (it->blocking())
-        {
-            break;
-        }
-    }
-}
+void InputManager::invoke_axis(float x, float y) { g_event_queue.enqueue(EvMouseMove{{x, y}, m_mouse_pos}); }
 
 void InputManager::set_cursor_pos(const glm::dvec2& new_pos) { m_mouse_pos = new_pos; }
 

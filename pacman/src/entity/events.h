@@ -4,7 +4,7 @@
 
 namespace pac
 {
-struct InputEvent
+struct EvInput
 {
     Action action = ACTION_NONE;
 };
@@ -13,7 +13,6 @@ struct EvMouseMove
 {
     glm::vec2 delta{};
     glm::vec2 position{};
-    Action action = ACTION_NONE;
 };
 
 }  // namespace pac
