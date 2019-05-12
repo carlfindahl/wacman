@@ -5,8 +5,6 @@
 
 namespace pac
 {
-namespace input
-{
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* Inoke inputs if it's a key press */
@@ -37,18 +35,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         get_input().invoke(button);
     }
 }
-}  // namespace input
 
-void InputState::bind_key(int key, std::function<void()> action) { m_bindings[key] = action; }
+void InputDomain::bind_key(int key, Action action) { m_bindings[key] = action; }
 
-void InputState::bind_live_key(int key, std::function<void(float)> action) { m_live_bindings[key] = action; }
+void InputDomain::bind_live_key(int key, Action action) { m_live_bindings[key] = action; }
 
-void InputState::bind_mouse_axis(InputState::Axis axis, std::function<void(float)> action)
+void InputDomain::bind_mouse_axis(InputDomain::Axis axis, Action action)
 {
     m_axis_bindings.at(axis).push_back(action);
 }
 
-void InputState::try_invoke(int key)
+void InputDomain::try_invoke(int key)
 {
     if (auto it = m_bindings.find(key); it != m_bindings.end())
     {
@@ -56,7 +53,7 @@ void InputState::try_invoke(int key)
     }
 }
 
-void InputState::invoke_live_keys(float dt, GLFWwindow* win)
+void InputDomain::invoke_live_keys(float dt, GLFWwindow* win)
 {
     for (auto& m_live_binding : m_live_bindings)
     {
@@ -67,7 +64,7 @@ void InputState::invoke_live_keys(float dt, GLFWwindow* win)
     }
 }
 
-void InputState::update_axes(float x, float y)
+void InputDomain::update_axes(float x, float y)
 {
     for (auto& binding : m_axis_bindings[AXIS_Horizontal])
     {
@@ -80,11 +77,11 @@ void InputState::update_axes(float x, float y)
     }
 }
 
-bool InputState::blocking() const { return m_blocking; }
+bool InputDomain::blocking() const { return m_blocking; }
 
-void InputManager::push(const InputState& state) { m_waiting_commands.emplace_back(state, ECommandType::Push); }
+void InputManager::push(const InputDomain& state) { m_waiting_commands.emplace_back(state, ECommandType::Push); }
 
-void InputManager::push(InputState&& state) { m_waiting_commands.emplace_back(std::move(state), ECommandType::Push); }
+void InputManager::push(InputDomain&& state) { m_waiting_commands.emplace_back(std::move(state), ECommandType::Push); }
 
 void InputManager::pop() { m_waiting_commands.emplace_back(ECommandType::Pop); }
 

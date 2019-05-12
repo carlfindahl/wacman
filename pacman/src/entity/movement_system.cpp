@@ -8,8 +8,8 @@ namespace pac
 {
 void MovementSystem::update(float dt, entt::registry& reg)
 {
-    auto movement_view = reg.group<CPosition, CMovement>(entt::get<CCollision>);
-    movement_view.each([dt, this](CPosition& pos, CMovement& mov, CCollision& col) {
+    auto movement_group = reg.group<CPosition, CMovement>(entt::get<CCollision>);
+    movement_group.each([dt, this](CPosition& pos, CMovement& mov, CCollision& col) {
         /* Check if we can move towards desired direction and switch it if possible */
         if (mov.desired_direction != mov.current_direction && !m_level.will_collide(pos.position, mov.desired_direction))
         {

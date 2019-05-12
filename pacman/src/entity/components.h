@@ -72,7 +72,7 @@ struct CPlayer
 /* Input Component */
 struct CInput
 {
-    InputState input_state{false};
+    InputDomain input_state{false};
 };
 
 /* Pickup component represents a pickuppable */

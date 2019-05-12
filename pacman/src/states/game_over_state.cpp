@@ -17,7 +17,7 @@ void GameOverState::on_enter()
     m_playername.fill('\0');
 
     /* Add input state that is blocking so no other input works */
-    InputState pause_input(true);
+    InputDomain pause_input(true);
     get_input().push(std::move(pause_input));
 }
 

@@ -83,9 +83,9 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
     m_window = glfwCreateWindow(window_size.x, window_size.y, title, nullptr, nullptr);
     GFX_ASSERT(m_window, "Failed to create window %ux%u", window_size.x, window_size.y);
 
-    glfwSetCursorPosCallback(m_window, pac::input::cursor_position_callback);
-    glfwSetMouseButtonCallback(m_window, pac::input::mouse_button_callback);
-    glfwSetKeyCallback(m_window, pac::input::key_callback);
+    glfwSetCursorPosCallback(m_window, pac::cursor_position_callback);
+    glfwSetMouseButtonCallback(m_window, pac::mouse_button_callback);
+    glfwSetKeyCallback(m_window, pac::key_callback);
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
 

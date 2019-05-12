@@ -17,8 +17,33 @@ struct GLFWwindow;
 
 namespace pac
 {
-namespace input
+enum Action
 {
+    ACTION_NONE,
+
+    /* Core Actions */
+    ACTION_QUIT,
+    ACTION_TOGGLE_DEBUG,
+
+    /* In-Game Actions */
+    ACTION_MOVE_NORTH,
+    ACTION_MOVE_EAST,
+    ACTION_MOVE_SOUTH,
+    ACTION_MOVE_WEST,
+
+    ACTION_CONFIRM,
+    ACTION_CANCEL,
+    ACTION_PAUSE,
+
+    /* Editor Actions */
+    ACTION_PLACE,
+    ACTION_UNDO,
+    ACTION_NEXT_TILE,
+    ACTION_PREV_TILE,
+    ACTION_NEXT_ENTITY,
+    ACTION_PREV_ENTITY
+};
+
 /*!
  * \brief key_callback handles key events suchs as presses and releases
  */
@@ -33,28 +58,27 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
  * \brief mouse_button_callback handles mouse button clicks
  */
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-}  // namespace input
 
 /*!
  * \brief The InputState class contains a set of key bindings.
  */
-class InputState
+class InputDomain
 {
 private:
     /* Map of keybindings */
-    robin_hood::unordered_map<int, std::function<void(void)>> m_bindings{};
+    robin_hood::unordered_map<int, Action> m_bindings{};
 
     /* Map of live keybindings [polling instead of event based] */
-    robin_hood::unordered_map<int, std::function<void(float)>> m_live_bindings{};
+    robin_hood::unordered_map<int, Action> m_live_bindings{};
 
     /* Array of all axis bindings (since there are only 2 axes, we can afford storing it locally */
-    std::array<std::vector<std::function<void(float)>>, 2> m_axis_bindings = {};
+    std::array<std::vector<Action>, 2> m_axis_bindings = {};
 
     /* Whether this state is blocking */
     bool m_blocking = false;
 
 public:
-    InputState() = default;
+    InputDomain() = default;
 
     /*!
      * \brief The EAxis enum contains the various input axes that the InputState can handle. It is a regular enum instead of a
@@ -70,21 +94,21 @@ public:
      * \brief InputState
      * \param blocking if this state should block other states
      */
-    InputState(bool blocking) : m_blocking(blocking){};
+    InputDomain(bool blocking) : m_blocking(blocking){};
 
     /*!
      * \brief bind_key sets an action to be performed when the given key is pressed
      * \param key is the key to bind (GLFW_KEY_xxx)
-     * \param action is the action to perform (function)
+     * \param action is the action to assosciate
      */
-    void bind_key(int key, std::function<void(void)> action);
+    void bind_key(int key, Action action);
 
     /*!
      * \brief bind_live_key sets an action to be performed when the given key is pressed
      * \param key is the key to bind (GLFW_KEY_xxx)
      * \param action is the action to perform (function)
      */
-    void bind_live_key(int key, std::function<void(float)> action);
+    void bind_live_key(int key, Action action);
 
     /*!
      * \brief bind_mouse_axis binds an axis to a function that takes a float. This float is the value of the axis ranging from -N
@@ -93,7 +117,7 @@ public:
      * \param axis is the axis you want to bind an action to \param action is the action
      * you want to bind
      */
-    void bind_mouse_axis(Axis axis, std::function<void(float)> action);
+    void bind_mouse_axis(Axis axis, Action action);
 
     /*!
      * \brief try_invoke attempts to invoke the given key binding
@@ -128,7 +152,7 @@ class InputManager
 {
 private:
     /* Stack of input_states */
-    std::vector<InputState> m_input_states = {};
+    std::vector<InputDomain> m_input_states = {};
 
     /*!
      * \brief The ECommandType enum represents a command that can be executed by the state manager.
@@ -144,7 +168,7 @@ private:
     struct Command
     {
         /* Used when Command is Push */
-        InputState new_state{};
+        InputDomain new_state{};
 
         /* The command to execute */
         ECommandType command_type = ECommandType::Nothing;
@@ -152,9 +176,9 @@ private:
         /* So we can emplace back */
         Command(ECommandType type) : command_type(type) {}
 
-        Command(const InputState& state, ECommandType type) : new_state(state), command_type(type) {}
+        Command(const InputDomain& state, ECommandType type) : new_state(state), command_type(type) {}
 
-        Command(InputState&& state, ECommandType type) : new_state(std::move(state)), command_type(type) {}
+        Command(InputDomain&& state, ECommandType type) : new_state(std::move(state)), command_type(type) {}
     };
 
     /* Commands waiting */
@@ -168,8 +192,8 @@ public:
      * \brief push an input state to the stack
      * \param state is the input state to push
      */
-    void push(const InputState& state);
-    void push(InputState&& state);
+    void push(const InputDomain& state);
+    void push(InputDomain&& state);
 
     /*!
      * \brief pop an input state from the stack

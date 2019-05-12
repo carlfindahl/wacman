@@ -11,7 +11,7 @@ void PauseState::on_enter()
 {
     m_splash = get_renderer().load_texture("res/pause_screen.png");
 
-    InputState pause_input(true);
+    InputDomain pause_input(true);
 
     /* Resume game */
     pause_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });

@@ -26,17 +26,21 @@ void GameState::on_enter()
 
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
-    InputState game_input(true);
+    m_level.load("res/level0");
+    auto pac = m_prototypes.at("pacman").create(m_registry);
+    m_registry.get<CPosition>(pac).position = glm::ivec2(3, 3);
+    m_registry.get<CMovement>(pac).desired_direction = glm::ivec2(1, 0);
+
+    InputDomain game_input(true);
     game_input.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->push<PauseState>(m_context); });
     game_input.bind_key(GLFW_KEY_P, [this] { m_context.state_manager->push<PauseState>(m_context); });
 
-    auto& input_manager = get_input();
-    input_manager.push(std::move(game_input));
+    game_input.bind_key(GLFW_KEY_UP, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, -1}; });
+    game_input.bind_key(GLFW_KEY_DOWN, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {0, 1}; });
+    game_input.bind_key(GLFW_KEY_LEFT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {-1, 0}; });
+    game_input.bind_key(GLFW_KEY_RIGHT, [this, pac] { m_registry.get<CMovement>(pac).desired_direction = {1, 0}; });
 
-    m_level.load("res/level0");
-    auto pac = m_prototypes.at("pacman").create(m_registry);
-    m_registry.get<CPosition>(pac).position = glm::ivec2(3, 4);
-    m_registry.get<CMovement>(pac).current_direction = glm::ivec2(1, 0);
+    get_input().push(std::move(game_input));
 }
 
 void GameState::on_exit()
@@ -122,7 +126,7 @@ void GameState::create_prototypes()
 
 void GameState::add_systems()
 {
-    m_systems.emplace_back(std::make_unique<MovementSystem>());
+    m_systems.emplace_back(std::make_unique<MovementSystem>(m_level));
     m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
 }

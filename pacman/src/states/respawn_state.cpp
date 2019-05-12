@@ -15,7 +15,7 @@ RespawnState::RespawnState(GameContext context, float wait_seconds, std::string_
 void RespawnState::on_enter()
 {
     /* Add input state that is blocking so no other input works */
-    InputState pause_input(true);
+    InputDomain pause_input(true);
     get_input().push(std::move(pause_input));
 }
 
