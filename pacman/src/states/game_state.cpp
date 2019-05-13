@@ -42,7 +42,15 @@ void GameState::on_enter()
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
 
-    m_factory.spawn(m_lua, "food");;
+
+    /* Register action enum */
+    m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},
+                                      {"MOVE_EAST", ACTION_MOVE_EAST},
+                                      {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
+                                      {"MOVE_WEST", ACTION_MOVE_WEST}});
+
+    m_factory.spawn(m_lua, "food");
+    m_factory.spawn(m_lua, "pacman");
 }
 
 void GameState::on_exit()

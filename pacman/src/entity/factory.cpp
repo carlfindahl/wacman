@@ -88,7 +88,30 @@ void EntityFactory::make_sprite_component(sol::state_view& state, const sol::tab
                                           glm::vec3{comp["tint"][0], comp["tint"][1], comp["tint"][2]}});
 }
 
-void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
+void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    /* Prepare data */
+    robin_hood::unordered_map<std::string, TextureID> anims{};
+    sol::table sprites = comp["sprites"];
+
+    /* For each sprite defined, add and load it's animation */
+    sprites.for_each([&anims](sol::object k, sol::object v) {
+        GFX_DEBUG("Loading animation sprite {%s}", k.as<const char*>());
+
+        auto tbl = v.as<sol::table>();
+
+        /* Load anim texture based on information */
+        auto tex = get_renderer().load_animation_texture(
+            "res/textures/" + tbl["file"].get<std::string>(), tbl["startX"].get<int>() * tbl["size"].get<int>(),
+            tbl["startY"].get<int>() * tbl["size"].get<int>(), tbl["size"], tbl["size"], tbl["cols"], tbl["length"]);
+
+        anims.emplace(k.as<std::string>(), tex);
+    });
+
+    /* Finally create animation sprite based on loaded data */
+    m_registry.assign<CAnimationSprite>(e, anims, glm::vec3{comp["tint"][0], comp["tint"][1], comp["tint"][2]},
+                                        anims[comp["starting"]], 0.f, comp["fps"]);
+}
 
 void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
@@ -96,11 +119,26 @@ void EntityFactory::make_position_component(sol::state_view& state, const sol::t
     m_registry.assign<CPosition>(e, CPosition{glm::ivec2{comp["x"], comp["y"]}});
 }
 
-void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
+void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CMovement>(e, glm::ivec2{}, glm::ivec2{}, comp["speed"], 0.f);
+}
 
-void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
+void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CPlayer>(e, comp["lives"], 0);
+}
 
-void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
+void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    robin_hood::unordered_map<Action, sol::function> actions{};
+    for (auto& [k, v] : comp)
+    {
+        actions.emplace(k.as<Action>(), v.as<sol::function>());
+    }
+
+    m_registry.assign<CInput>(e, std::move(actions));
+}
 
 void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {

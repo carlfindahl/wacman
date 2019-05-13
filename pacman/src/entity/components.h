@@ -4,6 +4,7 @@
 #include "rendering/renderer.h"
 
 #include <glm/vec2.hpp>
+#include <sol/function.hpp>
 #include <robinhood/robinhood.h>
 
 namespace pac
@@ -72,7 +73,7 @@ struct CPlayer
 /* Input Component */
 struct CInput
 {
-    robin_hood::unordered_map<Action, std::function<void()>> actions{};
+    robin_hood::unordered_map<Action, sol::function> actions{};
 };
 
 /* Pickup component represents a pickuppable */
