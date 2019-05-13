@@ -65,6 +65,7 @@ void Game::run()
 #endif
 
         glfwPollEvents();
+        g_event_queue.update();
         update(dt);
         draw();
     } while (m_flags.running && !glfwWindowShouldClose(m_window) && !m_state_manager.empty());

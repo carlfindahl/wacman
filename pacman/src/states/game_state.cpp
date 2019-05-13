@@ -71,8 +71,6 @@ void GameState::on_exit()
 
 bool GameState::update(float dt)
 {
-    g_event_queue.update();
-
     m_level.update(dt);
     for (auto& system : m_systems)
     {

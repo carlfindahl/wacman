@@ -1,5 +1,7 @@
 #pragma once
 
+#include "components.h"
+
 #include <stack>
 #include <string>
 #include <cstdint>
@@ -18,7 +20,7 @@ namespace pac
 class EntityFactory
 {
 private:
-    using ComponentFn = void (EntityFactory::*)(sol::state_view&, const sol::table&, uint32_t);
+    using ComponentFn = std::function<void(sol::state_view&, const sol::table&, uint32_t)>;
 
     /* Factory registry */
     entt::registry& m_registry;
@@ -26,13 +28,13 @@ private:
     /* Cached entity paths */
     robin_hood::unordered_map<std::string, std::filesystem::path> m_entity_path_map{};
 
-    /* Map that maps hashed component names to component creation functions */
-    robin_hood::unordered_map<std::string, ComponentFn> m_component_map = {{"Sprite", &EntityFactory::make_sprite_component},
-                                                                           {"Position", &EntityFactory::make_position_component},
-                                                                           {"Pickup", &EntityFactory::make_pickup_component}};
+    robin_hood::unordered_map<std::string, ComponentFn> m_component_map{
+        {"Sprite", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_sprite_component(s, t, e); }},
+        {"Position", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_position_component(s, t, e); }},
+        {"Pickup", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_pickup_component(s, t, e); }}};
 
 public:
-    EntityFactory(entt::registry& registry) : m_registry(registry) {}
+    EntityFactory(entt::registry& registry);
 
     /*!
      * \brief spawn spawns a new entity from a resource file

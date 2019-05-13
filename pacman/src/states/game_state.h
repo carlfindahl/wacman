@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entity/factory.h>
+
 #include <level.h>
 #include <entity/events.h>
 #include <entity/system.h>
@@ -31,6 +33,8 @@ private:
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};
 
+    EntityFactory m_factory{m_registry};
+
 public:
     GameState(GameContext owner);
 
@@ -54,6 +58,5 @@ private:
      * \brief add_systems needed by this state
      */
     void add_systems();
-
 };
 }  // namespace pac
