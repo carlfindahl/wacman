@@ -1,4 +1,6 @@
 #include "factory.h"
+#include "rendering/renderer.h"
+#include "components.h"
 
 namespace pac
 {
@@ -38,6 +40,7 @@ uint32_t EntityFactory::spawn(sol::state_view& state, const std::string& name)
             m_component_map.at(k.first.as<std::string>())(state, component, e);
         }
     }
+    return e;
 }
 
 std::optional<std::filesystem::path> EntityFactory::find_entity_path(const std::string& name)
@@ -71,20 +74,29 @@ std::optional<std::filesystem::path> EntityFactory::find_entity_path(const std::
     return std::nullopt;
 }
 
-void EntityFactory::make_sprite_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_sprite_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CSprite>(e, get_renderer().get_tileset_texture(comp["index"]), comp["tint"]);
+}
 
-void EntityFactory::make_animsprite_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
 
-void EntityFactory::make_position_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CPosition>(e, glm::ivec2{comp["x"], comp["y"]});
+}
 
-void EntityFactory::make_movement_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
 
-void EntityFactory::make_player_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
 
-void EntityFactory::make_input_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
 
-void EntityFactory::make_pickup_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CPickup>(e, comp["score"]);
+}
 
-void EntityFactory::make_collision_component(sol::state_view& state, sol::table& comp, uint32_t e) {}
+void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
 
 }  // namespace pac
