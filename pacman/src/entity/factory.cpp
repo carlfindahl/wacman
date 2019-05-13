@@ -70,6 +70,7 @@ std::optional<std::filesystem::path> EntityFactory::find_entity_path(const std::
             {
                 if (entry.path().filename().string() == name + ".lua")
                 {
+                    GFX_DEBUG("Found entity path: %s", entry.path().c_str());
                     return entry.path();
                 }
             }

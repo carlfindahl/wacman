@@ -29,25 +29,8 @@ void GameState::on_enter()
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
     m_level.load("res/level0");
-    auto pac = m_prototypes.at("pacman").create(m_registry);
-    m_registry.get<CPosition>(pac).position = glm::ivec2(3, 3);
-    m_registry.get<CMovement>(pac).desired_direction = glm::ivec2(1, 0);
-    m_registry.get<CInput>(pac).actions = {{ACTION_MOVE_NORTH,
-                                            [pac, this] {
-                                                m_registry.get<CMovement>(pac).desired_direction = {0, -1};
-                                            }},
-                                           {ACTION_MOVE_EAST,
-                                            [pac, this] {
-                                                m_registry.get<CMovement>(pac).desired_direction = {1, 0};
-                                            }},
-                                           {ACTION_MOVE_SOUTH,
-                                            [pac, this] {
-                                                m_registry.get<CMovement>(pac).desired_direction = {0, 1};
-                                            }},
-                                           {ACTION_MOVE_WEST, [pac, this] {
-                                                m_registry.get<CMovement>(pac).desired_direction = {-1, 0};
-                                            }}};
 
+    /* Create the input domain for the game */
     InputDomain game_input(true);
     game_input.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
     game_input.bind_key(GLFW_KEY_P, ACTION_PAUSE);
@@ -55,7 +38,6 @@ void GameState::on_enter()
     game_input.bind_key(GLFW_KEY_RIGHT, ACTION_MOVE_EAST);
     game_input.bind_key(GLFW_KEY_DOWN, ACTION_MOVE_SOUTH);
     game_input.bind_key(GLFW_KEY_LEFT, ACTION_MOVE_WEST);
-
     get_input().push(std::move(game_input));
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
