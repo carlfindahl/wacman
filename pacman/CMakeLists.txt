@@ -8,7 +8,7 @@ add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(EnTT REQUIRED)
-find_package(sol2 3.0 REQUIRED)
+find_package(Lua REQUIRED)
 
 target_link_libraries(
     ${EXEC_NAME}
@@ -24,7 +24,8 @@ target_link_libraries(
     glfw                                        # For window integration
     glm                                         # For Maths
     cgl                                         # OpenGL utilities (custom library built in-source for this project)
-    sol2                                        # Lua Bindings
+    lua                                         # Sol2 Needs this
+    sol2::sol2                                  # Lua Bindings
 )
 
 # Add this so it can specify source files and include directories local to it's own directory
