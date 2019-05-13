@@ -7,6 +7,7 @@
 #include <functional>
 #include <unordered_map>
 
+#include <sol/state.hpp>
 #include <entt/entity/registry.hpp>
 
 namespace pac
@@ -27,6 +28,9 @@ protected:
     /* Entity Registry */
     entt::registry m_registry{};
 
+    /* Lua State */
+    sol::state m_lua{};
+
 public:
     State() = default;
 
@@ -38,7 +42,7 @@ public:
 
     State& operator=(const State&) = delete;
 
-    State& operator=(State&& other) noexcept = default;
+    State& operator=(State&& other) = default;
 
     virtual ~State() noexcept = default;
 
