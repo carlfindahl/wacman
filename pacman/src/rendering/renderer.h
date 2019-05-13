@@ -127,6 +127,14 @@ public:
     TextureID load_texture(std::string_view relative_fp);
 
     /*!
+     * \brief get_tileset_texture is a shortcut to get the tileset texture, and the texture at location NO. Starting to count
+     * from the top left corner
+     * \param no is the index into the tileset
+     * \return A Texture ID to the correct texture
+     */
+    TextureID get_tileset_texture(unsigned no);
+
+    /*!
      * \brief load_animation_texture loads a texture with an animated sprite in it that can later be used with an animation
      * \note if you call this multiple times with the same texture, it will be loaded again! Not cached. So be careful.
      * \param relative_fp is the relative file path

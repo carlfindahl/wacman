@@ -145,6 +145,13 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
     return out;
 }
 
+TextureID Renderer::get_tileset_texture(unsigned no)
+{
+    auto id = load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
+    id.frame_number = no;
+    return id;
+}
+
 TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols,
                                            int count)
 {
