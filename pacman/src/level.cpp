@@ -24,12 +24,6 @@ Level::Level(GameContext context) : m_context(context)
 
 void Level::update(float dt)
 {
-    /* We win */
-    if (m_remaining_food == 0)
-    {
-        m_context.state_manager->push<GameOverState>(m_context, m_score, "YOU WIN!");
-    }
-
     /* Use ImGui to display the score */
     ImGui::SetNextWindowSize({100.f, 16.f});
     ImGui::SetNextWindowPos({120.f, 11.f});
@@ -117,10 +111,6 @@ void Level::load(std::string_view fp)
             {
                 /* This works since the Enum values have been set to match the tile index in the tileset for the level */
                 col.type = static_cast<ETileType>(tmp_val);
-                if (col.type == ETileType::Food)
-                {
-                    ++m_remaining_food;
-                }
             }
         }
     }

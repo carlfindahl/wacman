@@ -52,9 +52,6 @@ private:
     /* Score on this level */
     int32_t m_score = 0u;
 
-    /* Number of remaining food items (used to track progress) */
-    int32_t m_remaining_food = 0;
-
     /* Context in which level exists */
     GameContext m_context{};
 
