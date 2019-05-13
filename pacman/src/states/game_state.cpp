@@ -60,9 +60,7 @@ void GameState::on_enter()
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
 
-    auto food = m_factory.spawn(m_lua, "food");
-
-    m_lua.set_function("spawn", [this](const char* entity) { m_factory.spawn(m_lua, entity); });
+    m_factory.spawn(m_lua, "food");;
 }
 
 void GameState::on_exit()

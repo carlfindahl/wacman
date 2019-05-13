@@ -5,24 +5,7 @@
 
 namespace pac
 {
-EntityFactory::EntityFactory(entt::registry& registry) : m_registry(registry)
-{
-    //    entt::reflect<TextureID>("TextureID")
-    //        .data<&TextureID::array_index>("index")
-    //        .data<&TextureID::frame_count>("frames")
-    //        .data<&TextureID::frame_number>("current_frame");
-
-    //    entt::reflect<glm::ivec2>("ivec2").data<&glm::ivec2::x>("x").data<&glm::ivec2::y>("y");
-
-    //    /* Reflect Components */
-    //    entt::reflect<CPosition>("Position").ctor<&detail::make_position_component>().data<&CPosition::position>("position");
-    //    entt::reflect<CPickup>("Pickup").ctor<&detail::make_pickup_component>().data<&CPickup::score>("score");
-    //    entt::reflect<CSprite>("Sprite").ctor<&detail::make_sprite_component>().data<&CSprite::tint>("tint").data<&CSprite::sprite>(
-    //        "sprite");
-
-    //    /* Debug for reflection props */
-    //    entt::resolve([](entt::meta_type type) { GFX_DEBUG("Has reflected type: %s", type.name()); });
-}
+EntityFactory::EntityFactory(entt::registry& registry) : m_registry(registry) {}
 
 uint32_t EntityFactory::spawn(sol::state_view& state, const std::string& name)
 {
