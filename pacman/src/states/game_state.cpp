@@ -25,6 +25,8 @@ void GameState::on_enter()
 {
     add_systems();
 
+    m_lua.open_libraries(sol::lib::base, sol::lib::package);
+
     m_music_id = get_sound().play("theme", true);
 
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
@@ -42,7 +44,6 @@ void GameState::on_enter()
     get_input().push(std::move(game_input));
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
-
 
     /* Register action enum */
     m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},

@@ -21,7 +21,6 @@ void InputSystem::update(float dt, entt::registry& reg)
         {
             if (auto found = input.actions.find(action); found != input.actions.end())
             {
-                GFX_DEBUG("#%u accepted event #%d", e, action);
                 found->second.call();
             }
         }

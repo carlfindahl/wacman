@@ -49,9 +49,9 @@ pacman = {
         lives = 3
     },
     Input = {
-        MOVE_NORTH = function() print("Hello North") end,
-        MOVE_EAST = function() print("Hello East") end,
-        MOVE_SOUTH = function() print("Hello South") end,
-        MOVE_WEST = function() print("Hello West") end
+        [Action.MOVE_NORTH] = function() print("Hello North") end,
+        [Action.MOVE_EAST] = function() print("Hello East") end,
+        [Action.MOVE_SOUTH] = function() print("Hello South") end,
+        [Action.MOVE_WEST] = function() print("Hello West") end
     }
 }
