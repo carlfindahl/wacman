@@ -11,10 +11,20 @@ namespace pac
 class InputSystem : public System
 {
 private:
+    /* Actions not yet processed */
+    std::vector<Action> m_unprocessed_actions{};
 
 public:
+    InputSystem();
+
+    ~InputSystem() noexcept override;
+
     void update(float dt, entt::registry& reg) override;
 
+    /*!
+     * \brief recieve
+     * \param input
+     */
     void recieve(const EvInput& input);
 };
 }  // namespace pac

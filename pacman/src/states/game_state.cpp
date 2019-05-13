@@ -1,6 +1,7 @@
 #include "game_state.h"
 #include "entity/components.h"
 #include "audio/sound_manager.h"
+#include "entity/input_system.h"
 #include "entity/movement_system.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
@@ -79,6 +80,7 @@ bool GameState::draw()
 
 void GameState::add_systems()
 {
+    m_systems.emplace_back(std::make_unique<InputSystem>());
     m_systems.emplace_back(std::make_unique<MovementSystem>(m_level));
     m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
@@ -86,7 +88,6 @@ void GameState::add_systems()
 
 void GameState::recieve(const EvInput& input)
 {
-    GFX_DEBUG("Recieve event #%d", input.action);
     switch (input.action)
     {
     case ACTION_BACK: m_context.state_manager->pop(); break;
