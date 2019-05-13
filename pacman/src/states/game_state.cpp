@@ -22,7 +22,6 @@ GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
 
 void GameState::on_enter()
 {
-    create_prototypes();
     add_systems();
 
     m_music_id = get_sound().play("theme", true);
@@ -60,6 +59,10 @@ void GameState::on_enter()
     get_input().push(std::move(game_input));
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
+
+    auto food = m_factory.spawn(m_lua, "food");
+
+    m_lua.set_function("spawn", [this](const char* entity) { m_factory.spawn(m_lua, entity); });
 }
 
 void GameState::on_exit()
@@ -84,65 +87,6 @@ bool GameState::draw()
     m_level.draw();
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
     return false;
-}
-
-void GameState::create_prototypes()
-{
-    auto pacman_dn = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 0, 70, 70, 4, 4);
-    auto pacman_up = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 70, 70, 70, 4, 4);
-    auto pacman_lt = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 140, 70, 70, 4, 4);
-    auto pacman_rt = get_renderer().load_animation_texture("res/textures/pacman.png", 0, 210, 70, 70, 4, 4);
-
-    /* Pacman Prototype */
-    auto pacman = entt::prototype{m_registry};
-    pacman.set<CPlayer>();
-    pacman.set<CPosition>();
-    pacman.set<CMovement>(glm::ivec2{}, glm::ivec2{}, 3.f, 0.f);
-    pacman.set<CCollision>();
-    pacman.set<CAnimationSprite>(robin_hood::unordered_map<std::string, TextureID>{
-        {"up", pacman_up}, {"dn", pacman_dn}, {"lt", pacman_lt}, {"rt", pacman_rt}});
-    pacman.get<CAnimationSprite>().active_animation = pacman_rt;
-    pacman.set<CInput>();
-
-    m_prototypes.emplace("pacman", std::move(pacman));
-
-    /* Food Prototype */
-    auto tileset_tex = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 20);
-    tileset_tex.frame_number = 18;
-
-    auto food = entt::prototype{m_registry};
-    food.set<CPosition>();
-    food.set<CSprite>(tileset_tex, glm::vec3(1.f));
-    food.set<CPickup>(50);
-
-    m_prototypes.emplace("food", std::move(food));
-
-    /* Strawberry Prototype */
-    tileset_tex.frame_number = 15;
-    auto strawberry = entt::prototype{m_registry};
-    strawberry.set<CPosition>();
-    strawberry.set<CSprite>(tileset_tex, glm::vec3(1.f));
-    strawberry.set<CPickup>(250);
-
-    m_prototypes.emplace("strawberry", std::move(strawberry));
-
-    /* Banana Properties */
-    tileset_tex.frame_number = 16;
-    auto banana = entt::prototype{m_registry};
-    banana.set<CPosition>();
-    banana.set<CSprite>(tileset_tex, glm::vec3(1.f));
-    banana.set<CPickup>(250);
-
-    m_prototypes.emplace("banana", std::move(banana));
-
-    /* Orange Properties */
-    tileset_tex.frame_number = 17;
-    auto orange = entt::prototype{m_registry};
-    orange.set<CPosition>();
-    orange.set<CSprite>(tileset_tex, glm::vec3(1.f));
-    orange.set<CPickup>(250);
-
-    m_prototypes.emplace("orange", std::move(orange));
 }
 
 void GameState::add_systems()

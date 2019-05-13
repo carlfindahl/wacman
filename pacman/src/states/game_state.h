@@ -50,11 +50,6 @@ public:
 
 private:
     /*!
-     * \brief create_prototypes creates entity prototypes
-     */
-    void create_prototypes();
-
-    /*!
      * \brief add_systems needed by this state
      */
     void add_systems();
