@@ -15,8 +15,8 @@ void HighScoreState::on_enter()
     m_splash_texture = get_renderer().load_texture("res/hiscore_screen.png");
 
     InputDomain hs_input_state(true);
-//    hs_input_state.bind_key(GLFW_KEY_ESCAPE, [this] { m_context.state_manager->pop(); });
-//    get_input().push(std::move(hs_input_state));
+    hs_input_state.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
+    get_input().push(std::move(hs_input_state));
 
     m_entries = load_high_score_entries_from_file();
 }
