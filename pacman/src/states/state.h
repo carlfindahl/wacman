@@ -25,11 +25,11 @@ protected:
     /* The context of the state */
     GameContext m_context{};
 
-    /* Entity Registry */
-    entt::registry m_registry{};
-
     /* Lua State */
     sol::state m_lua{};
+
+    /* Entity Registry */
+    entt::registry m_registry{};
 
 public:
     State() = default;
