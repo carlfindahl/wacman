@@ -32,6 +32,7 @@ private:
         {"Sprite", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_sprite_component(s, t, e); }},
         {"Position", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_position_component(s, t, e); }},
         {"Pickup", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_pickup_component(s, t, e); }},
+        {"Collision", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_collision_component(s, t, e); }},
         {"Movement", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_movement_component(s, t, e); }},
         {"Player", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_player_component(s, t, e); }},
         {"AnimationSprite", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_animsprite_component(s, t, e); }},

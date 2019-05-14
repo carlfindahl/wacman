@@ -11,8 +11,18 @@ void MovementSystem::update(float dt, entt::registry& reg)
     auto movement_group = reg.group<CPosition, CMovement>(entt::get<CCollision>);
     movement_group.each([dt, this](CPosition& pos, CMovement& mov, CCollision& col) {
         /* Check if we can move towards desired direction and switch it if possible */
-        if (mov.desired_direction != mov.current_direction && !m_level.will_collide(pos.position, mov.desired_direction))
+        if (mov.desired_direction != mov.current_direction && !m_level.will_collide(pos.position, mov.desired_direction) &&
+            mov.progress < 0.4f)
         {
+            if (glm::distance(glm::vec2(mov.current_direction), glm::vec2(mov.desired_direction)) == 2)
+            {
+                mov.progress = 0.f;
+            }
+            else
+            {
+                mov.progress += 0.25f;
+            }
+
             mov.current_direction = mov.desired_direction;
         }
 

@@ -43,15 +43,16 @@ pacman = {
         y = 3
     },
     Movement = {
-        speed = 3.0        
+        speed = 4.0        
     },
     Player = {
         lives = 3
     },
+    Collision = {},    
     Input = {
-        [Action.MOVE_NORTH] = function(e) move(e, 0, -1) print("Hello North") end,
-        [Action.MOVE_EAST] = function(e)  move(e, 1, 0) print("Hello East") end,
-        [Action.MOVE_SOUTH] = function(e) move(e, 0, 1) print("Hello South") end,
-        [Action.MOVE_WEST] = function(e)  move(e, -1, 0) print("Hello West") end
+        [Action.MOVE_NORTH] = function(e) move(e, 0, -1) set_animation(e, "up") end,
+        [Action.MOVE_EAST] = function(e)  move(e, 1, 0)  set_animation(e, "right") end,
+        [Action.MOVE_SOUTH] = function(e) move(e, 0, 1)  set_animation(e, "down") end,
+        [Action.MOVE_WEST] = function(e)  move(e, -1, 0) set_animation(e, "left") end
     }
 }

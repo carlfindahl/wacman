@@ -51,8 +51,11 @@ void GameState::on_enter()
                                       {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
                                       {"MOVE_WEST", ACTION_MOVE_WEST}});
 
-    m_lua.set_function("move", [this](unsigned e, int x, int y) {
-        m_registry.get<CMovement>(e).desired_direction = {x, y};
+    m_lua.set_function("move", [this](unsigned e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
+
+    m_lua.set_function("set_animation", [this](unsigned e, const std::string& anim) {
+        auto& ac = m_registry.get<CAnimationSprite>(e);
+        ac.active_animation = ac.available_animations.at(anim);
     });
 
     /* Spawn some entities (later to be done in the level */

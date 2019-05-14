@@ -121,7 +121,7 @@ void EntityFactory::make_position_component(sol::state_view& state, const sol::t
 
 void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
-    m_registry.assign<CMovement>(e, glm::ivec2{}, glm::ivec2{}, comp["speed"], 0.f);
+    m_registry.assign<CMovement>(e, glm::ivec2{0}, glm::ivec2{0}, comp["speed"], 0.f);
 }
 
 void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e)
@@ -146,6 +146,9 @@ void EntityFactory::make_pickup_component(sol::state_view& state, const sol::tab
     m_registry.assign<CPickup>(e, CPickup{comp["score"]});
 }
 
-void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e) {}
+void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CCollision>(e);
+}
 
 }  // namespace pac
