@@ -63,6 +63,9 @@ struct CSprite
 /* Player component (Pacman) */
 struct CPlayer
 {
+    /* Player icon */
+    TextureID icon{};
+
     /* Number of lives */
     int32_t lives = 3;
 

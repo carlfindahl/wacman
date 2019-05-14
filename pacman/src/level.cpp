@@ -19,7 +19,7 @@ namespace pac
 {
 Level::Level(GameContext context) : m_context(context)
 {
-    m_tileset_texture = get_renderer().load_animation_texture("res/tileset.png", 0, 0, 25, 25, 4, 20);
+    m_tileset_texture = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 21);
 }
 
 void Level::update(float dt)

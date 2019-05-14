@@ -126,7 +126,7 @@ void EntityFactory::make_movement_component(sol::state_view& state, const sol::t
 
 void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
-    m_registry.assign<CPlayer>(e, comp["lives"], 0);
+    m_registry.assign<CPlayer>(e, get_renderer().get_tileset_texture(comp["icon"]), comp["lives"], 0);
 }
 
 void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e)

@@ -43,5 +43,16 @@ void RenderingSystem::update(float dt, entt::registry& reg)
         get_renderer().draw({HALF_TILE + interp_pos * TILE_SIZE<float>, glm::vec2(TILE_SIZE<float>, TILE_SIZE<float>),
                              glm::vec3(1.f), sprite.active_animation});
     });
+
+    /* Draw Player Icon as Lives */
+    reg.view<CPlayer>().each([](const CPlayer& plr) {
+        for (int i = 0; i < plr.lives; ++i)
+        {
+            get_renderer().draw({HALF_TILE + glm::vec2(i + 1, SCREEN_H / TILE_SIZE<int> - 2) * TILE_SIZE<float>,
+                                 {TILE_SIZE<float>, TILE_SIZE<float>},
+                                 {1.f, 1.f, 1.f},
+                                 plr.icon});
+        }
+    });
 }
 }  // namespace pac
