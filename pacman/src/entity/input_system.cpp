@@ -21,7 +21,7 @@ void InputSystem::update(float dt, entt::registry& reg)
         {
             if (auto found = input.actions.find(action); found != input.actions.end())
             {
-                found->second.call();
+                found->second.call(e);
             }
         }
     });

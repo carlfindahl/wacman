@@ -51,6 +51,11 @@ void GameState::on_enter()
                                       {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
                                       {"MOVE_WEST", ACTION_MOVE_WEST}});
 
+    m_lua.set_function("move", [this](unsigned e, int x, int y) {
+        m_registry.get<CMovement>(e).desired_direction = {x, y};
+    });
+
+    /* Spawn some entities (later to be done in the level */
     m_factory.spawn(m_lua, "food");
     m_factory.spawn(m_lua, "pacman");
 }
