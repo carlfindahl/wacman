@@ -115,11 +115,19 @@ public:
      */
     std::vector<glm::ivec2> get_neighbours(glm::ivec2 pos) const;
 
+    /*!
+     * \brief score returns current score
+     */
     unsigned score() const;
 
 private:
     bool bounds_check(glm::ivec2 pos) const;
 
+    /*!
+     * \brief resize changes the size of the level without altering it's contents (unless it is downscaled, in which case data is
+     * lost)
+     * \param new_size is the new size of the level
+     */
     void resize(glm::ivec2 new_size);
 
     /*!
