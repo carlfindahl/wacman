@@ -26,6 +26,7 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
+    set_up_lua();
 }
 
 Game::~Game() noexcept
@@ -40,7 +41,7 @@ Game::~Game() noexcept
 void Game::run()
 {
     /* Add initial state to the stack */
-    m_state_manager.push<MainMenuState>({&m_state_manager});
+    m_state_manager.push<MainMenuState>({&m_state_manager, &m_lua, &m_registry});
 
     /* Create variables for tracking frame-times */
     std::chrono::steady_clock delta_clock = {};
@@ -156,6 +157,27 @@ void Game::draw()
     get_renderer().submit_work();
 
     glfwSwapBuffers(m_window);
+}
+
+void Game::set_up_lua()
+{
+    m_lua.open_libraries(sol::lib::base, sol::lib::package);
+
+    /* Register action enum */
+    m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},
+                                      {"MOVE_EAST", ACTION_MOVE_EAST},
+                                      {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
+                                      {"MOVE_WEST", ACTION_MOVE_WEST}});
+
+    /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
+     * given entity has this component. This makes for a flexible way to tell something what you want to do */
+    m_lua.set_function("move", [this](unsigned e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
+
+    /* Animation actions */
+    m_lua.set_function("set_animation", [this](unsigned e, const std::string& anim) {
+        auto& ac = m_registry.get<CAnimationSprite>(e);
+        ac.active_animation = ac.available_animations.at(anim);
+    });
 }
 
 }  // namespace pac

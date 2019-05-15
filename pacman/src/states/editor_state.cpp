@@ -26,6 +26,10 @@ void EditorState::on_enter()
     editor_domain.bind_key(GLFW_KEY_Q, ACTION_PREV_TILE);
     get_input().push(std::move(editor_domain));
 
+    /* Add Systems */
+    m_systems.emplace_back(std::make_unique<AnimationSystem>());
+    m_systems.emplace_back(std::make_unique<RenderingSystem>());
+
     /* Overlay for reference */
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
@@ -41,11 +45,16 @@ void EditorState::on_exit()
     g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(this);
 
     get_input().pop();
+    m_context.registry->reset();
 }
 
 bool EditorState::update(float dt)
 {
     draw_ui(dt);
+    for (auto& system : m_systems)
+    {
+        system->update(dt, *m_context.registry);
+    }
     return false;
 }
 
@@ -89,6 +98,19 @@ void EditorState::draw_ui(float dt)
 {
     ImGui::Begin("Editor");
 
+    /* Saving and Loading */
+    ImGui::InputText("Level Name", m_level_name.data(), cgl::size_bytes(m_level_name));
+    if (ImGui::Button("Load"))
+    {
+        m_level.load(*m_context.lua, *m_context.registry, m_level_name.data());
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Save"))
+    {
+        m_level.save(*m_context.lua, *m_context.registry, m_level_name.data(), m_entities);
+    }
+
+    /* Level Properties */
     if (ImGui::DragInt2("Size", glm::value_ptr(m_size), 1.f, 5, 36))
     {
         m_level.resize(m_size);

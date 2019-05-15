@@ -21,9 +21,7 @@ extern entt::dispatcher g_event_queue;
 
 GameState::GameState(GameContext owner, std::string_view level_name) : State(owner), m_level(owner)
 {
-    set_up_lua();
-    m_lua.open_libraries(sol::lib::base, sol::lib::package);
-    m_level.load(m_lua, m_registry, level_name);
+    m_level.load(*owner.lua, *m_context.registry, level_name);
 }
 
 void GameState::on_enter()
@@ -50,8 +48,10 @@ void GameState::on_enter()
 void GameState::on_exit()
 {
     g_event_queue.sink<EvInput>().disconnect<&GameState::recieve>(this);
+
     get_sound().stop(m_music_id);
     get_input().pop();
+    m_context.registry->reset();
 }
 
 bool GameState::update(float dt)
@@ -59,7 +59,7 @@ bool GameState::update(float dt)
     m_level.update(dt);
     for (auto& system : m_systems)
     {
-        system->update(dt, m_registry);
+        system->update(dt, *m_context.registry);
     }
     return false;
 }
@@ -87,25 +87,6 @@ void GameState::add_systems()
     m_systems.emplace_back(std::make_unique<MovementSystem>(m_level));
     m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
-}
-
-void GameState::set_up_lua()
-{
-    /* Register action enum */
-    m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},
-                                      {"MOVE_EAST", ACTION_MOVE_EAST},
-                                      {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
-                                      {"MOVE_WEST", ACTION_MOVE_WEST}});
-
-    /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
-     * given entity has this component. This makes for a flexible way to tell something what you want to do */
-    m_lua.set_function("move", [this](unsigned e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
-
-    /* Animation actions */
-    m_lua.set_function("set_animation", [this](unsigned e, const std::string& anim) {
-        auto& ac = m_registry.get<CAnimationSprite>(e);
-        ac.active_animation = ac.available_animations.at(anim);
-    });
 }
 
 }  // namespace pac

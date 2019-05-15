@@ -105,7 +105,7 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
     }
 }
 
-void Level::save(sol::state_view state_view, const entt::registry& reg, std::string_view level_name,
+void Level::save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
                  robin_hood::unordered_map<std::string, glm::ivec2> entities)
 {
     /* First get access to a table for the level to save. Clear it up front in case it already holds some data */

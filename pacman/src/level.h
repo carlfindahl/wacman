@@ -89,7 +89,7 @@ public:
      * \brief save saves the level to a file
      * \param fp is the relative filepath to save at
      */
-    void save(sol::state_view state_view, const entt::registry& reg, std::string_view level_name,
+    void save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
               robin_hood::unordered_map<std::string, glm::ivec2> entities);
 
     /*!

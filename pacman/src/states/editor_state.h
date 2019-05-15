@@ -3,9 +3,13 @@
 #include "states/state.h"
 #include "entity/events.h"
 #include "level.h"
+#include "entity/rendering_system.h"
+#include "entity/animation_system.h"
 
 #include <array>
 #include <cstdint>
+
+#include <robinhood/robinhood.h>
 
 namespace pac
 {
@@ -14,6 +18,15 @@ class EditorState : public State
 private:
     /* Level we are editing */
     Level m_level{};
+
+    /* All entities currently active */
+    robin_hood::unordered_map<std::string, glm::ivec2> m_entities{};
+
+    /* Active Systems */
+    std::vector<std::unique_ptr<System>> m_systems{};
+
+    /* Level Name */
+    std::array<char, 64> m_level_name{};
 
     /* Current Level Size */
     glm::ivec2 m_size = {28, 36};

@@ -22,19 +22,14 @@ private:
     /* The level / world */
     Level m_level;
 
+    /* Active Systems */
+    std::vector<std::unique_ptr<System>> m_systems{};
+
     /* Game overlay */
     TextureID m_overlay{};
 
     /* ID of music track */
     unsigned m_music_id = 0u;
-
-    /* Prototypes of entities */
-    robin_hood::unordered_map<std::string, entt::prototype> m_prototypes{};
-
-    /* Active Systems */
-    std::vector<std::unique_ptr<System>> m_systems{};
-
-    EntityFactory m_factory{m_registry};
 
 public:
     using State::State;
@@ -56,7 +51,5 @@ private:
      * \brief add_systems needed by this state
      */
     void add_systems();
-
-    void set_up_lua();
 };
 }  // namespace pac

@@ -6,6 +6,8 @@
 #include <cstdint>
 
 #include <glm/vec2.hpp>
+#include <sol/state.hpp>
+#include <entt/entity/registry.hpp>
 
 namespace pac
 {
@@ -29,6 +31,8 @@ struct custom_ivec2_hash
 struct GameContext
 {
     StateManager* state_manager = nullptr;
+    sol::state* lua = nullptr;
+    entt::registry* registry = nullptr;
 };
 
 /*!

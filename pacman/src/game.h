@@ -10,6 +10,8 @@
 #include <string_view>
 
 #include <glm/vec2.hpp>
+#include <sol/state.hpp>
+#include <entt/entity/registry.hpp>
 
 struct GLFWwindow;
 
@@ -22,11 +24,17 @@ namespace pac
 class Game
 {
 private:
-    /* The Game Window */
-    GLFWwindow* m_window = nullptr;
-
     /* The currently active game state */
     StateManager m_state_manager = {};
+
+    /* Lua State */
+    sol::state m_lua{};
+
+    /* Entity Registry */
+    entt::registry m_registry{};
+
+    /* The Game Window */
+    GLFWwindow* m_window = nullptr;
 
     /* This struct will contain flags that can be flipped on / off to toggle features */
     struct Flags
@@ -71,6 +79,14 @@ private:
      * \brief render will render what needs to be rendered.
      */
     void draw();
+
+
+private:
+    /*!
+     * \brief set_up_lua adds lua bindings and functions to the lua state
+     */
+    void set_up_lua();
+
 };
 
 }  // namespace pac
