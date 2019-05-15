@@ -15,6 +15,12 @@ namespace pac
 class EditorState : public State
 {
 private:
+    enum class EMode
+    {
+        TilePlacement,
+        EntityPlacement
+    };
+
     /* Level we are editing */
     Level m_level{};
 
@@ -32,6 +38,9 @@ private:
 
     /* Current Cursor Tile */
     glm::ivec2 m_hovered_tile = {0, 0};
+
+    /* Current editor mode */
+    EMode m_editor_mode = EMode::TilePlacement;
 
     /* Current tile tex */
     unsigned m_tileset_tex = 0u;

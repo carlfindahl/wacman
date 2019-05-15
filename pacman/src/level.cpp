@@ -253,7 +253,7 @@ void Level::save_to_file(sol::table levels_table)
                   << "x = " << entity_data["x"].get<int>() << ",\n\t\t\t\t"
                   << "y = " << entity_data["y"].get<int>() << "\n\t\t\t},\n\t\t\t";
         }
-        ofile << "}\n\t},\n";
+        ofile << "}\n\t},\n\t";
     }
     ofile << "}\n";
 }
