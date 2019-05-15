@@ -15,6 +15,18 @@ private:
     /* Level we are editing */
     Level m_level{};
 
+    /* Current Level Size */
+    glm::ivec2 m_size = {28, 36};
+
+    /* Current Cursor Tile */
+    glm::ivec2 m_hovered_tile = {0, 0};
+
+    /* Current tile tex */
+    unsigned m_tileset_tex = 0u;
+
+    /* Overlay */
+    TextureID m_overlay = {};
+
 public:
     using State::State;
 
@@ -26,6 +38,15 @@ public:
 
     bool draw() override;
 
-    void recieve(const EvInput& input);
+    void recieve_key(const EvInput& input);
+
+    void recieve_mouse(const EvMouseMove& input);
+
+private:
+    /*!
+     * \brief draw_ui draws the editor UI
+     * \param dt is the delta time
+     */
+    void draw_ui(float dt);
 };
 }  // namespace pac
