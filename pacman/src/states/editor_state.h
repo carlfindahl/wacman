@@ -47,7 +47,13 @@ private:
     EMode m_editor_mode = EMode::TilePlacement;
 
     /* Current tile tex */
-    unsigned m_tileset_tex = 0u;
+    unsigned m_current_tex = 0u;
+
+    /* Current entity to place */
+    std::string m_current_entity{};
+
+    /* ID of Entity that is about to be spawned */
+    unsigned m_entity_about_to_spawn = 0u;
 
     /* Overlay */
     TextureID m_overlay = {};

@@ -1,6 +1,7 @@
 #include "editor_state.h"
 #include "state_manager.h"
 #include "entity/components.h"
+#include "entity/factory.h"
 #include "rendering/renderer.h"
 #include "input/input.h"
 #include "config.h"
@@ -66,6 +67,22 @@ bool EditorState::update(float dt)
     {
         system->update(dt, *m_context.registry);
     }
+
+    if (m_editor_mode == EMode::EntityPlacement)
+    {
+        if (m_context.registry->valid(m_entity_about_to_spawn) && m_context.registry->has<CPosition>(m_entity_about_to_spawn))
+        {
+            m_context.registry->get<CPosition>(m_entity_about_to_spawn).position = m_hovered_tile;
+        }
+    }
+    else
+    {
+        if (m_context.registry->valid(m_entity_about_to_spawn))
+        {
+            m_context.registry->destroy(m_entity_about_to_spawn);
+        }
+    }
+
     return false;
 }
 
@@ -77,7 +94,7 @@ bool EditorState::draw()
     if (m_editor_mode == EMode::TilePlacement)
     {
         get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(m_hovered_tile) * TILE_SIZE<float>}, glm::vec2(TILE_SIZE<float>),
-                             glm::vec3(.5f, 1.f, 0.5f), get_renderer().get_tileset_texture(m_tileset_tex)});
+                             glm::vec3(.5f, 1.f, 0.5f), get_renderer().get_tileset_texture(m_current_tex)});
     }
 
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
@@ -94,11 +111,12 @@ void EditorState::recieve_key(const EvInput& input)
     case ACTION_PLACE:
         if (m_editor_mode == EMode::TilePlacement)
         {
-            tile.type = static_cast<Level::ETileType>(m_tileset_tex);
-            tile.texture = get_renderer().get_tileset_texture(m_tileset_tex);
+            tile.type = static_cast<Level::ETileType>(m_current_tex);
+            tile.texture = get_renderer().get_tileset_texture(m_current_tex);
         }
         else
         {
+            m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
         }
         break;
     case ACTION_UNDO:
@@ -106,16 +124,16 @@ void EditorState::recieve_key(const EvInput& input)
         tile.texture = {};
         break;
     case ACTION_CLONE:
-        m_tileset_tex = tile.texture.frame_number;
-        m_tileselect_ui.set_selection(m_tileset_tex);
+        m_current_tex = tile.texture.frame_number;
+        m_tileselect_ui.set_selection(m_current_tex);
         break;
     case ACTION_NEXT_TILE:
-        ++m_tileset_tex;
-        m_tileselect_ui.set_selection(m_tileset_tex);
+        ++m_current_tex;
+        m_tileselect_ui.set_selection(m_current_tex);
         break;
     case ACTION_PREV_TILE:
-        --m_tileset_tex;
-        m_tileselect_ui.set_selection(m_tileset_tex);
+        --m_current_tex;
+        m_tileselect_ui.set_selection(m_current_tex);
         break;
     default: break;
     }
@@ -123,7 +141,7 @@ void EditorState::recieve_key(const EvInput& input)
 
 void EditorState::recieve_mouse(const EvMouseMove& input) { m_hovered_tile = input.position / TILE_SIZE<float>; }
 
-void EditorState::set_selection(unsigned selection) { m_tileset_tex = selection; }
+void EditorState::set_selection(unsigned selection) { m_current_tex = selection; }
 
 void EditorState::draw_ui(float dt)
 {
@@ -156,11 +174,28 @@ void EditorState::draw_ui(float dt)
     {
         if (ImGui::BeginTabItem("Tile Placement"))
         {
+            m_editor_mode = EMode::TilePlacement;
             m_tileselect_ui.update(dt);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Entity Placement"))
         {
+            m_editor_mode = EMode::EntityPlacement;
+            ImGui::BeginChild("Entity");
+            for (const auto& ent : m_entity_prototypes)
+            {
+                /* TODO : Document this */
+                if (ImGui::Selectable(ent.c_str(), ent == m_current_entity))
+                {
+                    m_current_entity = ent;
+                    if (m_context.registry->valid(m_entity_about_to_spawn))
+                    {
+                        m_context.registry->destroy(m_entity_about_to_spawn);
+                    }
+                    m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, ent);
+                }
+            }
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -194,5 +229,6 @@ void EditorState::load_entity_prototypes()
     {
         m_entity_prototypes.push_back(entry.path().filename().stem().string());
     }
+    m_current_entity = m_entity_prototypes.back();
 }
 }  // namespace pac
