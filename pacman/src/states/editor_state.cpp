@@ -42,6 +42,7 @@ void EditorState::on_enter()
     /* Register event listeners */
     g_event_queue.sink<EvInput>().connect<&EditorState::recieve_key>(this);
     g_event_queue.sink<EvMouseMove>().connect<&EditorState::recieve_mouse>(this);
+    m_tileselect_ui.on_select_tile.sink().connect<&EditorState::set_selection>(this);
 
     /* Fetch available entities */
     load_entity_prototypes();
@@ -51,6 +52,7 @@ void EditorState::on_exit()
 {
     g_event_queue.sink<EvInput>().disconnect<&EditorState::recieve_key>(this);
     g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(this);
+    m_tileselect_ui.on_select_tile.sink().disconnect<&EditorState::set_selection>(this);
 
     get_input().pop();
     m_context.registry->reset();
@@ -101,14 +103,25 @@ void EditorState::recieve_key(const EvInput& input)
         tile.type = Level::ETileType::Blank;
         tile.texture = {};
         break;
-    case ACTION_CLONE: m_tileset_tex = tile.texture.frame_number; break;
-    case ACTION_NEXT_TILE: ++m_tileset_tex; break;
-    case ACTION_PREV_TILE: --m_tileset_tex; break;
+    case ACTION_CLONE:
+        m_tileset_tex = tile.texture.frame_number;
+        m_tileselect_ui.set_selection(m_tileset_tex);
+        break;
+    case ACTION_NEXT_TILE:
+        ++m_tileset_tex;
+        m_tileselect_ui.set_selection(m_tileset_tex);
+        break;
+    case ACTION_PREV_TILE:
+        --m_tileset_tex;
+        m_tileselect_ui.set_selection(m_tileset_tex);
+        break;
     default: break;
     }
 }
 
 void EditorState::recieve_mouse(const EvMouseMove& input) { m_hovered_tile = input.position / TILE_SIZE<float>; }
+
+void EditorState::set_selection(unsigned selection) { m_tileset_tex = selection; }
 
 void EditorState::draw_ui(float dt)
 {
@@ -141,7 +154,7 @@ void EditorState::draw_ui(float dt)
     {
         if (ImGui::BeginTabItem("Tile Placement"))
         {
-            ui::TilesetSelector(get_renderer().get_tileset_texture(0u)).update(dt);
+            m_tileselect_ui.update(dt);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Entity Placement"))

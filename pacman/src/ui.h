@@ -1,8 +1,10 @@
 #pragma once
 
+#include "rendering/renderer.h"
+
 #include <vector>
 
-#include "rendering/renderer.h"
+#include <entt/signal/sigh.hpp>
 
 namespace pac
 {
@@ -14,7 +16,11 @@ private:
     /* The tileset being edited */
     TextureID m_tileset;
 
+    /* Current selected */
+    unsigned m_selected = 0u;
+
 public:
+    TilesetSelector();
     TilesetSelector(TextureID texture);
 
     /*!
@@ -23,7 +29,14 @@ public:
      */
     void update(float dt);
 
-private:
+    /*!
+     * \brief set_selection sets the selection of this tileset selector
+     * \param s is the new selection
+     */
+    void set_selection(unsigned s);
+
+    /* Signal for when a tile is selected */
+    entt::sigh<void(unsigned)> on_select_tile{};
 };
 }  // namespace ui
 }  // namespace pac

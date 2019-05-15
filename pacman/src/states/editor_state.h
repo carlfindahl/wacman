@@ -5,6 +5,7 @@
 #include "level.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
+#include "ui.h"
 
 #include <array>
 #include <cstdint>
@@ -51,6 +52,9 @@ private:
     /* Overlay */
     TextureID m_overlay = {};
 
+    /* Tileset selector UI */
+    ui::TilesetSelector m_tileselect_ui{};
+
 public:
     using State::State;
 
@@ -73,6 +77,8 @@ public:
      * \param input is the event data
      */
     void recieve_mouse(const EvMouseMove& input);
+
+    void set_selection(unsigned selection);
 
 private:
     /*!
