@@ -4,6 +4,7 @@
 #include "audio/sound_manager.h"
 #include "respawn_state.h"
 #include "state_manager.h"
+#include "editor_state.h"
 #include "help_state.h"
 #include "config.h"
 
@@ -39,6 +40,11 @@ bool pac::MainMenuState::update(float dt)
     if (ImGui::Button("High Scores", {150, 50}))
     {
         m_context.state_manager->push<HighScoreState>(m_context);
+    }
+
+    if (ImGui::Button("Editor", {150, 50}))
+    {
+        m_context.state_manager->push<EditorState>(m_context);
     }
 
     if (ImGui::Button("Help / Credits", {150, 50}))
