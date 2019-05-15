@@ -33,7 +33,7 @@ bool pac::MainMenuState::update(float dt)
     {
         /* Stop music if still playing to avoid massive music load */
         get_sound().stop(m_music_id);
-        m_context.state_manager->push<GameState>(m_context);
+        m_context.state_manager->push<GameState>(m_context, "level0");
         m_context.state_manager->push<RespawnState>(m_context);
     }
 

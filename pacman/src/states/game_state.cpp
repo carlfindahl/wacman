@@ -19,16 +19,18 @@ namespace pac
 {
 extern entt::dispatcher g_event_queue;
 
-GameState::GameState(GameContext owner) : State(owner), m_level(owner) {}
+GameState::GameState(GameContext owner, std::string_view level_name) : State(owner), m_level(owner)
+{
+    m_lua.open_libraries(sol::lib::base, sol::lib::package);
+    m_level.load(m_lua, m_registry, level_name);
+}
 
 void GameState::on_enter()
 {
     add_systems();
 
-    m_lua.open_libraries(sol::lib::base, sol::lib::package);
-
+    /* Load resources and prepare music ID */
     m_music_id = get_sound().play("theme", true);
-
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
     /* Create the input domain for the game */

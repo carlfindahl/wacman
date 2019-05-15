@@ -9,6 +9,7 @@
 #include <states/state.h>
 
 #include <memory>
+#include <string_view>
 
 #include <robinhood/robinhood.h>
 #include <entt/entity/prototype.hpp>
@@ -36,7 +37,9 @@ private:
     EntityFactory m_factory{m_registry};
 
 public:
-    GameState(GameContext owner);
+    using State::State;
+
+    GameState(GameContext owner, std::string_view level_name);
 
     void on_enter() override;
 
