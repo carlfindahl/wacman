@@ -1,7 +1,7 @@
 food = {
     Position = { 
-        x = 5, 
-        y = 5
+        x = 0, 
+        y = 0
     },
     Pickup = { 
         score = 50

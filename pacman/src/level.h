@@ -8,6 +8,10 @@
 #include <cstdint>
 #include <string_view>
 
+#include <robinhood/robinhood.h>
+#include <sol/state_view.hpp>
+#include <entt/entity/registry.hpp>
+
 namespace pac
 {
 /*!
@@ -60,6 +64,9 @@ public:
 
     Level(GameContext context);
 
+    /* Level editor can freely change the level */
+    friend class EditorState;
+
     /*!
      * \brief update update the state of tiles and the level
      * \param dt is the delta time
@@ -76,7 +83,14 @@ public:
      * \brief load a level at the given relative file path
      * \param fp is the relative (to the executable dir) file path of the level file
      */
-    void load(std::string_view fp);
+    void load(sol::state_view& state_view, entt::registry& reg, std::string_view level_name);
+
+    /*!
+     * \brief save saves the level to a file
+     * \param fp is the relative filepath to save at
+     */
+    void save(sol::state_view state_view, const entt::registry& reg, std::string_view level_name,
+              robin_hood::unordered_map<std::string, glm::ivec2> entities);
 
     /*!
      * \brief get_tile returns the tile at the given coordinate
@@ -105,5 +119,7 @@ public:
 
 private:
     bool bounds_check(glm::ivec2 pos) const;
+
+    void resize(glm::ivec2 new_size);
 };
 }  // namespace pac

@@ -5,8 +5,8 @@ pacman = {
         icon = 20
     },
     Position = {
-        x = 3,
-        y = 3
+        x = 0,
+        y = 0
     },
     Movement = {
         speed = 4.0        

@@ -1,5 +1,6 @@
 #include "level.h"
 #include "pathfinding.h"
+#include "entity/factory.h"
 #include "audio/sound_manager.h"
 #include "states/state_manager.h"
 #include "states/respawn_state.h"
@@ -14,6 +15,7 @@
 #include <imgui/imgui.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <entt/entity/snapshot.hpp>
 
 namespace pac
 {
@@ -54,65 +56,84 @@ void Level::draw()
     }
 }
 
-void Level::load(std::string_view fp)
+void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_view level_name)
 {
-    GFX_INFO("Loading level %s", fp.data());
+    GFX_INFO("Loading level %s", level_name.data());
 
     /* Read level file data */
-    const auto level = cgl::read_entire_file(fp.data());
-    std::istringstream level_stream(level);
+    state_view.script_file(cgl::native_absolute_path("res/levels.lua"));
+    sol::table level_data = state_view["levels"][level_name];
 
-    /* Read level size from stream. NOTE: I mostly use regex here for fun since it's the first time I am using the <regex>
-     * header, so it's a bit experimental, but it works and is actually quite nice, so yeah! */
-    auto lvl_size_pattern = std::regex(R"((\d+)x(\d+))");
-    std::smatch matches{};
+    /* Reisze level to level size */
+    resize({level_data["w"], level_data["h"]});
 
-    /* Map size should always be in first line, so we get it out of the stream to pattern match */
-    std::string first_line = {};
-    std::getline(level_stream, first_line);
+    /* Load the tile information */
+    const auto& tiles = level_data["tiles"].get<std::vector<int>>();
 
-    if (!std::regex_match(first_line.cbegin(), first_line.cend(), matches, lvl_size_pattern) || matches.empty())
+    /* Then use this tile data to generate the level tile format */
+    for (auto y = 0ul; y < m_tiles.size(); ++y)
     {
-        GFX_ERROR("Failed to find level size in level file (%s) with format (WxH).", fp.data());
-    }
-
-    /* Get sub-matches from regex match object and convert (parantheses in expression correspond to each sub-match) */
-    glm::ivec2 level_size = {};
-    level_size.x = std::stoi(matches[1]);
-    level_size.y = std::stoi(matches[2]);
-
-    /* Now that we know size of level, reserve space in vectors and fill in the tiles */
-    m_tiles.resize(level_size.y);
-    for (auto& row : m_tiles)
-    {
-        row.resize(level_size.x);
-        int tmp_val;
-        for (auto& col : row)
+        for (auto x = 0ul; x < m_tiles[y].size(); ++x)
         {
-            level_stream >> tmp_val;
+            auto& level_tile = m_tiles[y][x];
+            auto tile_type = tiles[y * level_data["w"].get<int>() + x];
 
-            /* If it is not a tile, then move on */
-            if (tmp_val == -1)
+            /* It's either a blank tile or it is some kind of wall */
+            if (tile_type != -1)
             {
-                col.type = ETileType::Blank;
-                continue;
-            }
-
-            /* Use texture ID, but assign frame number from the value in the map */
-            col.texture = m_tileset_texture;
-            col.texture.frame_number = tmp_val;
-
-            /* Assign based on value */
-            if (tmp_val < 14)
-            {
-                col.type = ETileType::Wall;
+                level_tile.type = ETileType::Wall;
+                level_tile.texture = get_renderer().get_tileset_texture(tiles[y * m_tiles[y].size() + x]);
             }
             else
             {
-                /* This works since the Enum values have been set to match the tile index in the tileset for the level */
-                col.type = static_cast<ETileType>(tmp_val);
+                level_tile.type = ETileType::Blank;
             }
         }
+    }
+
+    /* Process entities by key / value */
+    sol::table entities = level_data["entities"];
+    EntityFactory factory(reg);
+    for (auto& [k, v] : entities)
+    {
+        auto e = factory.spawn(state_view, k.as<std::string>());
+        if (reg.has<CPosition>(e))
+        {
+            reg.get<CPosition>(e).position = v.as<glm::ivec2>();
+        }
+    }
+}
+
+void Level::save(sol::state_view state_view, const entt::registry& reg, std::string_view level_name,
+                 robin_hood::unordered_map<std::string, glm::ivec2> entities)
+{
+    /* First get access to a table for the level to save. Clear it up front in case it already holds some data */
+    sol::table levels = state_view["levels"];
+    sol::table level_data = levels.create(level_name);
+    level_data.clear();
+
+    /* Then start by writing size information */
+    level_data["w"] = m_tiles[0].size();
+    level_data["h"] = m_tiles.size();
+
+    /* Extract tiles into a single vector */
+    std::vector<int> tiles{};
+    for (const auto& rowtile : m_tiles)
+    {
+        for (const auto& coltile : rowtile)
+        {
+            tiles.push_back(coltile.texture.frame_number);
+        }
+    }
+
+    /* Then write that information */
+    level_data["tiles"] = tiles;
+
+    /* Finally do the same for all entities */
+    sol::table entity_data = level_data.create("entities");
+    for (const auto& [k, v] : entities)
+    {
+        entity_data[k] = std::vector<int>{v.x, v.y};
     }
 }
 
@@ -166,6 +187,15 @@ bool Level::bounds_check(glm::ivec2 pos) const
 {
     return pos.y >= 0 && pos.y < static_cast<int>(m_tiles.size()) && pos.x >= 0 &&
            pos.x < static_cast<int>(m_tiles[pos.y].size());
+}
+
+void Level::resize(glm::ivec2 new_size)
+{
+    m_tiles.resize(new_size.y);
+    for (auto& xvec : m_tiles)
+    {
+        xvec.resize(new_size.x);
+    }
 }
 
 }  // namespace pac
