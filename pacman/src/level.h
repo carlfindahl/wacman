@@ -121,5 +121,12 @@ private:
     bool bounds_check(glm::ivec2 pos) const;
 
     void resize(glm::ivec2 new_size);
+
+    /*!
+     * \brief save_to_file saves the current levels lua state to the levels.lua file
+     * \param levels_table is the table that holds all the levels
+     * \note this is used inside the save function after we have saved the level to the current lua state
+     */
+    void save_to_file(sol::table levels_table);
 };
 }  // namespace pac

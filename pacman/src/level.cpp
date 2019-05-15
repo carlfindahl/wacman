@@ -8,7 +8,9 @@
 #include "config.h"
 
 #include <regex>
-#include <sstream>
+#include <fstream>
+#include <iterator>
+#include <algorithm>
 
 #include <gfx.h>
 #include <cglutil.h>
@@ -37,9 +39,9 @@ void Level::update(float dt)
 void Level::draw()
 {
     auto& r = get_renderer();
-    for (auto y = 0u; y < m_tiles.size(); ++y)
+    for (auto y = 0ul; y < m_tiles.size(); ++y)
     {
-        for (auto x = 0u; x < m_tiles[y].size(); ++x)
+        for (auto x = 0ul; x < m_tiles[y].size(); ++x)
         {
             const Tile& t = m_tiles[y][x];
 
@@ -92,6 +94,7 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
     }
 
     /* Process entities by key / value */
+    reg.reset();
     sol::table entities = level_data["entities"];
     EntityFactory factory(reg);
     for (auto& [k, v] : entities)
@@ -109,6 +112,7 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
                  robin_hood::unordered_map<std::string, glm::ivec2> entities)
 {
     /* First get access to a table for the level to save. Clear it up front in case it already holds some data */
+    state_view.script_file(cgl::native_absolute_path("res/levels.lua"));
     sol::table levels = state_view["levels"];
     sol::table level_data = levels.create(level_name);
     level_data.clear();
@@ -123,7 +127,14 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     {
         for (const auto& coltile : rowtile)
         {
-            tiles.push_back(coltile.texture.frame_number);
+            if (coltile.type == ETileType::Blank)
+            {
+                tiles.push_back(-1);
+            }
+            else
+            {
+                tiles.push_back(coltile.texture.frame_number);
+            }
         }
     }
 
@@ -136,6 +147,9 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     {
         entity_data[k] = std::vector<int>{v.x, v.y};
     }
+
+    /* Save the new LUA state to file for future loading */
+    save_to_file(levels);
 }
 
 std::vector<glm::ivec2> Level::get_neighbours(glm::ivec2 pos) const
@@ -197,6 +211,40 @@ void Level::resize(glm::ivec2 new_size)
     {
         xvec.resize(new_size.x);
     }
+}
+
+void Level::save_to_file(sol::table levels_table)
+{
+    /* Now we must write back the entire levels table to a file for future read back */
+    std::ofstream ofile{cgl::native_absolute_path("res/levels.lua")};
+    ofile << "levels = {\n\t";
+
+    /* Outer loop is each level */
+    for (const auto& [k, v] : levels_table)
+    {
+        ofile << k.as<std::string>() << " = {\n\t\t";
+
+        /* Inner loop is all level parameters and data */
+        const auto current_level = v.as<sol::table>();
+        ofile << "w = " << current_level["w"].get<int>() << ",\n\t\t"
+              << "h = " << current_level["h"].get<int>() << ",\n\t\t"
+              << "tiles = { ";
+
+        /* Copy vector to file */
+        const auto& tiledata = current_level["tiles"].get<std::vector<int>>();
+        std::copy(tiledata.cbegin(), tiledata.cend(), std::ostream_iterator<int>(ofile, ", "));
+        ofile << "},\n\t\t";
+
+        /* Copy entities to file */
+        ofile << "entities = {\n\t\t\t";
+        for (const auto& [ent, pos] : current_level["entities"].get<sol::table>())
+        {
+            const auto& vec_pos = pos.as<std::vector<int>>();
+            ofile << ent.as<std::string>() << " = { " << vec_pos[0] << ", " << vec_pos[1] << " },\n\t\t\t";
+        }
+        ofile << "}\n\t},\n\t";
+    }
+    ofile << "}\n";
 }
 
 }  // namespace pac
