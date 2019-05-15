@@ -56,5 +56,7 @@ private:
      * \brief add_systems needed by this state
      */
     void add_systems();
+
+    void set_up_lua();
 };
 }  // namespace pac

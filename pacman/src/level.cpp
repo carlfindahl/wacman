@@ -99,7 +99,8 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
         auto e = factory.spawn(state_view, k.as<std::string>());
         if (reg.has<CPosition>(e))
         {
-            reg.get<CPosition>(e).position = v.as<glm::ivec2>();
+            const auto pos = v.as<std::vector<int>>();
+            reg.get<CPosition>(e).position = {pos[0], pos[1]};
         }
     }
 }
