@@ -116,12 +116,19 @@ void EditorState::recieve_key(const EvInput& input)
         }
         else
         {
-            m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
+            spawn_entity();
         }
         break;
     case ACTION_UNDO:
-        tile.type = Level::ETileType::Blank;
-        tile.texture = {};
+        if (m_editor_mode == EMode::TilePlacement)
+        {
+            tile.type = Level::ETileType::Blank;
+            tile.texture = {};
+        }
+        else
+        {
+            remove_entity();
+        }
         break;
     case ACTION_CLONE:
         m_current_tex = tile.texture.frame_number;
@@ -181,18 +188,20 @@ void EditorState::draw_ui(float dt)
         if (ImGui::BeginTabItem("Entity Placement"))
         {
             m_editor_mode = EMode::EntityPlacement;
-            ImGui::BeginChild("Entity");
+            ImGui::BeginChild("EntitySelection");
+            /* Show list of all available entities */
             for (const auto& ent : m_entity_prototypes)
             {
-                /* TODO : Document this */
+                /* When we select a new entity, change selection and... */
                 if (ImGui::Selectable(ent.c_str(), ent == m_current_entity))
                 {
                     m_current_entity = ent;
                     if (m_context.registry->valid(m_entity_about_to_spawn))
                     {
+                        /* .. destroy the existing 'preview entity' and then spawn a new one of the new type */
                         m_context.registry->destroy(m_entity_about_to_spawn);
                     }
-                    m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, ent);
+                    m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
                 }
             }
             ImGui::EndChild();
@@ -231,4 +240,62 @@ void EditorState::load_entity_prototypes()
     }
     m_current_entity = m_entity_prototypes.back();
 }
+
+void EditorState::spawn_entity()
+{
+    /* Can not place an entity where there is a wall */
+    if (m_level.get_tile(m_hovered_tile).type != Level::ETileType::Blank)
+    {
+        GFX_INFO("Can not place entity on an occupied tile.");
+        return;
+    }
+
+    bool occupied = false;
+
+    /* Ensure no two entities with position components are on the same tile */
+    m_context.registry->view<CPosition>().each([this, &occupied](uint32_t e, const CPosition& pos) {
+        if (e != m_entity_about_to_spawn && pos.position == m_hovered_tile)
+        {
+            occupied = true;
+        }
+    });
+
+    /* If it is not occupied, then we can spawn it by changing the entity about to spawn */
+    if (!occupied)
+    {
+        m_entities.emplace_back(m_current_entity, m_hovered_tile);
+        m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
+    }
+}
+
+void EditorState::remove_entity()
+{
+    std::vector<uint32_t> to_destroy{};
+
+    /* Search for entities to delete (and then remove from entity lookup if matching) */
+    m_context.registry->view<CPosition>().each([this, &to_destroy](uint32_t e, const CPosition& pos) {
+        if (pos.position == m_hovered_tile)
+        {
+            /* Flag entity for deletion */
+            to_destroy.push_back(e);
+
+            /* Then look for corresponding entry in the save-data vector */
+            auto itr = std::find_if(m_entities.begin(), m_entities.end(),
+                                    [&pos](const auto& pair) { return pair.second == pos.position; });
+
+            /* If found in there, delete it */
+            if (itr != m_entities.end())
+            {
+                m_entities.erase(itr);
+            }
+        }
+    });
+
+    /* Destroy entities */
+    for (auto e : to_destroy)
+    {
+        m_context.registry->destroy(e);
+    }
+}
+
 }  // namespace pac

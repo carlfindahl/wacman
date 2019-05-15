@@ -53,7 +53,7 @@ private:
     std::string m_current_entity{};
 
     /* ID of Entity that is about to be spawned */
-    unsigned m_entity_about_to_spawn = 0u;
+    unsigned m_entity_about_to_spawn = entt::null;
 
     /* Overlay */
     TextureID m_overlay = {};
@@ -102,5 +102,15 @@ private:
      * \brief load_entity_prototypes searches the entity folder for available Entity prototypes so we can choose between them
      */
     void load_entity_prototypes();
+
+    /*!
+     * \brief spawn_entity spawns the current entity at the currently hovered location (tile) if possible
+     */
+    void spawn_entity();
+
+    /*!
+     * \brief remove_entity removes entity at the currently hovered tile position if any
+     */
+    void remove_entity();
 };
 }  // namespace pac
