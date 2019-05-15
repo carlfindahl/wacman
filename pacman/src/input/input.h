@@ -40,6 +40,7 @@ enum Action
     /* Editor Actions */
     ACTION_PLACE,
     ACTION_UNDO,
+    ACTION_CLONE,
     ACTION_NEXT_TILE,
     ACTION_PREV_TILE,
     ACTION_NEXT_ENTITY,

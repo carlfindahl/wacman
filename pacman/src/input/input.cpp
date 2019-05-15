@@ -4,6 +4,7 @@
 #include <gfx.h>
 #include <glm/vec2.hpp>
 #include <GLFW/glfw3.h>
+#include <imgui/imgui.h>
 
 namespace pac
 {
@@ -56,7 +57,8 @@ void InputDomain::invoke_live_keys(float dt, GLFWwindow* win)
 {
     for (auto& m_live_binding : m_live_bindings)
     {
-        if (glfwGetKey(win, m_live_binding.first))
+        if (glfwGetKey(win, m_live_binding.first) ||
+            (glfwGetMouseButton(win, m_live_binding.first) && !ImGui::GetIO().WantCaptureMouse))
         {
             g_event_queue.enqueue(EvInput{m_live_binding.second});
         }
