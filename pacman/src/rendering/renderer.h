@@ -135,6 +135,12 @@ public:
     TextureID get_tileset_texture(unsigned no);
 
     /*!
+     * \brief get_texture_for_imgui fetches the raw texture handle for the purpose of using it with ImGui
+     * \param id is the texture ID of the texture
+     */
+    unsigned long get_texture_for_imgui(TextureID id) const;
+
+    /*!
      * \brief load_animation_texture loads a texture with an animated sprite in it that can later be used with an animation
      * \note if you call this multiple times with the same texture, it will be loaded again! Not cached. So be careful.
      * \param relative_fp is the relative file path
