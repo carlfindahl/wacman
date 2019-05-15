@@ -9,6 +9,13 @@
 
 namespace pac
 {
+/* Meta Component is used to provide information about the entity it is attached to. Basically meta information */
+struct CMeta
+{
+    /* Name of entity (if it was spawned from a LUA file, this will be the name) */
+    std::string name{};
+};
+
 /* Position Component */
 struct CPosition
 {

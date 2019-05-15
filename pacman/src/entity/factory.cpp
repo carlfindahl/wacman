@@ -46,6 +46,10 @@ uint32_t EntityFactory::spawn(sol::state_view& state, const std::string& name)
             fn->getSecond()(state, component, e);
         }
     }
+
+    /* Finally add a meta data component since it was created by a factory */
+    m_registry.assign<CMeta>(e, filepath.filename().stem().string());
+
     return e;
 }
 
