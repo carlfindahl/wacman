@@ -13,7 +13,7 @@ extern entt::dispatcher g_event_queue;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* Inoke inputs if it's a key press */
-    if (action == GLFW_PRESS)
+    if (action == GLFW_PRESS && !ImGui::GetIO().WantTextInput)
     {
         get_input().invoke(key);
     }

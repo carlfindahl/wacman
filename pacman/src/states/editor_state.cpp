@@ -1,8 +1,9 @@
 #include "editor_state.h"
-#include "input/input.h"
-#include "config.h"
+#include "state_manager.h"
 #include "entity/components.h"
 #include "rendering/renderer.h"
+#include "input/input.h"
+#include "config.h"
 #include "ui.h"
 
 #include <filesystem>
@@ -89,6 +90,7 @@ void EditorState::recieve_key(const EvInput& input)
 
     switch (input.action)
     {
+    case ACTION_BACK: m_context.state_manager->pop(); break;
     case ACTION_PLACE:
         if (m_editor_mode == EMode::TilePlacement)
         {
