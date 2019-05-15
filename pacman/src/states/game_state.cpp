@@ -31,8 +31,6 @@ void GameState::on_enter()
 
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
-    m_level.load("res/level0");
-
     /* Create the input domain for the game */
     InputDomain game_input(true);
     game_input.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
@@ -57,10 +55,6 @@ void GameState::on_enter()
         auto& ac = m_registry.get<CAnimationSprite>(e);
         ac.active_animation = ac.available_animations.at(anim);
     });
-
-    /* Spawn some entities (later to be done in the level */
-    m_factory.spawn(m_lua, "food");
-    m_factory.spawn(m_lua, "pacman");
 }
 
 void GameState::on_exit()
