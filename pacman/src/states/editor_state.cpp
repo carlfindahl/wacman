@@ -1,6 +1,7 @@
 #include "editor_state.h"
 #include "input/input.h"
 #include "config.h"
+#include "entity/components.h"
 #include "rendering/renderer.h"
 
 #include <GLFW/glfw3.h>
@@ -62,10 +63,8 @@ bool EditorState::draw()
 {
     m_level.draw();
 
-    get_renderer().draw({{HALF_TILE + glm::vec2(m_hovered_tile) * TILE_SIZE<float>},
-                         glm::vec2(TILE_SIZE<float>),
-                         glm::vec3(.5f, 1.f, 0.5f),
-                         get_renderer().get_tileset_texture(m_tileset_tex)});
+    get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(m_hovered_tile) * TILE_SIZE<float>}, glm::vec2(TILE_SIZE<float>),
+                         glm::vec3(.5f, 1.f, 0.5f), get_renderer().get_tileset_texture(m_tileset_tex)});
 
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
     return false;
@@ -102,10 +101,12 @@ void EditorState::draw_ui(float dt)
     ImGui::InputText("Level Name", m_level_name.data(), cgl::size_bytes(m_level_name));
     if (ImGui::Button("Load"))
     {
+        m_entities.clear();
         m_level.load(*m_context.lua, *m_context.registry, m_level_name.data());
+        load_get_entities();
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Save") && !m_level_name.empty())
     {
         m_level.save(*m_context.lua, *m_context.registry, m_level_name.data(), m_entities);
     }
@@ -117,6 +118,23 @@ void EditorState::draw_ui(float dt)
     }
 
     ImGui::End();
+}
+
+void EditorState::load_get_entities()
+{
+    /* For every entity with meta data, load it into the entity map */
+    auto view = m_context.registry->view<CMeta>();
+    view.each([this](uint32_t e, const CMeta& meta) {
+        if (m_context.registry->has<CPosition>(e))
+        {
+            const auto& pos = m_context.registry->get<CPosition>(e);
+            m_entities.emplace_back(meta.name, pos.position);
+        }
+        else
+        {
+            m_entities.emplace_back(meta.name, glm::ivec2{0, 0});
+        }
+    });
 }
 
 }  // namespace pac

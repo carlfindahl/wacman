@@ -8,8 +8,7 @@
 
 #include <array>
 #include <cstdint>
-
-#include <robinhood/robinhood.h>
+#include <vector>
 
 namespace pac
 {
@@ -20,7 +19,7 @@ private:
     Level m_level{};
 
     /* All entities currently active */
-    robin_hood::unordered_map<std::string, glm::ivec2> m_entities{};
+    std::vector<std::pair<std::string, glm::ivec2>> m_entities{};
 
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};
@@ -61,5 +60,10 @@ private:
      * \param dt is the delta time
      */
     void draw_ui(float dt);
+
+    /*!
+     * \brief load_get_entities is called after loading a level to store the current loaded entities in the entity map
+     */
+    void load_get_entities();
 };
 }  // namespace pac

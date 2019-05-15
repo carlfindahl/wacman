@@ -163,6 +163,8 @@ void Game::set_up_lua()
 {
     m_lua.open_libraries(sol::lib::base, sol::lib::package);
 
+    /* Register Data Types */
+
     /* Register action enum */
     m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},
                                       {"MOVE_EAST", ACTION_MOVE_EAST},

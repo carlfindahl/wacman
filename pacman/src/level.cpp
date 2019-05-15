@@ -95,21 +95,24 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
 
     /* Process entities by key / value */
     reg.reset();
-    sol::table entities = level_data["entities"];
     EntityFactory factory(reg);
-    for (auto& [k, v] : entities)
+    sol::table entities = level_data["entities"];
+
+    for (const auto& [_, entity] : entities)
     {
-        auto e = factory.spawn(state_view, k.as<std::string>());
+        sol::table entity_data = entity.as<sol::table>();
+
+        /* Spawn based on name, and then move to position if entity has a position component */
+        auto e = factory.spawn(state_view, entity_data["name"]);
         if (reg.has<CPosition>(e))
         {
-            const auto pos = v.as<std::vector<int>>();
-            reg.get<CPosition>(e).position = {pos[0], pos[1]};
+            reg.get<CPosition>(e).position = {entity_data["x"], entity_data["y"]};
         }
     }
 }
 
 void Level::save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
-                 robin_hood::unordered_map<std::string, glm::ivec2> entities)
+                 const std::vector<std::pair<std::string, glm::ivec2>>& entities)
 {
     /* First get access to a table for the level to save. Clear it up front in case it already holds some data */
     state_view.script_file(cgl::native_absolute_path("res/levels.lua"));
@@ -142,10 +145,14 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     level_data["tiles"] = tiles;
 
     /* Finally do the same for all entities */
+    unsigned next_idx = 1u;
     sol::table entity_data = level_data.create("entities");
     for (const auto& [k, v] : entities)
     {
-        entity_data[k] = std::vector<int>{v.x, v.y};
+        auto tbl = entity_data.create(next_idx++);
+        tbl["name"] = k;
+        tbl["x"] = v.x;
+        tbl["y"] = v.y;
     }
 
     /* Save the new LUA state to file for future loading */
@@ -237,12 +244,16 @@ void Level::save_to_file(sol::table levels_table)
 
         /* Copy entities to file */
         ofile << "entities = {\n\t\t\t";
-        for (const auto& [ent, pos] : current_level["entities"].get<sol::table>())
+        for (const auto& [idx, ent] : current_level["entities"].get<sol::table>())
         {
-            const auto& vec_pos = pos.as<std::vector<int>>();
-            ofile << ent.as<std::string>() << " = { " << vec_pos[0] << ", " << vec_pos[1] << " },\n\t\t\t";
+            sol::table entity_data = ent.as<sol::table>();
+
+            ofile << "[" << idx.as<int>() << "] = {\n\t\t\t\t";
+            ofile << "name = " << '"' << entity_data["name"].get<std::string>() << '"' << ",\n\t\t\t\t"
+                  << "x = " << entity_data["x"].get<int>() << ",\n\t\t\t\t"
+                  << "y = " << entity_data["y"].get<int>() << "\n\t\t\t},\n\t\t\t";
         }
-        ofile << "}\n\t},\n\t";
+        ofile << "}\n\t},\n";
     }
     ofile << "}\n";
 }
