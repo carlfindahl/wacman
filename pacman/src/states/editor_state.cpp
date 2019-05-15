@@ -3,6 +3,9 @@
 #include "config.h"
 #include "entity/components.h"
 #include "rendering/renderer.h"
+#include "ui.h"
+
+#include <filesystem>
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -31,13 +34,17 @@ void EditorState::on_enter()
     m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
 
-    /* Overlay for reference */
+    /* Game overlay for reference */
     m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
 
     m_level.resize(m_size);
 
+    /* Register event listeners */
     g_event_queue.sink<EvInput>().connect<&EditorState::recieve_key>(this);
     g_event_queue.sink<EvMouseMove>().connect<&EditorState::recieve_mouse>(this);
+
+    /* Fetch available entities */
+    load_entity_prototypes();
 }
 
 void EditorState::on_exit()
@@ -81,8 +88,14 @@ void EditorState::recieve_key(const EvInput& input)
     switch (input.action)
     {
     case ACTION_PLACE:
-        tile.type = static_cast<Level::ETileType>(m_tileset_tex);
-        tile.texture = get_renderer().get_tileset_texture(m_tileset_tex);
+        if (m_editor_mode == EMode::TilePlacement)
+        {
+            tile.type = static_cast<Level::ETileType>(m_tileset_tex);
+            tile.texture = get_renderer().get_tileset_texture(m_tileset_tex);
+        }
+        else
+        {
+        }
         break;
     case ACTION_UNDO:
         tile.type = Level::ETileType::Blank;
@@ -121,6 +134,23 @@ void EditorState::draw_ui(float dt)
         m_level.resize(m_size);
     }
 
+    ImGui::Separator();
+
+    /* Mode Tabs */
+    if (ImGui::BeginTabBar("Modes"))
+    {
+        if (ImGui::BeginTabItem("Tile Placement"))
+        {
+            ui::TilesetSelector(get_renderer().get_tileset_texture(0u)).update(dt);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Entity Placement"))
+        {
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+
     ImGui::End();
 }
 
@@ -142,4 +172,12 @@ void EditorState::load_get_entities()
     });
 }
 
+void EditorState::load_entity_prototypes()
+{
+    const auto entity_dir_path = std::filesystem::path(cgl::native_absolute_path("res/entities"));
+    for (const auto& entry : std::filesystem::directory_iterator(entity_dir_path))
+    {
+        m_entity_prototypes.push_back(entry.path().filename().stem().string());
+    }
+}
 }  // namespace pac

@@ -248,6 +248,7 @@ void Level::save_to_file(sol::table levels_table)
         {
             sol::table entity_data = ent.as<sol::table>();
 
+            /* Write index (of array) then each data member required to properly create the entity */
             ofile << "[" << idx.as<int>() << "] = {\n\t\t\t\t";
             ofile << "name = " << '"' << entity_data["name"].get<std::string>() << '"' << ",\n\t\t\t\t"
                   << "x = " << entity_data["x"].get<int>() << ",\n\t\t\t\t"

@@ -30,6 +30,9 @@ private:
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};
 
+    /* Entities availalbe to spawn */
+    std::vector<std::string> m_entity_prototypes{};
+
     /* Level Name */
     std::array<char, 64> m_level_name{};
 
@@ -59,8 +62,16 @@ public:
 
     bool draw() override;
 
+    /*!
+     * \brief recieve_key accepts input actions and updates the editor state based on that
+     * \param input is the event data
+     */
     void recieve_key(const EvInput& input);
 
+    /*!
+     * \brief recieve_mouse accepts mouse input and updates the currently selected editor tile
+     * \param input is the event data
+     */
     void recieve_mouse(const EvMouseMove& input);
 
 private:
@@ -74,5 +85,10 @@ private:
      * \brief load_get_entities is called after loading a level to store the current loaded entities in the entity map
      */
     void load_get_entities();
+
+    /*!
+     * \brief load_entity_prototypes searches the entity folder for available Entity prototypes so we can choose between them
+     */
+    void load_entity_prototypes();
 };
 }  // namespace pac

@@ -4,23 +4,12 @@ set(CGL_UTIL_NAME "cgl")
 add_library(${CGL_UTIL_NAME} ${CMAKE_BUILD_SHARED_LIBS} "")
 
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.2)
 
-# Define CGL_USE_GLFW if we have access to GLFW
-if(glfw3_FOUND)
-option(CGL_USE_GLFW ON)
-else()
-option(CGL_USE_GLFW OFF)
-endif()
-
-if(CGL_USE_GLFW)
-    message(STATUS "Adding GLFW support to CGL.")
-    target_compile_definitions(
-        ${CGL_UTIL_NAME}
-        PUBLIC
-        CGL_USE_GLFW
-    )
-endif()
+target_compile_definitions(
+    ${CGL_UTIL_NAME}
+    PUBLIC
+    CGL_USE_GLFW
+)
 
 # Add source files
 target_sources(
@@ -32,16 +21,15 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/src/cglutil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/stb_image.h
     ${CMAKE_CURRENT_LIST_DIR}/src/implementations.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/glad/glad.h
-    ${CMAKE_CURRENT_LIST_DIR}/src/glad.c
 )
 
 # Set up dependencies
 target_link_libraries(
     ${CGL_UTIL_NAME}
     PRIVATE
+    glad
     OpenGL::GL
-    $<$<BOOL:CGL_USE_GLFW>:glfw>
+    glfw
     $<IF:$<CXX_COMPILER_ID:GNU>,stdc++fs,> # GCC requires manual fs link
 )
 

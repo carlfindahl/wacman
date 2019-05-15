@@ -108,7 +108,7 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
 
     /* Enable default debug callback provided by cgl */
 #ifndef NDEBUG
-//    cgl::create_debug_callback();
+    cgl::create_debug_callback();
 #endif
 }
 

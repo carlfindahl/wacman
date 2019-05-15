@@ -3,6 +3,9 @@ target_sources(
     ${EXEC_NAME}
     PRIVATE
 
+    ${CMAKE_CURRENT_LIST_DIR}/ui.h
+    ${CMAKE_CURRENT_LIST_DIR}/ui.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/game.h
     ${CMAKE_CURRENT_LIST_DIR}/game.cpp
 
