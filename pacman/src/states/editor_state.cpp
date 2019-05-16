@@ -154,6 +154,23 @@ void EditorState::draw_ui(float dt)
 {
     ImGui::Begin("Editor");
 
+    /* Editor Buttons */
+    if (ImGui::Button("Animation Editor##Btn"))
+    {
+        ImGui::OpenPopup("Animation Editor");
+    }
+
+    /* Popup Editors */
+    if (ImGui::BeginPopupModal("Animation Editor"))
+    {
+        m_anim_editor.update(dt);
+        if (ImGui::Button("Close##Animation"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
     /* Saving and Loading */
     ImGui::InputText("Level Name", m_level_name.data(), cgl::size_bytes(m_level_name));
     if (ImGui::Button("Load"))
@@ -173,10 +190,6 @@ void EditorState::draw_ui(float dt)
     {
         m_level.resize(m_size);
     }
-
-    ImGui::Separator();
-
-    m_anim_editor.update(dt);
 
     ImGui::Separator();
 

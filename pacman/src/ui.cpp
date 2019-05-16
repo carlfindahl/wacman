@@ -75,9 +75,13 @@ void AnimationEditor::update(float dt)
         /* TODO: Save Animation */
     }
 
-    Separator();
-    Text("Preview:");
-    Image((void*)(static_cast<uint64_t>(m_current_tex) | (static_cast<uint64_t>(m_current_frame) << 32u)), {25, 25});
+    /* Only preview if there is anything to preview */
+    if (m_current_tex != 0u)
+    {
+        Text("Preview:");
+        SameLine();
+        Image((void*)(static_cast<uint64_t>(m_current_tex) | (static_cast<uint64_t>(m_current_frame) << 32u)), {25, 25});
+    }
 
     /* Update animation */
     m_frame_timer += dt;
