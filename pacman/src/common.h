@@ -45,6 +45,18 @@ struct ScoreEntry
 };
 
 /*!
+ * \brief The EAIState enum describes the current state of an AI in the game
+ */
+enum class EAIState
+{
+    Chasing,
+    ChasingAhead,
+    Searching,
+    Scattering,
+    Fleeing
+};
+
+/*!
  * \brief load_entries_from_file loads high score entries from highscores.txt in order to display them in the menu
  * \return a vector of entries
  */

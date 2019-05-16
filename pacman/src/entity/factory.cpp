@@ -117,6 +117,8 @@ void EntityFactory::make_animsprite_component(sol::state_view& state, const sol:
                                         anims[comp["starting"]], 0.f, comp["fps"]);
 }
 
+void EntityFactory::make_ai_component(sol::state_view& state, const sol::table& comp, uint32_t e) { m_registry.assign<CAI>(e); }
+
 void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
     GFX_DEBUG("Position Component at (%d, %d)", comp["x"].get<int>(), comp["y"].get<int>());

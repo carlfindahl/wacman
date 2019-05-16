@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "input/input.h"
 #include "rendering/renderer.h"
 
@@ -78,6 +79,19 @@ struct CPlayer
 
     /* Current score */
     int32_t score = 0;
+};
+
+/* AI Component for Ghosts */
+struct CAI
+{
+    /* Current Path (after pathfinding) */
+    std::vector<glm::ivec2> path{};
+
+    /* Current AI state */
+    EAIState state = EAIState::Searching;
+
+    /* Target tile for the AI (can be player, escape point or anything similar) */
+    glm::ivec2 target{};
 };
 
 /* Input Component */

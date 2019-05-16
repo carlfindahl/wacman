@@ -4,6 +4,7 @@ ghost = {
         x = 0,
         y = 0
     },
+    AI = {},
     Movement = {
         speed = 3.5        
     },

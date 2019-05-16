@@ -36,6 +36,7 @@ private:
         {"Movement", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_movement_component(s, t, e); }},
         {"Player", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_player_component(s, t, e); }},
         {"AnimationSprite", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_animsprite_component(s, t, e); }},
+        {"AI", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_ai_component(s, t, e); }},
         {"Input", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_input_component(s, t, e); }}};
 
 public:
@@ -60,6 +61,7 @@ private:
     /* Factory functions for each component type */
     void make_sprite_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e);
+    void make_ai_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e);
