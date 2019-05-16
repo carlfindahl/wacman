@@ -176,6 +176,10 @@ void EditorState::draw_ui(float dt)
 
     ImGui::Separator();
 
+    m_anim_editor.update(dt);
+
+    ImGui::Separator();
+
     /* Mode Tabs */
     if (ImGui::BeginTabBar("Modes"))
     {

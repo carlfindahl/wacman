@@ -61,6 +61,9 @@ private:
     /* Tileset selector UI */
     ui::TilesetSelector m_tileselect_ui{};
 
+    /* Animation Editor */
+    ui::AnimationEditor m_anim_editor{};
+
 public:
     using State::State;
 

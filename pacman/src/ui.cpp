@@ -1,11 +1,14 @@
 #include "ui.h"
 
+#include <cglutil.h>
 #include <imgui/imgui.h>
 
 namespace pac
 {
 namespace ui
 {
+/* ---- TILESET EDITOR ---- */
+
 TilesetSelector::TilesetSelector() : m_tileset(get_renderer().get_tileset_texture(0u)) {}
 
 TilesetSelector::TilesetSelector(TextureID texture) : m_tileset(texture) {}
@@ -19,7 +22,7 @@ void TilesetSelector::update(float dt)
     {
         frame_tex.frame_number = i;
 
-        /* If we click the tileset btn, then signal that we have changed selection */
+        /* If we click the tileset btn, then signal that we have changed selection (void* cast is fine since it's 8 bytes) */
         if (ImageButton((void*)get_renderer().get_texture_for_imgui(frame_tex), {25, 25}, {0, 0}, {1, 1}, -1, {0, 0, 0, 0},
                         (m_selected == i ? ImVec4{1.f, 1.f, 1.f, 1.f} : ImVec4{0.5f, 0.5f, 0.5f, 0.5f})))
         {
@@ -29,12 +32,61 @@ void TilesetSelector::update(float dt)
 
         if ((i + 1) % 6 != 0)
         {
-            ImGui::SameLine();
+            SameLine();
         }
     }
 }
 
 void TilesetSelector::set_selection(unsigned s) { m_selected = s; }
+
+/* ---- ANIMATION EDITOR ---- */
+
+AnimationEditor::~AnimationEditor() noexcept { glDeleteTextures(1, &m_current_tex); }
+
+void AnimationEditor::update(float dt)
+{
+    using namespace ImGui;
+    InputText("Texture", m_current_anim.texture_name, 64);
+    InputInt("Start X", &m_current_anim.start_x, 1, 5);
+    InputInt("Start Y", &m_current_anim.start_y, 1, 5);
+    InputInt("Width", &m_current_anim.width, 1, 5);
+    InputInt("Height", &m_current_anim.height, 1, 5);
+    InputInt("Columns", &m_current_anim.columns, 1, 2);
+    InputInt("Length", &m_current_anim.length, 1, 2);
+
+    /* Commit to preview */
+    if (Button("Preview"))
+    {
+        glDeleteTextures(1, &m_current_tex);
+        char final_buffer[256];
+        sprintf(final_buffer, "res/textures/%s", m_current_anim.texture_name);
+        m_current_tex =
+            cgl::load_gl_texture_partitioned(final_buffer, m_current_anim.start_x, m_current_anim.start_y, m_current_anim.width,
+                                             m_current_anim.height, m_current_anim.columns, m_current_anim.length);
+        m_current_tex_frames = m_current_anim.length;
+        m_current_frame = 0u;
+        m_frame_timer = 0.f;
+    }
+
+    SameLine();
+
+    if (Button("Save"))
+    {
+        /* TODO: Save Animation */
+    }
+
+    Separator();
+    Text("Preview:");
+    Image((void*)(static_cast<uint64_t>(m_current_tex) | (static_cast<uint64_t>(m_current_frame) << 32u)), {25, 25});
+
+    /* Update animation */
+    m_frame_timer += dt;
+    if (m_frame_timer > 1.f / 24.f && m_current_tex_frames != 0u)
+    {
+        m_frame_timer = 0.f;
+        m_current_frame = (m_current_frame + 1u) % m_current_tex_frames;
+    }
+}
 
 }  // namespace ui
 }  // namespace pac
