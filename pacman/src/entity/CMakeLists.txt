@@ -16,6 +16,12 @@ target_sources(
     "${CMAKE_CURRENT_LIST_DIR}/input_system.h"
     "${CMAKE_CURRENT_LIST_DIR}/input_system.cpp"
 
+    "${CMAKE_CURRENT_LIST_DIR}/game_system.h"
+    "${CMAKE_CURRENT_LIST_DIR}/game_system.cpp"
+
+    "${CMAKE_CURRENT_LIST_DIR}/ai_system.h"
+    "${CMAKE_CURRENT_LIST_DIR}/ai_system.cpp"
+
     "${CMAKE_CURRENT_LIST_DIR}/movement_system.h"
     "${CMAKE_CURRENT_LIST_DIR}/movement_system.cpp"
 
