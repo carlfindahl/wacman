@@ -326,6 +326,31 @@ unsigned load_gl_texture(const char* fp)
     return name;
 }
 
+unsigned load_gl_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count)
+{
+    const auto tex_data = load_texture_partitioned(fp, xoffset, yoffset, w, h, cols, count);
+
+    GLuint tex_id = 0u;
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &tex_id);
+
+    /* Set up sensible default parameters */
+    glTextureParameteri(tex_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(tex_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(tex_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(tex_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    /* Allocate and transfer data to Texture */
+    glTextureStorage3D(tex_id, 1, GL_RGBA8, tex_data[0].width, tex_data[0].height, tex_data.size());
+    for (int i = 0; i < static_cast<int>(tex_data.size()); ++i)
+    {
+        /* One texture per array layer */
+        glTextureSubImage3D(tex_id, 0, 0, 0, i, tex_data[i].width, tex_data[i].height, 1, GL_RGBA, GL_UNSIGNED_BYTE,
+                            tex_data[i].pixels.data());
+    }
+
+    return tex_id;
+}
+
 LoadedHeightmap load_heightmap(const char* fp)
 {
     const auto abs_path = native_absolute_path(fp);
@@ -347,7 +372,7 @@ LoadedHeightmap load_heightmap(const char* fp)
     }
 }
 
-unsigned load_gl_heightmap(const char *fp)
+unsigned load_gl_heightmap(const char* fp)
 {
     auto heightmap = load_heightmap(fp);
 
@@ -478,5 +503,6 @@ namespace detail
 UncaughtExceptionCounter::UncaughtExceptionCounter() : m_exception_count(std::uncaught_exceptions()) {}
 
 bool UncaughtExceptionCounter::new_uncaught_exception() noexcept { return std::uncaught_exceptions() > m_exception_count; }
-} // namespace detail
+}  // namespace detail
+// namespace detail
 }  // namespace cgl

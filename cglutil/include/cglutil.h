@@ -76,7 +76,8 @@ struct LoadedTexture
 };
 
 /*!
- * \brief The LoadedTexture struct represents a 16-bit R-only heightmap that has been loaded and contains relevant information about it.
+ * \brief The LoadedTexture struct represents a 16-bit R-only heightmap that has been loaded and contains relevant information
+ * about it.
  */
 struct LoadedHeightmap
 {
@@ -84,7 +85,6 @@ struct LoadedHeightmap
     int height = 0u;
     std::vector<uint16_t> pixels = {};
 };
-
 
 /*!
  * \brief The ModelData struct represents vertices in a loaded model based on the obj format
@@ -165,15 +165,38 @@ namespace cgl
  */
 LoadedTexture load_texture(const char* fp);
 
+/*!
+ * \brief load_texture_partitioned loads a texture in similar partitions starting at {xoffset,yoffset}, then moving {w,h} pixels
+ * out from that. It does this count times and every time it has done {cols} number of tiles it moves to the next row and
+ * continues there
+ * \param fp is the relative file path
+ * \param xoffset is the starting x coordinate to sample from
+ * \param yoffset is the starting y coordinate to sample from
+ * \param w is the width of each texture to extract
+ * \param h is the height of each texture to extract
+ * \param cols is the number of columns
+ * \param count is the total number of sprites/textures to extract
+ * \return a vector of data about the loaded textures, in order
+ * \note this function is great for loading animations and storing them as a 2D Array Texture for example
+ */
 std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 /*!
  * \brief load_gl_texture is a shortcut helper function to quickly load an entire texture with sensible defaults with OpenGL and
  * get out a handle to that texture
  * \param fp is the relative filepath of the texture
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
  * \return an OpenGL handle to the texture
  */
 unsigned load_gl_texture(const char* fp);
+
+/*!
+ * \brief load_gl_texture_partitioned does the same as {@load_texture_partitioned}, except it creates a default 2D_ARRAY_TEXTURE
+ * where each of the partitions are stored on their own layer.
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
+ * \return an OpenGL handle to the texture
+ */
+unsigned load_gl_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 /*!
  * \brief load_texture loads the heightmap texture at the given relative filepath.
@@ -187,6 +210,7 @@ LoadedHeightmap load_heightmap(const char* fp);
  * \brief load_gl_heightmap is a shortcut helper function to quickly load an entire heightmap with sensible defaults with OpenGL
  * and get out a handle to that texture
  * \param fp is the relative filepath of the heightmap
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
  * \return an OpenGL handle to the heightmap
  */
 unsigned load_gl_heightmap(const char* fp);
