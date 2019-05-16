@@ -105,9 +105,9 @@ void EntityFactory::make_animsprite_component(sol::state_view& state, const sol:
         auto tbl = v.as<sol::table>();
 
         /* Load anim texture based on information */
-        auto tex = get_renderer().load_animation_texture(
-            "res/textures/" + tbl["file"].get<std::string>(), tbl["startX"].get<int>() * tbl["size"].get<int>(),
-            tbl["startY"].get<int>() * tbl["size"].get<int>(), tbl["size"], tbl["size"], tbl["cols"], tbl["length"]);
+        auto tex = get_renderer().load_animation_texture("res/textures/" + tbl["file"].get<std::string>(),
+                                                         tbl["startX"].get<int>(), tbl["startY"].get<int>(), tbl["width"],
+                                                         tbl["height"], tbl["cols"], tbl["length"]);
 
         anims.emplace(k.as<std::string>(), tex);
     });

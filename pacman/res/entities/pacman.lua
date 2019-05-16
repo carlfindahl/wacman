@@ -19,8 +19,9 @@ pacman = {
             up = {
                 file = "pacman.png",
                 startX = 0,
-                startY = 1,
-                size = 70,
+                startY = 70,
+                width = 70,
+                height = 70,
                 cols = 4,
                 length = 4
             },
@@ -28,23 +29,26 @@ pacman = {
                 file = "pacman.png",
                 startX = 0,
                 startY = 0,
-                size = 70,
+                width = 70,
+                height = 70,
                 cols = 4,
                 length = 4
             },
             left = {
                 file = "pacman.png",
                 startX = 0,
-                startY = 2,
-                size = 70,
+                startY = 140,
+                width = 70,
+                height = 70,
                 cols = 4,
                 length = 4
             },
             right = {
                 file = "pacman.png",
                 startX = 0,
-                startY = 3,
-                size = 70,
+                startY = 210,
+                width = 70,
+                height = 70,
                 cols = 4,
                 length = 4
             }
