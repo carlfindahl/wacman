@@ -82,6 +82,9 @@ struct CPlayer
 
     /* Current score */
     int32_t score = 0;
+
+    /* Invulnerable (when GhostKiller is consumed) */
+    bool invulnerable = false;
 };
 
 /* AI Component for Ghosts */
@@ -95,6 +98,9 @@ struct CAI
 
     /* Target tile for the AI (can be player, escape point or anything similar) */
     glm::ivec2 target{};
+
+    /* How long the AI has been in it's current state */
+    float state_timer = 0.f;
 };
 
 /* Input Component */

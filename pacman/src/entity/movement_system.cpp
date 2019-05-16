@@ -9,7 +9,7 @@ namespace pac
 void MovementSystem::update(float dt, entt::registry& reg)
 {
     auto movement_group = reg.group<CPosition, CMovement>(entt::get<CCollision>);
-    movement_group.each([dt, this](CPosition& pos, CMovement& mov, CCollision& col) {
+    movement_group.each([dt, this](uint32_t e, CPosition& pos, CMovement& mov, CCollision& col) {
         /* Check if we can move towards desired direction and switch it if possible */
         if (mov.desired_direction != mov.current_direction && !m_level.will_collide(pos.position, mov.desired_direction) &&
             mov.progress < 0.4f)
@@ -41,6 +41,12 @@ void MovementSystem::update(float dt, entt::registry& reg)
         {
             mov.progress = 0.f;
             pos.position += mov.current_direction;
+
+            /* If an AI owns this movement component, feed a new path now that we reached next step */
+            if(reg.has<CAI>(e))
+            {
+                mov.desired_direction = reg.get<CAI>(e).path->get();
+            }
         }
     });
 }

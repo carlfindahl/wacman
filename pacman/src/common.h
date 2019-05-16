@@ -53,7 +53,8 @@ enum class EAIState
     ChasingAhead,
     Searching,
     Scattering,
-    Fleeing
+    Scared,
+    Dead
 };
 
 /*!
