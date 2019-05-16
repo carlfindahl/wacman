@@ -2,7 +2,10 @@
 
 #include "common.h"
 #include "input/input.h"
+#include "pathfinding.h"
 #include "rendering/renderer.h"
+
+#include <memory>
 
 #include <glm/vec2.hpp>
 #include <sol/function.hpp>
@@ -85,7 +88,7 @@ struct CPlayer
 struct CAI
 {
     /* Current Path (after pathfinding) */
-    std::vector<glm::ivec2> path{};
+    std::unique_ptr<Path> path = nullptr;
 
     /* Current AI state */
     EAIState state = EAIState::Searching;
