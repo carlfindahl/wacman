@@ -203,6 +203,66 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 
 bool Level::will_collide(glm::ivec2 pos, glm::ivec2 direction) const { return get_tile(pos + direction).type == ETileType::Wall; }
 
+glm::ivec2 Level::find_closest_intersection(glm::ivec2 start) const
+{
+    /* An intersection has at least 3 blank neighbours */
+    constexpr uint32_t intersection_size = 3u;
+
+    glm::ivec2 closest = {512, 512};
+    for (int x = glm::max(0, start.x - 5); x < glm::min<int>(start.x + 5, m_tiles.front().size()); ++x)
+    {
+        for (int y = glm::max(0, start.y - 5); y < glm::min<int>(start.y + 5, m_tiles.size()); ++y)
+        {
+            /* Check number of open neighbour tiles */
+            const auto neighbours = get_neighbours({x, y});
+            unsigned neighbour_count = 0u;
+            for (const auto& n : neighbours)
+            {
+                if (get_tile(n).type == ETileType::Blank)
+                {
+                    ++neighbour_count;
+                }
+            }
+
+            /* Update closest intersection if closest */
+            if (neighbour_count > intersection_size && manhattan_distance({x, y}, start) < manhattan_distance(closest, start))
+            {
+                closest = {x, y};
+            }
+        }
+    }
+
+    return closest;
+}
+
+bool Level::los(glm::ivec2 start, glm::ivec2 end) const
+{
+    /* If we are next to this tile, always has LOS */
+    if (manhattan_distance(start, end) < 2)
+    {
+        return true;
+    }
+    /* On diagonals, always false */
+    else if (start.x != end.x && start.y != end.y)
+    {
+        return false;
+    }
+
+    /* Find delta between start and end */
+    const auto delta = glm::normalize(end - start);
+
+    /* Trace from start to end with the delta -> If we hit a wall, there is no LOS */
+    for (; start != end; start += delta)
+    {
+        if (get_tile(start).type == ETileType::Wall)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 unsigned Level::score() const { return m_score; }
 
 bool Level::bounds_check(glm::ivec2 pos) const

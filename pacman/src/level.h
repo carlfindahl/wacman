@@ -109,6 +109,19 @@ public:
     bool will_collide(glm::ivec2 pos, glm::ivec2 direction) const;
 
     /*!
+     * \brief ...
+     */
+    glm::ivec2 find_closest_intersection(glm::ivec2 start) const;
+
+    /*!
+     * \brief los checks line of sight from start to end. If there is LOS. returns true
+     * \param start is the start
+     * \param end is the end
+     * \return true if there is line of sight
+     */
+    bool los(glm::ivec2 start, glm::ivec2 end) const;
+
+    /*!
      * \brief get_neighbours gets all non-wall neighbouring tiles of the tile at pos
      * \param pos the position of the tile to get the neighbours (NESW) of
      * \return A vector of tile coordinates
