@@ -12,7 +12,7 @@ namespace pac
 {
 void HighScoreState::on_enter()
 {
-    m_splash_texture = get_renderer().load_texture("res/hiscore_screen.png");
+    m_splash_texture = get_renderer().load_texture("res/textures/hiscore_screen.png");
 
     InputDomain hs_input_state(true);
     hs_input_state.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);

@@ -15,7 +15,7 @@ namespace pac
 {
 void pac::MainMenuState::on_enter()
 {
-    m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
+    m_splash_texture = get_renderer().load_texture("res/textures/splash_screen.png");
     get_sound().play("pacman");
     m_music_id = get_sound().play("simple_theme");
 }

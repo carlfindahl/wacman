@@ -21,12 +21,12 @@ void AISystem::update(float dt, entt::registry& reg)
             {
             /* Chasing goes directly to the player */
             case EAIState::Chasing: ai.target = plr_pos; break;
-            /* ChasingAhead goes ahead of the player, anticipating their moves (TODO) */
+            /* ChasingAhead goes ahead of the player, anticipating their moves (TODO : Add this state) */
             case EAIState::ChasingAhead: ai.target = plr_pos; break;
             /* Searching doesn't know where the player is, and will wander to the next intersection */
             case EAIState::Searching: ai.target = m_level.find_closest_intersection(ai_pos); break;
             /* Scattering means going to random locations */
-            case EAIState::Scattering: break;
+            case EAIState::Scattering:  break;
             /* Fleeing means -> Get away from Pacman ASAP! */
             case EAIState::Scared: break;
             /* When Dead -> Go to Death Point */

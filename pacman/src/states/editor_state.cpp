@@ -37,7 +37,7 @@ void EditorState::on_enter()
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
 
     /* Game overlay for reference */
-    m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
+    m_overlay = get_renderer().load_texture("res/textures/ingame_overlay.png");
 
     m_level.resize(m_size);
 

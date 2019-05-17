@@ -249,7 +249,7 @@ bool Level::los(glm::ivec2 start, glm::ivec2 end) const
     }
 
     /* Find delta between start and end */
-    const auto delta = glm::normalize(end - start);
+    const auto delta = glm::ivec2(glm::normalize(glm::vec2(end - start)));
 
     /* Trace from start to end with the delta -> If we hit a wall, there is no LOS */
     for (; start != end; start += delta)

@@ -8,7 +8,8 @@
 
 namespace pac
 {
-PostProcessor::PostProcessor() : m_shader({{GL_VERTEX_SHADER, "res/post.vert"}, {GL_FRAGMENT_SHADER, "res/post.frag"}})
+PostProcessor::PostProcessor()
+    : m_shader({{GL_VERTEX_SHADER, "res/shaders/post.vert"}, {GL_FRAGMENT_SHADER, "res/shaders/post.frag"}})
 {
     /* Create framebuffer render texture */
     glCreateTextures(GL_TEXTURE_2D, 1, &m_framebuffer.texture);

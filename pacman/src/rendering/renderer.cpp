@@ -35,8 +35,8 @@ void Renderer::init(unsigned max_sprites)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     /* Create Shader Program */
-    prog = std::make_unique<ShaderProgram>(
-        std::vector<cgl::ShaderStage>{{GL_VERTEX_SHADER, "res/sprite.vert"}, {GL_FRAGMENT_SHADER, "res/sprite.frag"}});
+    prog = std::make_unique<ShaderProgram>(std::vector<cgl::ShaderStage>{{GL_VERTEX_SHADER, "res/shaders/sprite.vert"},
+                                                                         {GL_FRAGMENT_SHADER, "res/shaders/sprite.frag"}});
 
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
@@ -76,7 +76,7 @@ void Renderer::init(unsigned max_sprites)
     glVertexArrayVertexBuffer(m_vao, 1u, m_instance_buffer, 0u, sizeof(InstanceVertex));
 
     /* Load default texture ID 0 -> blank.png */
-    load_texture("res/blank.png");
+    load_texture("res/textures/blank.png");
 }
 
 Renderer::~Renderer()

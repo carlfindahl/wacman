@@ -9,11 +9,11 @@ namespace pac
 {
 void pac::HelpState::on_enter()
 {
-    m_splash_texture = get_renderer().load_texture("res/splash_screen.png");
+    m_splash_texture = get_renderer().load_texture("res/textures/splash_screen.png");
 
     /* Add input state that is blocking so no other input works */
     InputDomain pause_domain(true);
-//    pause_domain.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
+    //    pause_domain.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
     get_input().push(std::move(pause_domain));
 }
 

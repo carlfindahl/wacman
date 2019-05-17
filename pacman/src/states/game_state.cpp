@@ -2,6 +2,8 @@
 #include "entity/components.h"
 #include "audio/sound_manager.h"
 #include "entity/input_system.h"
+#include "entity/ai_system.h"
+#include "entity/game_system.h"
 #include "entity/movement_system.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
@@ -30,7 +32,7 @@ void GameState::on_enter()
 
     /* Load resources and prepare music ID */
     m_music_id = get_sound().play("theme", true);
-    m_overlay = get_renderer().load_texture("res/ingame_overlay.png");
+    m_overlay = get_renderer().load_texture("res/textures/ingame_overlay.png");
 
     /* Create the input domain for the game */
     InputDomain game_input(true);
@@ -84,7 +86,9 @@ void GameState::recieve(const EvInput& input)
 void GameState::add_systems()
 {
     m_systems.emplace_back(std::make_unique<InputSystem>());
+    m_systems.emplace_back(std::make_unique<AISystem>(m_level));
     m_systems.emplace_back(std::make_unique<MovementSystem>(m_level));
+    m_systems.emplace_back(std::make_unique<GameSystem>());
     m_systems.emplace_back(std::make_unique<AnimationSystem>());
     m_systems.emplace_back(std::make_unique<RenderingSystem>());
 }
