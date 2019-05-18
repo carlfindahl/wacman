@@ -3,6 +3,7 @@
 #include "entity/components.h"
 #include "rendering/renderer.h"
 
+#include <array>
 #include <vector>
 
 #include <entt/signal/sigh.hpp>
@@ -79,6 +80,34 @@ public:
      * \param dt is delta time
      */
     void update(float dt);
+};
+
+class CampaignEditor
+{
+private:
+    /* Levels part of this campaign (in order) */
+    std::vector<std::string> m_levels{};
+
+    /* Levels you can add to this campaign */
+    std::vector<std::string> m_available_levels{};
+
+    /* Campaign Name */
+    std::array<char, 64> m_name{};
+
+public:
+    CampaignEditor() = default;
+
+    /*!
+     * \brief update draws the UI
+     * \param dt delta time
+     */
+    void update(float dt);
+
+private:
+    /*!
+     * \brief save Save campaign to campaign file
+     */
+    void save();
 };
 
 }  // namespace ui

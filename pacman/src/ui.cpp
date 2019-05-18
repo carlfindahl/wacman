@@ -1,5 +1,7 @@
 #include "ui.h"
 
+#include <fstream>
+
 #include <cglutil.h>
 #include <imgui/imgui.h>
 
@@ -91,6 +93,43 @@ void AnimationEditor::update(float dt)
         m_current_frame = (m_current_frame + 1u) % m_current_tex_frames;
     }
 }
+
+void CampaignEditor::update(float dt)
+{
+    using namespace ImGui;
+    Columns(2, "CampaignCol", false);
+    BeginChild("AvailableCampaignLevels", {0, 0}, true);
+    for (auto itr = m_available_levels.crbegin(); itr != m_available_levels.crend(); ++itr)
+    {
+        if (Selectable(itr->c_str()))
+        {
+            m_levels.push_back(*itr);
+        }
+    }
+    NextColumn();
+
+    /* Show selected levels */
+    Text("Campaign Levels");
+    BeginChild("SelectedCampaignLevels");
+    for (auto i = 0u; i < m_levels.size(); ++i)
+    {
+        if (Selectable(m_levels[i].c_str()))
+        {
+            m_levels.erase(m_levels.begin() + i);
+        }
+    }
+
+    /* Input text */
+    InputText("Campaign Name", m_name.data(), m_name.size());
+    if (Button("Save"))
+    {
+        save();
+    }
+    NextColumn();
+    Columns();
+}
+
+void CampaignEditor::save() {}
 
 }  // namespace ui
 }  // namespace pac

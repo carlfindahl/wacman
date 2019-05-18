@@ -64,6 +64,9 @@ private:
     /* Animation Editor */
     ui::AnimationEditor m_anim_editor{};
 
+    /* Edit campaign */
+    ui::CampaignEditor m_campaign_editor{};
+
 public:
     using State::State;
 

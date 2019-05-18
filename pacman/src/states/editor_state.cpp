@@ -160,12 +160,28 @@ void EditorState::draw_ui(float dt)
     {
         ImGui::OpenPopup("Animation Editor");
     }
+    if (ImGui::Button("Campaign Editor##Btn"))
+    {
+        ImGui::OpenPopup("Campaign Editor");
+    }
+
+    ImGui::Separator();
 
     /* Popup Editors */
     if (ImGui::BeginPopupModal("Animation Editor"))
     {
         m_anim_editor.update(dt);
         if (ImGui::Button("Close##Animation"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal("Campaign Editor"))
+    {
+        m_campaign_editor.update(dt);
+        if (ImGui::Button("Close##Campaign"))
         {
             ImGui::CloseCurrentPopup();
         }
