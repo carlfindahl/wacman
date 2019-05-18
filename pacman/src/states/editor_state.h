@@ -26,7 +26,7 @@ private:
     Level m_level{};
 
     /* All entities currently active */
-    std::vector<std::pair<std::string, glm::ivec2>> m_entities{};
+    std::vector<std::pair<std::string, std::vector<glm::ivec2>>> m_entities{};
 
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};

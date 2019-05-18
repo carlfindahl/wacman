@@ -95,16 +95,20 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
         sol::table entity_data = entity.as<sol::table>();
 
         /* Spawn based on name, and then move to position if entity has a position component */
-        auto e = factory.spawn(state_view, entity_data["name"]);
-        if (reg.has<CPosition>(e))
+        const auto& x_positions = entity_data["x"].get<std::vector<int>>();
+        const auto& y_positions = entity_data["y"].get<std::vector<int>>();
+
+        /* For each position, spawn an entity */
+        for (auto i = 0u; i < x_positions.size(); ++i)
         {
-            reg.get<CPosition>(e).position = {entity_data["x"], entity_data["y"]};
+            auto e = factory.spawn(state_view, entity_data["name"]);
+            reg.get<CPosition>(e).position = {x_positions[i], y_positions[i]};
         }
     }
 }
 
 void Level::save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
-                 const std::vector<std::pair<std::string, glm::ivec2>>& entities)
+                 const std::vector<std::pair<std::string, std::vector<glm::ivec2>>>& entities)
 {
     /* First get access to a table for the level to save. Clear it up front in case it already holds some data */
     state_view.script_file(cgl::native_absolute_path("res/levels.lua"));
@@ -141,10 +145,17 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     sol::table entity_data = level_data.create("entities");
     for (const auto& [k, v] : entities)
     {
+        /* Extract X and Y Positions */
+        std::vector<int> x_positions{};
+        std::vector<int> y_positions{};
+        std::transform(v.cbegin(), v.cend(), std::back_inserter(x_positions), [](auto&& e) { return e.x; });
+        std::transform(v.cbegin(), v.cend(), std::back_inserter(y_positions), [](auto&& e) { return e.y; });
+
+        /* Write one element per entity type */
         auto tbl = entity_data.create(next_idx++);
         tbl["name"] = k;
-        tbl["x"] = v.x;
-        tbl["y"] = v.y;
+        tbl["x"] = x_positions;
+        tbl["y"] = y_positions;
     }
 
     /* Save the new LUA state to file for future loading */
@@ -312,8 +323,16 @@ void Level::save_to_file(sol::table levels_table)
             /* Write index (of array) then each data member required to properly create the entity */
             ofile << "[" << idx.as<int>() << "] = {\n\t\t\t\t";
             ofile << "name = " << '"' << entity_data["name"].get<std::string>() << '"' << ",\n\t\t\t\t"
-                  << "x = " << entity_data["x"].get<int>() << ",\n\t\t\t\t"
-                  << "y = " << entity_data["y"].get<int>() << "\n\t\t\t},\n\t\t\t";
+                  << "x = {";
+
+            const auto& x_vec = entity_data["x"].get<std::vector<int>>();
+            std::copy(x_vec.cbegin(), x_vec.cend(), std::ostream_iterator<int>(ofile, ", "));
+            ofile << "},\n\t\t\t\t"
+                  << "y = {";
+
+            const auto& y_vec = entity_data["y"].get<std::vector<int>>();
+            std::copy(y_vec.cbegin(), y_vec.cend(), std::ostream_iterator<int>(ofile, ", "));
+            ofile << "}\n\t\t\t},\n\t\t\t";
         }
         ofile << "}\n\t},\n\t";
     }

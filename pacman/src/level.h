@@ -90,7 +90,7 @@ public:
      * \param fp is the relative filepath to save at
      */
     void save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
-              const std::vector<std::pair<std::string, glm::ivec2>>& entities);
+              const std::vector<std::pair<std::string, std::vector<glm::ivec2>>>& entities);
 
     /*!
      * \brief get_tile returns the tile at the given coordinate

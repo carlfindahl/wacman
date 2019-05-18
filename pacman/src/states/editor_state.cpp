@@ -238,15 +238,23 @@ void EditorState::load_get_entities()
     /* For every entity with meta data, load it into the entity map */
     auto view = m_context.registry->view<CMeta>();
     view.each([this](uint32_t e, const CMeta& meta) {
-        /* If they have a position, read that in, otherwise store 0 as it doesn't matter */
+        glm::ivec2 new_position = {0, 0};
+
         if (m_context.registry->has<CPosition>(e))
         {
             const auto& pos = m_context.registry->get<CPosition>(e);
-            m_entities.emplace_back(meta.name, pos.position);
+            new_position = pos.position;
+        }
+
+        /* Find out if this is a new entity or existing one and load accordingly */
+        auto itr = std::find_if(m_entities.begin(), m_entities.end(), [&meta](auto&& p) { return p.first == meta.name; });
+        if (itr != m_entities.end())
+        {
+            itr->second.push_back(new_position);
         }
         else
         {
-            m_entities.emplace_back(meta.name, glm::ivec2{0, 0});
+            m_entities.emplace_back(meta.name, std::vector<glm::ivec2>{new_position});
         }
     });
 }
@@ -283,39 +291,51 @@ void EditorState::spawn_entity()
     /* If it is not occupied, then we can spawn it by changing the entity about to spawn */
     if (!occupied)
     {
-        m_entities.emplace_back(m_current_entity, m_hovered_tile);
+        /* Look if entity type exists and then push it back in entity position vector */
+        auto pos = std::find_if(m_entities.begin(), m_entities.end(), [this](auto&& p) { return p.first == m_current_entity; });
+        if (pos != m_entities.end())
+        {
+            pos->second.push_back(m_hovered_tile);
+        }
+        /* Otherwise create new entry */
+        else
+        {
+            m_entities.emplace_back(m_current_entity, std::vector<glm::ivec2>{m_hovered_tile});
+        }
         m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
     }
 }
 
 void EditorState::remove_entity()
 {
-    std::vector<uint32_t> to_destroy{};
-
     /* Search for entities to delete (and then remove from entity lookup if matching) */
-    m_context.registry->view<CPosition>().each([this, &to_destroy](uint32_t e, const CPosition& pos) {
+    m_context.registry->view<CPosition>().each([this](uint32_t e, const CPosition& pos) {
         if (pos.position == m_hovered_tile)
         {
-            /* Flag entity for deletion */
-            to_destroy.push_back(e);
-
             /* Then look for corresponding entry in the save-data vector */
             auto itr = std::find_if(m_entities.begin(), m_entities.end(),
-                                    [&pos](const auto& pair) { return pair.second == pos.position; });
+                                    [this](auto&& pair) { return pair.first == m_current_entity; });
 
             /* If found in there, delete it */
-            if (itr != m_entities.end())
+            if (itr != m_entities.end() && itr->second.size() == 1u)
             {
                 m_entities.erase(itr);
             }
+            /* Otherwise look for corresponding position for that entity and remove that entry instead */
+            else
+            {
+                auto erase_itr =
+                    std::find_if(itr->second.cbegin(), itr->second.cend(), [&pos](auto&& vec) { return pos.position == vec; });
+                if (erase_itr != itr->second.end())
+                {
+                    itr->second.erase(erase_itr);
+                }
+            }
+
+            /* Delete entity */
+            m_context.registry->destroy(e);
         }
     });
-
-    /* Destroy entities */
-    for (auto e : to_destroy)
-    {
-        m_context.registry->destroy(e);
-    }
 }
 
 }  // namespace pac
