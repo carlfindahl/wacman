@@ -47,9 +47,16 @@ void GameSystem::update(float dt)
             {
                 if (plr.invulnerable > 0.f)
                 {
-                    plr.score += 250;
+                    /* If ghost is not dead, and not at their spawn then add score */
+                    if (enemies.get<CAI>(ghost).state != EAIState::Dead &&
+                        enemies.get<const CPosition>(ghost).position != enemies.get<const CPosition>(ghost).spawn)
+                    {
+                        plr.score += 250;
+                    }
+
+                    /* Mark ghost as dead and set it's ting to someting sensible */
                     enemies.get<CAI>(ghost).state = EAIState::Dead;
-                    enemies.get<CAnimationSprite>(ghost).tint = glm::vec3{0.2f, 0.2f, 1.5f};
+                    enemies.get<CAnimationSprite>(ghost).tint = glm::vec3{0.05f, 0.05f, 1.f};
                 }
                 else
                 {
