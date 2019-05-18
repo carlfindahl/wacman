@@ -5,13 +5,14 @@
 
 namespace pac
 {
-void AISystem::update(float dt, entt::registry& reg)
+void AISystem::update(float dt)
 {
     /* Update paths when required */
-    reg.view<CAI>().each([this, &reg, dt](uint32_t e, CAI& ai) {
+    m_reg.view<CAI>().each([this, dt](uint32_t e, CAI& ai) {
         /* Get position of AI */
-        const auto& ai_pos = reg.get<CPosition>(e).position;
-        const auto& plr_pos = get_player_pos(reg);
+        const auto& ai_pos = m_reg.get<CPosition>(e).position;
+        const auto& ai_mov = m_reg.get<CMovement>(e);
+        const auto& plr_pos = get_player_pos();
 
         /* Create a new path when needed */
         if (!ai.path || ai.path->outdated())
@@ -23,12 +24,14 @@ void AISystem::update(float dt, entt::registry& reg)
             case EAIState::Chasing: ai.target = plr_pos; break;
             /* ChasingAhead goes ahead of the player, anticipating their moves (TODO : Add this state) */
             case EAIState::ChasingAhead: ai.target = plr_pos; break;
-            /* Searching doesn't know where the player is, and will wander to the next intersection */
-            case EAIState::Searching: ai.target = m_level.find_closest_intersection(ai_pos); break;
             /* Scattering means going to random locations */
-            case EAIState::Scattering:  break;
+            case EAIState::Scattering: ai.target = m_level.find_closest_intersection(ai_pos, ai_mov.current_direction); break;
+            /* Searching doesn't know where the player is, and will wander to the next intersection */
+            case EAIState::Searching: ai.target = m_level.find_closest_intersection(ai_pos, ai_mov.current_direction); break;
             /* Fleeing means -> Get away from Pacman ASAP! */
-            case EAIState::Scared: break;
+            case EAIState::Scared:
+                ai.target = m_level.find_sensible_escape_point(ai_pos, ai_mov.current_direction, plr_pos);
+                break;
             /* When Dead -> Go to Death Point */
             case EAIState::Dead: break;
             }
@@ -55,7 +58,7 @@ void AISystem::update(float dt, entt::registry& reg)
         case EAIState::Scattering:
             if (ai.state_timer > 10.f)
             {
-                ai.state = EAIState::Searching;
+                ai.state = EAIState::Chasing;
                 ai.state_timer = 0.f;
             }
         /* Search until you see player, then chase */
@@ -73,10 +76,10 @@ void AISystem::update(float dt, entt::registry& reg)
     });
 }
 
-glm::ivec2 AISystem::get_player_pos(entt::registry& reg) const
+glm::ivec2 AISystem::get_player_pos() const
 {
     glm::ivec2 out_pos{};
-    reg.view<CPlayer, CPosition>().each([&out_pos](const CPlayer& plr, const CPosition& pos) { out_pos = pos.position; });
+    m_reg.view<CPlayer, CPosition>().each([&out_pos](const CPlayer& plr, const CPosition& pos) { out_pos = pos.position; });
     return out_pos;
 }
 }  // namespace pac

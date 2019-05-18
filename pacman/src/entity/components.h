@@ -94,7 +94,7 @@ struct CAI
     std::unique_ptr<Path> path = nullptr;
 
     /* Current AI state */
-    EAIState state = EAIState::Searching;
+    EAIState state = EAIState::Scattering;
 
     /* Target tile for the AI (can be player, escape point or anything similar) */
     glm::ivec2 target{};
@@ -113,7 +113,7 @@ struct CInput
 struct CPickup
 {
     /* Score when picking up */
-    int score = 50;
+    int score = 0;
 
     /* Other effects */
 };

@@ -61,7 +61,7 @@ bool GameState::update(float dt)
     m_level.update(dt);
     for (auto& system : m_systems)
     {
-        system->update(dt, *m_context.registry);
+        system->update(dt);
     }
     return false;
 }
@@ -85,12 +85,12 @@ void GameState::recieve(const EvInput& input)
 
 void GameState::add_systems()
 {
-    m_systems.emplace_back(std::make_unique<InputSystem>());
-    m_systems.emplace_back(std::make_unique<AISystem>(m_level));
-    m_systems.emplace_back(std::make_unique<MovementSystem>(m_level));
-    m_systems.emplace_back(std::make_unique<GameSystem>());
-    m_systems.emplace_back(std::make_unique<AnimationSystem>());
-    m_systems.emplace_back(std::make_unique<RenderingSystem>());
+    m_systems.emplace_back(std::make_unique<InputSystem>(*m_context.registry));
+    m_systems.emplace_back(std::make_unique<AISystem>(*m_context.registry, m_level));
+    m_systems.emplace_back(std::make_unique<MovementSystem>(*m_context.registry, m_level));
+    m_systems.emplace_back(std::make_unique<GameSystem>(*m_context.registry));
+    m_systems.emplace_back(std::make_unique<AnimationSystem>(*m_context.registry));
+    m_systems.emplace_back(std::make_unique<RenderingSystem>(*m_context.registry));
 }
 
 }  // namespace pac

@@ -14,9 +14,9 @@ private:
     Level& m_level;
 
 public:
-    AISystem(Level& level) : m_level(level) {}
+    AISystem(entt::registry& reg, Level& level) : System(reg), m_level(level) {}
 
-    void update(float dt, entt::registry& reg) override;
+    void update(float dt) override;
 
 private:
     /*!
@@ -24,13 +24,6 @@ private:
      * \param reg is the registry
      * \return player position
      */
-    glm::ivec2 get_player_pos(entt::registry& reg) const;
-
-    /*!
-     * \brief get_player_ahead_pos gets some available tile in front of the player
-     * \param reg is the registry
-     * \return player position
-     */
-    glm::ivec2 get_player_ahead_pos(entt::registry& reg) const;
+    glm::ivec2 get_player_pos() const;
 };
 }  // namespace pac

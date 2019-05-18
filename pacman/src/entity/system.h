@@ -10,12 +10,16 @@ namespace pac
  */
 class System
 {
+protected:
+    /* Registry this system is working against */
+    entt::registry& m_reg;
+
 public:
-    System() = default;
+    System(entt::registry& reg) : m_reg(reg){};
     System(const System&) = default;
     System(System&&) = default;
-    System& operator=(System&&) = default;
-    System& operator=(const System&) = default;
+    System& operator=(System&&) = delete;
+    System& operator=(const System&) = delete;
     virtual ~System() noexcept = default;
 
     /*!
@@ -23,7 +27,7 @@ public:
      * \param dt is the delta time
      * \param reg is the current entity registry to work with
      */
-    virtual void update(float dt, entt::registry& reg) = 0;
+    virtual void update(float dt) = 0;
 };
 
 }  // namespace pac

@@ -111,7 +111,7 @@ public:
     /*!
      * \brief ...
      */
-    glm::ivec2 find_closest_intersection(glm::ivec2 start) const;
+    glm::ivec2 find_closest_intersection(glm::ivec2 start, glm::ivec2 dir) const;
 
     /*!
      * \brief los checks line of sight from start to end. If there is LOS. returns true
@@ -133,7 +133,20 @@ public:
      */
     unsigned score() const;
 
+    /*!
+     * \brief find_sensible_escape_point
+     * \param ghost_pos
+     * \param escape_from_pos
+     * \return
+     */
+    glm::ivec2 find_sensible_escape_point(glm::ivec2 ghost_pos, glm::ivec2 ghost_dir, glm::ivec2 escape_from_pos);
+
 private:
+    /*!
+     * \brief bounds_check
+     * \param pos
+     * \return
+     */
     bool bounds_check(glm::ivec2 pos) const;
 
     /*!
@@ -142,6 +155,14 @@ private:
      * \param new_size is the new size of the level
      */
     void resize(glm::ivec2 new_size);
+
+    /*!
+     * \brief direction gets the direction (-1, 0, 1) you need to go to get from a to b
+     * \param from
+     * \param to
+     * \return the direction
+     */
+    glm::ivec2 direction(glm::ivec2 from, glm::ivec2 to) const;
 
     /*!
      * \brief save_to_file saves the current levels lua state to the levels.lua file

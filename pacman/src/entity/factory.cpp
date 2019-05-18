@@ -149,7 +149,7 @@ void EntityFactory::make_input_component(sol::state_view& state, const sol::tabl
 void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
     GFX_DEBUG("Adding Pikcup Component");
-    m_registry.assign<CPickup>(e, CPickup{comp["score"]});
+    m_registry.assign<CPickup>(e, comp["score"].get<int>());
 }
 
 void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e)

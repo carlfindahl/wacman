@@ -3,10 +3,10 @@
 
 namespace pac
 {
-void pac::AnimationSystem::update(float dt, entt::registry& reg)
+void pac::AnimationSystem::update(float dt)
 {
     /* Update animation frame */
-    reg.view<CAnimationSprite>().each([dt](auto e, CAnimationSprite& spr) {
+    m_reg.view<CAnimationSprite>().each([dt](auto e, CAnimationSprite& spr) {
         spr.animation_timer += dt;
 
         /* If we hit a new frame, then update frame number */

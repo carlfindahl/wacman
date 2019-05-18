@@ -3,6 +3,7 @@
 #include "entity/components.h"
 #include "entity/factory.h"
 #include "rendering/renderer.h"
+#include "game_state.h"
 #include "input/input.h"
 #include "config.h"
 #include "ui.h"
@@ -33,8 +34,8 @@ void EditorState::on_enter()
     get_input().push(std::move(editor_domain));
 
     /* Add Systems */
-    m_systems.emplace_back(std::make_unique<AnimationSystem>());
-    m_systems.emplace_back(std::make_unique<RenderingSystem>());
+    m_systems.emplace_back(std::make_unique<AnimationSystem>(*m_context.registry));
+    m_systems.emplace_back(std::make_unique<RenderingSystem>(*m_context.registry));
 
     /* Game overlay for reference */
     m_overlay = get_renderer().load_texture("res/textures/ingame_overlay.png");
@@ -65,7 +66,7 @@ bool EditorState::update(float dt)
     draw_ui(dt);
     for (auto& system : m_systems)
     {
-        system->update(dt, *m_context.registry);
+        system->update(dt);
     }
 
     if (m_editor_mode == EMode::EntityPlacement)
@@ -170,6 +171,8 @@ void EditorState::draw_ui(float dt)
         }
         ImGui::EndPopup();
     }
+
+    ImGui::SameLine();
 
     /* Saving and Loading */
     ImGui::InputText("Level Name", m_level_name.data(), cgl::size_bytes(m_level_name));

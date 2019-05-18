@@ -26,15 +26,7 @@ Level::Level(GameContext context) : m_context(context)
     m_tileset_texture = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 21);
 }
 
-void Level::update(float dt)
-{
-    /* Use ImGui to display the score */
-    ImGui::SetNextWindowSize({100.f, 16.f});
-    ImGui::SetNextWindowPos({120.f, 11.f});
-    ImGui::Begin("ScoreWindow", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    ImGui::Text("%d", m_score);
-    ImGui::End();
-}
+void Level::update(float dt) {}
 
 void Level::draw()
 {
@@ -203,36 +195,37 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 
 bool Level::will_collide(glm::ivec2 pos, glm::ivec2 direction) const { return get_tile(pos + direction).type == ETileType::Wall; }
 
-glm::ivec2 Level::find_closest_intersection(glm::ivec2 start) const
+glm::ivec2 Level::find_closest_intersection(glm::ivec2 start, glm::ivec2 dir) const
 {
-    /* An intersection has at least 3 blank neighbours */
-    constexpr uint32_t intersection_size = 3u;
+    /* Get all possible movement directions */
+    auto directions = get_neighbours(start);
 
-    glm::ivec2 closest = {512, 512};
-    for (int x = glm::max(0, start.x - 5); x < glm::min<int>(start.x + 5, m_tiles.front().size()); ++x)
+    /* Delete the reverse direction since we can not move 180 degrees */
+    auto e_itr =
+        std::remove_if(directions.begin(), directions.end(), [&dir, &start](glm::ivec2 elem) { return (elem - start) == -dir; });
+    directions.erase(e_itr, directions.end());
+
+    /* Now choose a direction to move in and go as far as possible in that way */
+    std::vector<glm::ivec2> possible_targets = {};
+    for (const auto& dir : directions)
     {
-        for (int y = glm::max(0, start.y - 5); y < glm::min<int>(start.y + 5, m_tiles.size()); ++y)
+        glm::ivec2 movement_vector = dir - start;
+        glm::ivec2 target_tile = dir;
+        while (bounds_check(target_tile + movement_vector) && get_tile(target_tile + movement_vector).type != ETileType::Wall)
         {
-            /* Check number of open neighbour tiles */
-            const auto neighbours = get_neighbours({x, y});
-            unsigned neighbour_count = 0u;
-            for (const auto& n : neighbours)
-            {
-                if (get_tile(n).type == ETileType::Blank)
-                {
-                    ++neighbour_count;
-                }
-            }
-
-            /* Update closest intersection if closest */
-            if (neighbour_count > intersection_size && manhattan_distance({x, y}, start) < manhattan_distance(closest, start))
-            {
-                closest = {x, y};
-            }
+            target_tile += movement_vector;
         }
+
+        possible_targets.push_back(target_tile);
     }
 
-    return closest;
+    /* Find one with smallest distance in as few moves as possible */
+    std::nth_element(
+        possible_targets.begin(), possible_targets.begin(), possible_targets.end(),
+        [pos = start](glm::ivec2 a, glm::ivec2 b) { return manhattan_distance(a, pos) < manhattan_distance(b, pos); });
+
+    /* We know this is the point furthest away from pacman after nth-element */
+    return possible_targets[0];
 }
 
 bool Level::los(glm::ivec2 start, glm::ivec2 end) const
@@ -249,7 +242,7 @@ bool Level::los(glm::ivec2 start, glm::ivec2 end) const
     }
 
     /* Find delta between start and end */
-    const auto delta = glm::ivec2(glm::normalize(glm::vec2(end - start)));
+    const auto delta = direction(start, end);
 
     /* Trace from start to end with the delta -> If we hit a wall, there is no LOS */
     for (; start != end; start += delta)
@@ -278,6 +271,14 @@ void Level::resize(glm::ivec2 new_size)
     {
         xvec.resize(new_size.x);
     }
+}
+
+glm::ivec2 Level::direction(glm::ivec2 from, glm::ivec2 to) const
+{
+    auto diff = to - from;
+    diff.x /= diff.x;
+    diff.y /= diff.y;
+    return diff;
 }
 
 void Level::save_to_file(sol::table levels_table)
@@ -317,6 +318,47 @@ void Level::save_to_file(sol::table levels_table)
         ofile << "}\n\t},\n\t";
     }
     ofile << "}\n";
+}
+
+glm::ivec2 Level::find_sensible_escape_point(glm::ivec2 ghost_pos, glm::ivec2 ghost_dir, glm::ivec2 escape_from_pos)
+{
+    /* Compute direction to pacman so we can prefer some directions to others */
+    const auto pacman_delta = escape_from_pos - ghost_pos;
+
+    /* Get all possible movement directions */
+    auto directions = get_neighbours(ghost_pos);
+
+    /* Delete the reverse direction since we can not move 180 degrees */
+    auto e_itr = std::remove_if(directions.begin(), directions.end(),
+                                [pos = ghost_pos, dir = ghost_dir](glm::ivec2 elem) { return (elem - pos) == -dir; });
+    directions.erase(e_itr, directions.end());
+
+    /* Put directions going away from pacman in the front of the collection */
+    std::partition(directions.begin(), directions.end(), [&pacman_delta, &ghost_pos](glm::ivec2 v) {
+        return (v.x - ghost_pos.x) == -pacman_delta.x || (v.y - ghost_pos.y) == -pacman_delta.y;
+    });
+
+    /* Now choose a direction to move in and go as far as possible in that way */
+    std::vector<glm::ivec2> possible_targets = {};
+    for (const auto& dir : directions)
+    {
+        glm::ivec2 movement_vector = dir - ghost_pos;
+        glm::ivec2 target_tile = dir;
+        while (bounds_check(target_tile + movement_vector) && get_tile(target_tile + movement_vector).type != ETileType::Wall)
+        {
+            target_tile += movement_vector;
+        }
+
+        possible_targets.push_back(target_tile);
+    }
+
+    /* Find one with largest distance in as few moves as possible */
+    std::nth_element(
+        possible_targets.begin(), possible_targets.begin(), possible_targets.end(),
+        [pos = escape_from_pos](glm::ivec2 a, glm::ivec2 b) { return manhattan_distance(a, pos) > manhattan_distance(b, pos); });
+
+    /* We know this is the point furthest away from pacman after nth-element */
+    return possible_targets[0];
 }
 
 }  // namespace pac

@@ -15,4 +15,9 @@ struct EvMouseMove
     glm::vec2 position{};
 };
 
+struct EvEntityMoved
+{
+    uint32_t entity{};
+};
+
 }  // namespace pac

@@ -15,11 +15,11 @@ private:
     std::vector<Action> m_unprocessed_actions{};
 
 public:
-    InputSystem();
+    InputSystem(entt::registry& reg);
 
     ~InputSystem() noexcept override;
 
-    void update(float dt, entt::registry& reg) override;
+    void update(float dt) override;
 
     /*!
      * \brief recieve

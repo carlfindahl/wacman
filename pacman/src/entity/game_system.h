@@ -10,6 +10,8 @@ class GameSystem : public System
 {
 private:
 public:
-    void update(float dt, entt::registry& reg) override;
+    using System::System;
+
+    void update(float dt) override;
 };
 }  // namespace pac

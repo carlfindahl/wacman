@@ -12,8 +12,8 @@ private:
     Level& m_level;
 
 public:
-    MovementSystem(Level& level) : m_level(level) {}
+    MovementSystem(entt::registry& reg, Level& level) : System(reg), m_level(level) {}
 
-    void update(float dt, entt::registry& reg) override;
+    void update(float dt) override;
 };
 }  // namespace pac

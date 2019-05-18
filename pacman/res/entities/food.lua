@@ -4,7 +4,7 @@ food = {
         y = 0
     },
     Pickup = { 
-        score = 50
+        score = 10
     },
     Sprite = {
         tint = { 1.0, 1.0, 1.0 },

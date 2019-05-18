@@ -4,21 +4,22 @@
 #include "rendering/renderer.h"
 
 #include <gfx.h>
+#include <imgui/imgui.h>
 #include <entt/entity/registry.hpp>
 
 namespace pac
 {
-void RenderingSystem::update(float dt, entt::registry& reg)
+void RenderingSystem::update(float dt)
 {
     /* Draw Regular (non-animated) Sprites */
-    auto regular = reg.view<CSprite, CPosition>();
-    regular.each([&reg](auto e, const CSprite& sprite, const CPosition& pos) {
+    auto regular = m_reg.view<CSprite, CPosition>();
+    regular.each([this](auto e, const CSprite& sprite, const CPosition& pos) {
         auto interp_pos = glm::vec2(pos.position);
 
         /* If we also have a movement comp, take that into consideration */
-        if (reg.has<CMovement>(e))
+        if (m_reg.has<CMovement>(e))
         {
-            auto& move = reg.get<CMovement>(e);
+            auto& move = m_reg.get<CMovement>(e);
             interp_pos += move.progress * glm::vec2(move.current_direction);
         }
 
@@ -28,14 +29,14 @@ void RenderingSystem::update(float dt, entt::registry& reg)
     });
 
     /* Draw Animated Sprites */
-    auto regular_moving_anim = reg.view<CAnimationSprite, CPosition>();
-    regular_moving_anim.each([&reg](auto e, const CAnimationSprite& sprite, const CPosition& pos) {
+    auto regular_moving_anim = m_reg.view<CAnimationSprite, CPosition>();
+    regular_moving_anim.each([this](auto e, const CAnimationSprite& sprite, const CPosition& pos) {
         auto interp_pos = glm::vec2(pos.position);
 
         /* If we also have a movement comp, take that into consideration */
-        if (reg.has<CMovement>(e))
+        if (m_reg.has<CMovement>(e))
         {
-            auto& move = reg.get<CMovement>(e);
+            auto& move = m_reg.get<CMovement>(e);
             interp_pos += move.progress * glm::vec2(move.current_direction);
         }
 
@@ -45,7 +46,16 @@ void RenderingSystem::update(float dt, entt::registry& reg)
     });
 
     /* Draw Player Icon as Lives */
-    reg.view<CPlayer>().each([](const CPlayer& plr) {
+    m_reg.view<CPlayer>().each([](const CPlayer& plr) {
+        /* Use ImGui to display the score */
+        ImGui::SetNextWindowSize({100.f, 16.f});
+        ImGui::SetNextWindowPos({120.f, 11.f});
+        ImGui::Begin("ScoreWindow", nullptr,
+                     ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+        ImGui::Text("%d", plr.score);
+        ImGui::End();
+
+        /* Then draw the lives */
         for (int i = 0; i < plr.lives; ++i)
         {
             get_renderer().draw({HALF_TILE + glm::vec2(i + 1, SCREEN_H / TILE_SIZE<int> - 2) * TILE_SIZE<float>,
