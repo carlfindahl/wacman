@@ -84,7 +84,7 @@ struct CPlayer
     int32_t score = 0;
 
     /* Invulnerable (when GhostKiller is consumed) */
-    bool invulnerable = false;
+    float invulnerable = 0.f;
 };
 
 /* AI Component for Ghosts */

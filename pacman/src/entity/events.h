@@ -18,6 +18,13 @@ struct EvMouseMove
 struct EvEntityMoved
 {
     uint32_t entity{};
+    glm::ivec2 direction{};
+    glm::ivec2 new_position{};
+};
+
+struct EvPacInvulnreableChange
+{
+    bool is_invulnerable = false;
 };
 
 }  // namespace pac

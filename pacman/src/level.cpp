@@ -286,9 +286,7 @@ void Level::resize(glm::ivec2 new_size)
 
 glm::ivec2 Level::direction(glm::ivec2 from, glm::ivec2 to) const
 {
-    auto diff = to - from;
-    diff.x /= diff.x;
-    diff.y /= diff.y;
+    auto diff = glm::sign(to - from);
     return diff;
 }
 

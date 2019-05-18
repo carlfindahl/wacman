@@ -172,8 +172,6 @@ void EditorState::draw_ui(float dt)
         ImGui::EndPopup();
     }
 
-    ImGui::SameLine();
-
     /* Saving and Loading */
     ImGui::InputText("Level Name", m_level_name.data(), cgl::size_bytes(m_level_name));
     if (ImGui::Button("Load"))
