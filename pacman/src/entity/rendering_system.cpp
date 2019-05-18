@@ -25,7 +25,7 @@ void RenderingSystem::update(float dt)
 
         /* Submit the draw request */
         get_renderer().draw({HALF_TILE + interp_pos * TILE_SIZE<float>, glm::vec2(TILE_SIZE<float>, TILE_SIZE<float>),
-                             glm::vec3(1.f), sprite.sprite});
+                             sprite.tint, sprite.sprite});
     });
 
     /* Draw Animated Sprites */
@@ -42,7 +42,7 @@ void RenderingSystem::update(float dt)
 
         /* Draw */
         get_renderer().draw({HALF_TILE + interp_pos * TILE_SIZE<float>, glm::vec2(TILE_SIZE<float>, TILE_SIZE<float>),
-                             glm::vec3(1.f), sprite.active_animation});
+                             sprite.tint, sprite.active_animation});
     });
 
     /* Draw Player Icon as Lives */

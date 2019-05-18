@@ -103,6 +103,7 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
         {
             auto e = factory.spawn(state_view, entity_data["name"]);
             reg.get<CPosition>(e).position = {x_positions[i], y_positions[i]};
+            reg.get<CPosition>(e).spawn = {x_positions[i], y_positions[i]};
         }
     }
 }

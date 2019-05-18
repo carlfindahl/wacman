@@ -89,7 +89,7 @@ void EntityFactory::make_sprite_component(sol::state_view& state, const sol::tab
 {
     GFX_DEBUG("Adding Sprite Component");
     m_registry.assign<CSprite>(e, CSprite{get_renderer().get_tileset_texture(comp["index"]),
-                                          glm::vec3{comp["tint"][0], comp["tint"][1], comp["tint"][2]}});
+                                          glm::vec3{comp["tint"][1], comp["tint"][2], comp["tint"][3]}});
 }
 
 void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e)
@@ -113,7 +113,7 @@ void EntityFactory::make_animsprite_component(sol::state_view& state, const sol:
     });
 
     /* Finally create animation sprite based on loaded data */
-    m_registry.assign<CAnimationSprite>(e, anims, glm::vec3{comp["tint"][0], comp["tint"][1], comp["tint"][2]},
+    m_registry.assign<CAnimationSprite>(e, anims, glm::vec3{comp["tint"][1], comp["tint"][2], comp["tint"][3]},
                                         anims[comp["starting"]], 0.f, comp["fps"]);
 }
 
@@ -122,7 +122,7 @@ void EntityFactory::make_ai_component(sol::state_view& state, const sol::table& 
 void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
     GFX_DEBUG("Position Component at (%d, %d)", comp["x"].get<int>(), comp["y"].get<int>());
-    m_registry.assign<CPosition>(e, CPosition{glm::ivec2{comp["x"], comp["y"]}});
+    m_registry.assign<CPosition>(e, CPosition{glm::ivec2{comp["x"], comp["y"]}, glm::ivec2{comp["x"], comp["y"]}});
 }
 
 void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e)

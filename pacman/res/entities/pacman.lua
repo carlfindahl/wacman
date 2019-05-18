@@ -13,7 +13,7 @@ pacman = {
     },
     AnimationSprite = {
         fps = 24.0,
-        tint = { 1.0, 1.0 , 1.0 },
+        tint = { 1.0, 1.0, 1.0 },
         starting = "right",
         sprites = {
             up = {

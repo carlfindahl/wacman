@@ -38,6 +38,26 @@ void GameSystem::update(float dt)
                 m_reg.destroy(p);
             }
         }
+
+        /* Do similar check for ghosts */
+        auto enemies = m_reg.group<CAI>(entt::get<const CPosition, CAnimationSprite>);
+        for (auto ghost : enemies)
+        {
+            if (enemies.get<const CPosition>(ghost).position == pos.position)
+            {
+                if (plr.invulnerable > 0.f)
+                {
+                    plr.score += 250;
+                    enemies.get<CAI>(ghost).state = EAIState::Dead;
+                    enemies.get<CAnimationSprite>(ghost).tint = glm::vec3{0.2f, 0.2f, 1.5f};
+                }
+                else
+                {
+                    --plr.lives;
+                    /* TODO:  Push state manager so we respawn */
+                }
+            }
+        }
     });
 
     /* Manage ... */

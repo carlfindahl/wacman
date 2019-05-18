@@ -25,6 +25,9 @@ struct CPosition
 {
     /* Grid position */
     glm::ivec2 position{};
+
+    /* Where the entity was spawned */
+    glm::ivec2 spawn{};
 };
 
 /* Movement component */

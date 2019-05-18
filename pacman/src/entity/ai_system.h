@@ -34,6 +34,6 @@ private:
      */
     glm::ivec2 get_player_pos() const;
 
-    void pathfind(const glm::ivec2& ai_pos, const glm::ivec2& ai_dir, const glm::ivec2& plr_pos, CAI& ai);
+    void pathfind(const CPosition& pos, const glm::ivec2& ai_dir, const glm::ivec2& plr_pos, CAI& ai);
 };
 }  // namespace pac
