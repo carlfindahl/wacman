@@ -28,7 +28,14 @@ void MovementSystem::update(float dt)
                 mov.progress += 0.25f;
             }
 
+            /* Set direction */
             mov.current_direction = mov.desired_direction;
+
+            /* Auto-update direction animation if mover has anim sprite */
+            if (auto* anim = m_reg.try_get<CAnimationSprite>(e); anim)
+            {
+                update_animation(mov.current_direction, *anim);
+            }
         }
 
         /* If we will collide in current direction then just skip any other logic */
@@ -49,6 +56,27 @@ void MovementSystem::update(float dt)
             g_event_queue.enqueue(EvEntityMoved{e, mov.current_direction, pos.position});
         }
     });
+}
+
+void MovementSystem::update_animation(glm::ivec2 new_direction, CAnimationSprite& anim)
+{
+    /* Update animation direction automatically */
+    if (new_direction == glm::ivec2{1, 0})
+    {
+        anim.active_animation = anim.available_animations["right"];
+    }
+    else if (new_direction == glm::ivec2{-1, 0})
+    {
+        anim.active_animation = anim.available_animations["left"];
+    }
+    else if (new_direction == glm::ivec2{0, -1})
+    {
+        anim.active_animation = anim.available_animations["up"];
+    }
+    else
+    {
+        anim.active_animation = anim.available_animations["down"];
+    }
 }
 
 }  // namespace pac

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "system.h"
+#include "components.h"
 
 namespace pac
 {
@@ -15,5 +16,8 @@ public:
     MovementSystem(entt::registry& reg, Level& level) : System(reg), m_level(level) {}
 
     void update(float dt) override;
+
+private:
+    void update_animation(glm::ivec2 new_direction, CAnimationSprite& anim);
 };
 }  // namespace pac

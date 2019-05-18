@@ -57,19 +57,15 @@ pacman = {
     Input = {
         [Action.MOVE_NORTH] = function(e) 
             move(e, 0, -1)
-            set_animation(e, "up") 
         end,
         [Action.MOVE_EAST] = function(e)  
             move(e, 1, 0) 
-            set_animation(e, "right") 
         end,
         [Action.MOVE_SOUTH] = function(e) 
             move(e, 0, 1) 
-            set_animation(e, "down") 
         end,
         [Action.MOVE_WEST] = function(e)  
             move(e, -1, 0)
-            set_animation(e, "left") 
         end
     }
 }

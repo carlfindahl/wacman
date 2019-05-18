@@ -75,7 +75,8 @@ void AISystem::recieve(const EvEntityMoved& move)
 
     /* Create a new path and then ask movement system to move in the direction of the path */
     pathfind(move.new_position, move.direction, get_player_pos(), m_reg.get<CAI>(move.entity));
-    m_reg.get<CMovement>(move.entity).desired_direction = m_reg.get<CAI>(move.entity).path->get();
+    const auto new_direction = m_reg.get<CAI>(move.entity).path->get();
+    m_reg.get<CMovement>(move.entity).desired_direction = new_direction;
 }
 
 void AISystem::recieve_pacmanstate(const EvPacInvulnreableChange& pac)
