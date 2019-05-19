@@ -1,11 +1,19 @@
 #include "game_system.h"
+#include "states/state_manager.h"
+#include "states/respawn_state.h"
 #include "entity/components.h"
-#include "events.h"
 #include "config.h"
 
 namespace pac
 {
 extern entt::dispatcher g_event_queue;
+
+GameSystem::GameSystem(entt::registry& reg, GameContext context) : System(reg), m_context(context)
+{
+    g_event_queue.sink<EvPacLifeChanged>().connect<&GameSystem::recieve>(this);
+}
+
+GameSystem::~GameSystem() noexcept { g_event_queue.sink<EvPacLifeChanged>().disconnect<&GameSystem::recieve>(this); }
 
 void GameSystem::update(float dt)
 {
@@ -20,7 +28,7 @@ void GameSystem::update(float dt)
     });
 
     /* Add score to player when touching pickups */
-    m_reg.view<CPlayer, const CPosition>().each([this](uint32_t e, CPlayer& plr, const CPosition& pos) {
+    m_reg.view<CPlayer, CPosition>().each([this](uint32_t e, CPlayer& plr, CPosition& pos) {
         auto pickups = m_reg.group<CPickup>(entt::get<CPosition>);
         for (auto p : pickups)
         {
@@ -60,14 +68,39 @@ void GameSystem::update(float dt)
                 }
                 else
                 {
+                    /* Subtract player life and publish life changed event */
                     --plr.lives;
-                    /* TODO:  Push state manager so we respawn */
+                    g_event_queue.enqueue(EvPacLifeChanged{e, -1, plr.lives});
                 }
             }
         }
     });
 
     /* Manage ... */
+}
+
+void GameSystem::recieve(const EvPacLifeChanged& life_update)
+{
+    /* GAME OVER */
+    if (life_update.new_life == 0)
+    {
+        m_context.state_manager->pop(); /* TODO : Should put high score state here. */
+    }
+    /* Lost a life = Move everything to their spawn point and push respawn context */
+    else if (life_update.delta < 0)
+    {
+        m_context.state_manager->push<RespawnState>(m_context, 1.75f, "Respawning...");
+        m_reg.view<CPosition>().each([](CPosition& pos) { pos.position = pos.spawn; });
+        m_reg.view<CMovement>().each([](CMovement& mov) { mov.current_direction = {0, 0}; });
+        m_reg.view<CAI>().each([](CAI& ai) {
+            ai.state = EAIState::Searching;
+            ai.state_timer = 0.f;
+        });
+    }
+    /* Gained a life */
+    else if (life_update.delta > 0)
+    {
+    }
 }
 
 }  // namespace pac

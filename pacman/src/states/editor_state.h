@@ -3,6 +3,7 @@
 #include "states/state.h"
 #include "entity/events.h"
 #include "level.h"
+#include "common.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
 #include "ui.h"
@@ -11,11 +12,16 @@
 #include <cstdint>
 #include <vector>
 
+#include <robinhood/robinhood.h>
+
 namespace pac
 {
 class EditorState : public State
 {
 private:
+    /*!
+     * \brief The EMode enum describes the current editor stat
+     */
     enum class EMode
     {
         TilePlacement,
@@ -25,8 +31,8 @@ private:
     /* Level we are editing */
     Level m_level{};
 
-    /* All entities currently active */
-    std::vector<std::pair<std::string, std::vector<glm::ivec2>>> m_entities{};
+    /* All positions on the map can hold a single entity */
+    robin_hood::unordered_map<glm::ivec2, std::string, detail::custom_ivec2_hash> m_entities{};
 
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};

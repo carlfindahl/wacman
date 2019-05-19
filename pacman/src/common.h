@@ -16,12 +16,14 @@ class StateManager;
 namespace detail
 {
 /*!
- * \brief The custom_ivec2_hash struct is a quick hash that puts x in upper 32 bits and y in lower. Used for mapping dirs to
- * textures
+ * \brief The ivec2hash struct is used as a position based hash function for the entity map
  */
 struct custom_ivec2_hash
 {
-    std::size_t operator()(const glm::ivec2& vec) const noexcept { return std::hash<int>()(vec.x) ^ std::hash<int>()(vec.y); }
+    std::size_t operator()(const glm::ivec2& vec) const noexcept
+    {
+        return static_cast<uint64_t>(vec.x) | (static_cast<uint64_t>(vec.y) << 32u);
+    }
 };
 }  // namespace detail
 

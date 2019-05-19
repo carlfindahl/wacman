@@ -88,7 +88,7 @@ void GameState::add_systems()
     m_systems.emplace_back(std::make_unique<InputSystem>(*m_context.registry));
     m_systems.emplace_back(std::make_unique<AISystem>(*m_context.registry, m_level));
     m_systems.emplace_back(std::make_unique<MovementSystem>(*m_context.registry, m_level));
-    m_systems.emplace_back(std::make_unique<GameSystem>(*m_context.registry));
+    m_systems.emplace_back(std::make_unique<GameSystem>(*m_context.registry, m_context));
     m_systems.emplace_back(std::make_unique<AnimationSystem>(*m_context.registry));
     m_systems.emplace_back(std::make_unique<RenderingSystem>(*m_context.registry));
 }

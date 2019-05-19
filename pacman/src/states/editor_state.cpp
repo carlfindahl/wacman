@@ -261,15 +261,7 @@ void EditorState::load_get_entities()
         }
 
         /* Find out if this is a new entity or existing one and load accordingly */
-        auto itr = std::find_if(m_entities.begin(), m_entities.end(), [&meta](auto&& p) { return p.first == meta.name; });
-        if (itr != m_entities.end())
-        {
-            itr->second.push_back(new_position);
-        }
-        else
-        {
-            m_entities.emplace_back(meta.name, std::vector<glm::ivec2>{new_position});
-        }
+        m_entities.emplace(new_position, meta.name);
     });
 }
 
@@ -288,7 +280,7 @@ void EditorState::spawn_entity()
     /* Can not place an entity where there is a wall */
     if (m_level.get_tile(m_hovered_tile).type != Level::ETileType::Blank)
     {
-        GFX_INFO("Can not place entity on an occupied tile.");
+        GFX_DEBUG("Can not place entity on an occupied tile.");
         return;
     }
 
@@ -305,17 +297,7 @@ void EditorState::spawn_entity()
     /* If it is not occupied, then we can spawn it by changing the entity about to spawn */
     if (!occupied)
     {
-        /* Look if entity type exists and then push it back in entity position vector */
-        auto pos = std::find_if(m_entities.begin(), m_entities.end(), [this](auto&& p) { return p.first == m_current_entity; });
-        if (pos != m_entities.end())
-        {
-            pos->second.push_back(m_hovered_tile);
-        }
-        /* Otherwise create new entry */
-        else
-        {
-            m_entities.emplace_back(m_current_entity, std::vector<glm::ivec2>{m_hovered_tile});
-        }
+        m_entities[m_hovered_tile] = m_current_entity;
         m_entity_about_to_spawn = EntityFactory(*m_context.registry).spawn(*m_context.lua, m_current_entity);
     }
 }
@@ -326,24 +308,10 @@ void EditorState::remove_entity()
     m_context.registry->view<CPosition>().each([this](uint32_t e, const CPosition& pos) {
         if (pos.position == m_hovered_tile)
         {
-            /* Then look for corresponding entry in the save-data vector */
-            auto itr = std::find_if(m_entities.begin(), m_entities.end(),
-                                    [this](auto&& pair) { return pair.first == m_current_entity; });
-
-            /* If found in there, delete it */
-            if (itr != m_entities.end() && itr->second.size() == 1u)
+            /* If found in saved-vector map, delete it */
+            if (auto itr = m_entities.find(pos.position); itr != m_entities.end())
             {
                 m_entities.erase(itr);
-            }
-            /* Otherwise look for corresponding position for that entity and remove that entry instead */
-            else
-            {
-                auto erase_itr =
-                    std::find_if(itr->second.cbegin(), itr->second.cend(), [&pos](auto&& vec) { return pos.position == vec; });
-                if (erase_itr != itr->second.end())
-                {
-                    itr->second.erase(erase_itr);
-                }
             }
 
             /* Delete entity */

@@ -109,7 +109,7 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
 }
 
 void Level::save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,
-                 const std::vector<std::pair<std::string, std::vector<glm::ivec2>>>& entities)
+                 const robin_hood::unordered_map<glm::ivec2, std::string, detail::custom_ivec2_hash>& entities)
 {
     /* First get access to a table for the level to save. Clear it up front in case it already holds some data */
     state_view.script_file(cgl::native_absolute_path("res/levels.lua"));
@@ -141,10 +141,18 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     /* Then write that information */
     level_data["tiles"] = tiles;
 
-    /* Finally do the same for all entities */
+    /* Reverse the entity map so we can store the file in the desired format. Storing it the other way externally is to ensure
+     * there is only one entity per position. But to save it, we need an entity with N positions */
+    robin_hood::unordered_map<std::string, std::vector<glm::ivec2>> reverse_map{};
+    for (const auto& [k, v] : entities)
+    {
+        reverse_map[v].push_back(k);
+    }
+
+    /* Now we can properly extract information and save it to the lua state (and then to file) */
     unsigned next_idx = 1u;
     sol::table entity_data = level_data.create("entities");
-    for (const auto& [k, v] : entities)
+    for (const auto& [k, v] : reverse_map)
     {
         /* Extract X and Y Positions */
         std::vector<int> x_positions{};

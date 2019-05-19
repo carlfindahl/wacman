@@ -27,4 +27,11 @@ struct EvPacInvulnreableChange
     bool is_invulnerable = false;
 };
 
+struct EvPacLifeChanged
+{
+    uint32_t pacman{};
+    int delta = 0;
+    int new_life = 0;
+};
+
 }  // namespace pac
