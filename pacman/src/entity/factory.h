@@ -37,6 +37,7 @@ private:
         {"Player", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_player_component(s, t, e); }},
         {"AnimationSprite", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_animsprite_component(s, t, e); }},
         {"AI", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_ai_component(s, t, e); }},
+        {"Teleporter", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_teleporter_component(s, t, e); }},
         {"Input", [this](sol::state_view& s, const sol::table& t, uint32_t e) { make_input_component(s, t, e); }}};
 
 public:
@@ -66,6 +67,7 @@ private:
     void make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e);
+    void make_teleporter_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e);
     void make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e);
 };

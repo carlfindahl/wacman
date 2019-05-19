@@ -112,6 +112,16 @@ struct CInput
     robin_hood::unordered_map<Action, sol::function> actions{};
 };
 
+/* Teleporter component for transporting pacman */
+struct CTeleporter
+{
+    /* Target position */
+    glm::ivec2 target{};
+
+    /* Direction to face when exiting teleporter (if has movement component */
+    glm::ivec2 out_direction{};
+};
+
 /* Pickup component represents a pickuppable */
 struct CPickup
 {

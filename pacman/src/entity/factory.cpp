@@ -146,6 +146,11 @@ void EntityFactory::make_input_component(sol::state_view& state, const sol::tabl
     m_registry.assign<CInput>(e, std::move(actions));
 }
 
+void EntityFactory::make_teleporter_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+{
+    m_registry.assign<CTeleporter>(e, glm::ivec2{state["target"][1], state["target"][2]});
+}
+
 void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e)
 {
     GFX_DEBUG("Adding Pikcup Component");

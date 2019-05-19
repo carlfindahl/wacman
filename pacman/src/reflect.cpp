@@ -1,6 +1,7 @@
 #include "reflect.h"
-#include "rendering/renderer.h"
 #include "entity/events.h"
+#include "rendering/renderer.h"
+#include "entity/components.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -34,7 +35,23 @@ void reflect_common_data()
         .data<&TextureID::array_index>("array_index");
 }
 
-void reflect_components() {}
+void reflect_components()
+{
+    /* Position */
+    entt::reflect<CPosition>("Position").data<&CPosition::position>("position").data<&CPosition::spawn>("spawn");
+
+    /* Movement */
+    entt::reflect<CMovement>("Movement")
+        .data<&CMovement::speed>("speed")
+        .data<&CMovement::progress>("progress")
+        .data<&CMovement::current_direction>("current_direction")
+        .data<&CMovement::desired_direction>("desired_direction");
+
+    /* Teleporter */
+    entt::reflect<CTeleporter>("Teleporter")
+        .data<&CTeleporter::target>("target")
+        .data<&CTeleporter::out_direction>("out_direction");
+}
 
 void reflect_events()
 {
@@ -63,6 +80,19 @@ void reflect_events()
 
     /* Reflect Mouse Event */
     entt::reflect<EvMouseMove>("EvMouseMove").data<&EvMouseMove::delta>("delta").data<&EvMouseMove::position>("position");
+
+    /* Reflect movement event */
+    entt::reflect<EvEntityMoved>("EvEntityMoved")
+        .data<&EvEntityMoved::entity>("entity")
+        .data<&EvEntityMoved::direction>("direction")
+        .data<&EvEntityMoved::new_position>("new_position");
+}
+
+void reflect_all()
+{
+    reflect_common_data();
+    reflect_components();
+    reflect_events();
 }
 
 }  // namespace pac

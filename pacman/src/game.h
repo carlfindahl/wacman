@@ -4,6 +4,7 @@
 #pragma once
 
 #include "states/state_manager.h"
+#include "reflect.h"
 
 #include <vector>
 #include <memory>

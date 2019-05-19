@@ -26,6 +26,7 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
+    reflect_all();
     set_up_lua();
 }
 
