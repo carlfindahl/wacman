@@ -165,6 +165,12 @@ void Game::set_up_lua()
     m_lua.open_libraries(sol::lib::base, sol::lib::package);
 
     /* Register Data Types */
+    m_lua.new_usertype<glm::ivec2>("ivec2", sol::constructors<glm::ivec2(), glm::ivec2(int, int)>(), "x", &glm::ivec2::x, "y",
+                                   &glm::ivec2::y);
+
+    m_lua.new_usertype<Level::TeleportDestination>("TeleportDestination", "from", &Level::TeleportDestination::from, "position",
+                                                   &Level::TeleportDestination::position, "direction",
+                                                   &Level::TeleportDestination::direction);
 
     /* Register action enum */
     m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},

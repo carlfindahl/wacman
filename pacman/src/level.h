@@ -40,6 +40,9 @@ public:
      */
     struct TeleportDestination
     {
+        /* Start of teleporter */
+        glm::ivec2 from{};
+
         /* Position of output */
         glm::ivec2 position{};
 
@@ -63,7 +66,7 @@ private:
     std::vector<std::vector<Tile>> m_tiles = {};
 
     /* Teleporters in level */
-    robin_hood::unordered_map<glm::ivec2, TeleportDestination, detail::custom_ivec2_hash> m_teleporters{};
+    std::vector<TeleportDestination> m_teleporters{};
 
     /* The level tileset texture */
     TextureID m_tileset_texture = {};

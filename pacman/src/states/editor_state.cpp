@@ -99,12 +99,14 @@ bool EditorState::draw()
     }
 
     /* Draw teleporters */
-    for (const auto& [k, v] : m_level.m_teleporters)
+    for (const auto& tp : m_level.m_teleporters)
     {
-        get_renderer().draw(
-            {glm::vec2{HALF_TILE + glm::vec2(k) * TILE_SIZE<float>}, glm::vec2(TILE_SIZE<float>), glm::vec3(0.f, 1.f, 0.f), {}});
+        get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(tp.from) * TILE_SIZE<float>},
+                             glm::vec2(TILE_SIZE<float>),
+                             glm::vec3(0.f, 1.f, 0.f),
+                             {}});
 
-        get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(v.position) * TILE_SIZE<float>},
+        get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(tp.position) * TILE_SIZE<float>},
                              glm::vec2(TILE_SIZE<float>),
                              glm::vec3(1.f, 0.f, 0.f),
                              {}});
@@ -222,17 +224,25 @@ void EditorState::draw_ui(float dt)
 
     /* Teleporters */
     ImGui::Text("Teleporters");
-    for (auto& [k, v] : m_level.m_teleporters)
+    for (auto& tp : m_level.m_teleporters)
     {
-        const std::string tag = std::to_string(detail::custom_ivec2_hash()(k));
-        ImGui::InputInt2(("From##" + tag).c_str(), glm::value_ptr(k));
-        ImGui::InputInt2(("To Pos##" + tag).c_str(), glm::value_ptr(v.position));
-        ImGui::InputInt2(("To Dir##" + tag).c_str(), glm::value_ptr(v.direction));
+        const std::string tag = std::to_string(detail::custom_ivec2_hash()(tp.from));
+        ImGui::DragInt2(("From##" + tag).c_str(), glm::value_ptr(tp.from));
+        ImGui::DragInt2(("To Pos##" + tag).c_str(), glm::value_ptr(tp.position));
+        ImGui::DragInt2(("To Dir##" + tag).c_str(), glm::value_ptr(tp.direction), 1.f, -1, 1);
     }
 
+    /* Add / Remove TP */
     if (ImGui::Button("Add##Teleporter"))
     {
-        m_level.m_teleporters.emplace(glm::ivec2{0, 0}, Level::TeleportDestination{{1, 1}, {1, 0}});
+        m_level.m_teleporters.emplace_back(Level::TeleportDestination{glm::ivec2{0, 0}, {1, 1}, {1, 0}});
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Remove##Teleporter"))
+    {
+        m_level.m_teleporters.pop_back();
     }
 
     ImGui::Separator();

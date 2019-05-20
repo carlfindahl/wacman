@@ -17,7 +17,7 @@
 #include <imgui/imgui.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <entt/entity/snapshot.hpp>
+#include <entt/meta/factory.hpp>
 
 namespace pac
 {
@@ -121,6 +121,9 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     level_data["w"] = m_tiles[0].size();
     level_data["h"] = m_tiles.size();
 
+    /* Write out the teleporter data */
+
+
     /* Extract tiles into a single vector */
     std::vector<int> tiles{};
     for (const auto& rowtile : m_tiles)
@@ -216,9 +219,12 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
 std::optional<Level::TeleportDestination> Level::get_teleport_dest(glm::ivec2 from) const
 {
     /* If a destination exists, teleport! */
-    if (auto itr = m_teleporters.find(from); itr != m_teleporters.end())
+    auto itr = std::find_if(m_teleporters.cbegin(), m_teleporters.cend(), [&from](auto&& tpa) { return tpa.from == from; });
+
+    /* Return teleporter if found */
+    if (itr != m_teleporters.end())
     {
-        return itr->getSecond();
+        return *itr;
     }
     return std::nullopt;
 }
@@ -330,6 +336,11 @@ void Level::save_to_file(sol::table levels_table)
         const auto& tiledata = current_level["tiles"].get<std::vector<int>>();
         std::copy(tiledata.cbegin(), tiledata.cend(), std::ostream_iterator<int>(ofile, ", "));
         ofile << "},\n\t\t";
+
+        /* Write teleporter data to file */
+//        ofile << "teleporters = {\n\t\t\t";
+//        const auto& teleporters = current_level["teleporters"].get<std::vector<TeleportDestination>>();
+//        for (const auto& tp : teleporters) {}
 
         /* Copy entities to file */
         ofile << "entities = {\n\t\t\t";

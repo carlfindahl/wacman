@@ -1,4 +1,5 @@
 #include "reflect.h"
+#include "level.h"
 #include "entity/events.h"
 #include "rendering/renderer.h"
 #include "entity/components.h"
@@ -33,6 +34,12 @@ void reflect_common_data()
         .data<&TextureID::frame_number>("frame_number")
         .data<&TextureID::frame_count>("frame_count")
         .data<&TextureID::array_index>("array_index");
+
+    /* Reflect TP Destination */
+    entt::reflect<Level::TeleportDestination>("TeleportDestination")
+        .data<&Level::TeleportDestination::from>("from")
+        .data<&Level::TeleportDestination::position>("position")
+        .data<&Level::TeleportDestination::direction>("direction");
 }
 
 void reflect_components()
