@@ -98,6 +98,18 @@ bool EditorState::draw()
                              glm::vec3(.5f, 1.f, 0.5f), get_renderer().get_tileset_texture(m_current_tex)});
     }
 
+    /* Draw teleporters */
+    for (const auto& [k, v] : m_level.m_teleporters)
+    {
+        get_renderer().draw(
+            {glm::vec2{HALF_TILE + glm::vec2(k) * TILE_SIZE<float>}, glm::vec2(TILE_SIZE<float>), glm::vec3(0.f, 1.f, 0.f), {}});
+
+        get_renderer().draw({glm::vec2{HALF_TILE + glm::vec2(v.position) * TILE_SIZE<float>},
+                             glm::vec2(TILE_SIZE<float>),
+                             glm::vec3(1.f, 0.f, 0.f),
+                             {}});
+    }
+
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_overlay});
     return false;
 }
@@ -206,6 +218,21 @@ void EditorState::draw_ui(float dt)
     if (ImGui::DragInt2("Size", glm::value_ptr(m_size), 1.f, 5, 36))
     {
         m_level.resize(m_size);
+    }
+
+    /* Teleporters */
+    ImGui::Text("Teleporters");
+    for (auto& [k, v] : m_level.m_teleporters)
+    {
+        const std::string tag = std::to_string(detail::custom_ivec2_hash()(k));
+        ImGui::InputInt2(("From##" + tag).c_str(), glm::value_ptr(k));
+        ImGui::InputInt2(("To Pos##" + tag).c_str(), glm::value_ptr(v.position));
+        ImGui::InputInt2(("To Dir##" + tag).c_str(), glm::value_ptr(v.direction));
+    }
+
+    if (ImGui::Button("Add##Teleporter"))
+    {
+        m_level.m_teleporters.emplace(glm::ivec2{0, 0}, Level::TeleportDestination{{1, 1}, {1, 0}});
     }
 
     ImGui::Separator();
