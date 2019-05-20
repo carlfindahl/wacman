@@ -53,6 +53,15 @@ void MovementSystem::update(float dt)
         {
             mov.progress = 0.f;
             pos.position += mov.current_direction;
+
+            /* If there is a teleporter at the new destination, teleport */
+            if (auto dest = m_level.get_teleport_dest(pos.position); dest)
+            {
+                pos.position = dest.value().position;
+                mov.current_direction = dest.value().direction;
+            }
+
+            /* Publish event that entity has moved */
             g_event_queue.enqueue(EvEntityMoved{e, mov.current_direction, pos.position});
         }
     });

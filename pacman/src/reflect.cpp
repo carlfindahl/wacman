@@ -19,14 +19,14 @@ void reflect_common_data()
         .ctor<int, int, int>()
         .data<&glm::ivec3::x>("x")
         .data<&glm::ivec3::y>("y")
-        .data<&glm::ivec3::y>("z");
+        .data<&glm::ivec3::z>("z");
 
     entt::reflect<glm::vec3>("vec3")
         .ctor<float, float, float>()
-        .ctor<glm::ivec3>()
+        .ctor<glm::vec3>()
         .data<&glm::vec3::x>("x")
         .data<&glm::vec3::y>("y")
-        .data<&glm::vec3::y>("z");
+        .data<&glm::vec3::z>("z");
 
     /* Reflect Texture ID */
     entt::reflect<TextureID>("TextureID")

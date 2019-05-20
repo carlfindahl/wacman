@@ -36,6 +36,18 @@ public:
     };
 
     /*!
+     * \brief The TeleportDestination struct describes a teleporter destination
+     */
+    struct TeleportDestination
+    {
+        /* Position of output */
+        glm::ivec2 position{};
+
+        /* Direction of output */
+        glm::ivec2 direction{};
+    };
+
+    /*!
      * \brief The Tile struct contains data needed to draw and know the type of each tile
      */
     struct Tile
@@ -49,6 +61,9 @@ private:
 
     /* The tiles in the level (basically the map) */
     std::vector<std::vector<Tile>> m_tiles = {};
+
+    /* Teleporters in level */
+    robin_hood::unordered_map<glm::ivec2, TeleportDestination, detail::custom_ivec2_hash> m_teleporters{};
 
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
@@ -99,6 +114,13 @@ public:
      */
     Tile& get_tile(glm::ivec2 coordinate);
     const Tile& get_tile(glm::ivec2 coordinate) const;
+
+    /*!
+     * \brief get_teleport_dest returns the destination
+     * \param from is where you want to find a destination
+     * \return an optional destination
+     */
+    std::optional<TeleportDestination> get_teleport_dest(glm::ivec2 from) const;
 
     /*!
      * \brief will_collide checks if an entity at the given position moveing in the given direction will collide with the level

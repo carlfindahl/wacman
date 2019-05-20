@@ -213,6 +213,16 @@ const Level::Tile& Level::get_tile(glm::ivec2 coordinate) const
     return m_tiles[coordinate.y][coordinate.x];
 }
 
+std::optional<Level::TeleportDestination> Level::get_teleport_dest(glm::ivec2 from) const
+{
+    /* If a destination exists, teleport! */
+    if (auto itr = m_teleporters.find(from); itr != m_teleporters.end())
+    {
+        return itr->getSecond();
+    }
+    return std::nullopt;
+}
+
 bool Level::will_collide(glm::ivec2 pos, glm::ivec2 direction) const { return get_tile(pos + direction).type == ETileType::Wall; }
 
 glm::ivec2 Level::find_closest_intersection(glm::ivec2 start, glm::ivec2 dir) const
