@@ -6,6 +6,7 @@
 
 Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
 
+ * **1.1.0:** Level Editor, Refactored entire gamplay, basic LUA support, multiple levels and high scores per level...
  * **1.0.2:** Add Post processing effects
  * **1.0.0:** Final game with final music sounds and final logic / gameplay adjustments
  * **0.9.0:** Except final tweaks, has all major gameplay features, but not final audio.
