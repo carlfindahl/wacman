@@ -98,6 +98,9 @@ private:
     /* Matrix UBO */
     UniformBuffer<detail::MatrixData> m_ubo = {};
 
+    /* Post processing enabled or not */
+    bool m_post_enabled = true;
+
 public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
@@ -147,6 +150,12 @@ public:
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
     TextureID load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols, int count);
+
+    /*!
+     * \brief set_post_enabled allow you to enable or disable post processing
+     * \param flag is the value to set
+     */
+    void set_post_enabled(bool flag);
 
 private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */

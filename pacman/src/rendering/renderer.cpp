@@ -105,11 +105,24 @@ void Renderer::submit_work()
     m_ubo.bind(0);
     glBindVertexArray(m_vao);
     glBindTextures(0, m_textures.size(), m_textures.data());
-    m_post_processor.capture();
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    m_post_processor.process();
+
+    /* Enable post processing */
+    if (m_post_enabled)
+    {
+        m_post_processor.capture();
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_post_processor.process();
+    }
+    /* Or don't */
+    else
+    {
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
     m_instance_data.clear();
 }
 
@@ -210,6 +223,8 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
     m_loaded_texture_cache.emplace(hash_string, out);
     return out;
 }
+
+void Renderer::set_post_enabled(bool flag) { m_post_enabled = flag; }
 
 std::optional<TextureID> Renderer::check_texture_is_loaded(std::string_view fp)
 {
