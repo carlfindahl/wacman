@@ -75,10 +75,10 @@ void AnimationEditor::update(float dt)
 
     SameLine();
 
-    if (Button("Save"))
-    {
-        /* TODO: Save Animation */
-    }
+    //    if (Button("Save"))
+    //    {
+    //        /* TODO: Save Animation */
+    //    }
 
     /* Only preview if there is anything to preview */
     if (m_current_tex != 0u)
