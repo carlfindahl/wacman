@@ -4,7 +4,7 @@ strawberry = {
         y = 0
     },
     Pickup = { 
-        score = 250
+        score = 500
     },
     Sprite = {
         tint = { 1.0, 1.0, 1.0 },

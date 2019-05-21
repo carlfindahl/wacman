@@ -13,7 +13,7 @@ void pac::HelpState::on_enter()
 
     /* Add input state that is blocking so no other input works */
     InputDomain pause_domain(true);
-    //    pause_domain.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
+    //        pause_domain.bind_key(GLFW_KEY_ESCAPE, ACTION_BACK);
     get_input().push(std::move(pause_domain));
 }
 
@@ -48,12 +48,11 @@ bool pac::HelpState::update(float dt)
     /* Show game rules */
     ImGui::TextColored({1.f, 1.f, 0.f, 1.f}, "\nRULES:");
     ImGui::Indent();
-    ImGui::Text(
-        " - To win you must eat all food items in the main level.\n"
-        " - Eating ghost killers let you kill ghosts for the next 10 seconds\n"
-        " - The three fruits in the middle give you many points,\n\tbut each one eaten will increase the speed of the ghosts\n"
-        " - Fruits give more points for every ghost you have killed on\n\tyour current ghost killer.\n"
-        " - You lose if you lose all of your lives.");
+    ImGui::Text(" - To win you must eat all food items in the level.\n"
+                " - Eating ghost killers let you kill ghosts for the next 10 seconds\n"
+                " - The fruits give you many points, but each one eaten will\n\tincrease the speed of the ghosts\n"
+                " - You lose if you lose all of your lives.\n"
+                " - There is a per-level high score! Beat yourself.");
     ImGui::Unindent();
 
     /* Utility macro so I don't have to repeat this over and over */
@@ -77,8 +76,7 @@ bool pac::HelpState::update(float dt)
     SCORE_COL("Fruit", POWERUP_SCORE);
     ImGui::Separator();
     ImGui::Columns(1);
-    ImGui::TextColored({0.7f, 0.7f, 0.7f, 1.f},
-                       "\nKilling a ghost is multiplied by number of ghosts killed.\nLikewise for fruit pickup.");
+    ImGui::TextColored({0.7f, 0.7f, 0.7f, 1.f}, "\nKilling a ghost is multiplied by number of ghosts killed.");
     ImGui::Unindent();
 
     /* Show extra credits */

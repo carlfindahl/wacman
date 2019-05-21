@@ -88,6 +88,9 @@ struct CPlayer
 
     /* Invulnerable (when GhostKiller is consumed) */
     float invulnerable = 0.f;
+
+    /* Ghosts killed (resets when going vulnerable again */
+    int ghosts_killed = 0;
 };
 
 /* AI Component for Ghosts */

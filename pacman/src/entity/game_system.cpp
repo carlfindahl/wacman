@@ -23,6 +23,8 @@ void GameSystem::update(float dt)
         /* Turn of invulnerable when timer too low */
         if (plr.invulnerable > 0.f && plr.invulnerable - dt <= 0.f)
         {
+            /* When vulnerable, go back to a multiplier of 0 */
+            plr.ghosts_killed = 0;
             g_event_queue.trigger<EvPacInvulnreableChange>(false);
         }
         plr.invulnerable -= dt;
@@ -66,7 +68,9 @@ void GameSystem::update(float dt)
                     if (enemies.get<CAI>(ghost).state != EAIState::Dead &&
                         enemies.get<const CPosition>(ghost).position != enemies.get<const CPosition>(ghost).spawn)
                     {
-                        plr.score += 250;
+                        /* Multiply by number of ghosts killed */
+                        ++plr.ghosts_killed;
+                        plr.score += GHOST_KILL_SCORE * plr.ghosts_killed;
                     }
 
                     /* Mark ghost as dead and set it's ting to someting sensible */

@@ -4,7 +4,7 @@ ghostkiller = {
         y = 0
     },
     Pickup = { 
-        score = 150
+        score = 50
     },
     Sprite = {
         tint = { 1.0, 1.0, 1.0 },
