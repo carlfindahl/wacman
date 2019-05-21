@@ -110,6 +110,26 @@ private:
     void save();
 };
 
-}  // namespace ui
+/*!
+ * \brief The LevelSelector class allows you to select a level to play
+ */
+class LevelSelector
+{
+private:
+    /* Levels to select from */
+    std::vector<std::string> m_levels{};
 
+    GameContext m_context;
+
+public:
+
+    LevelSelector(GameContext context);;
+
+    /*!
+     * \brief update draws the UI
+     * \param dt delta time
+     */
+    void update(float dt);
+};
+}  // namespace ui
 }  // namespace pac

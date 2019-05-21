@@ -28,7 +28,7 @@ void GameOverState::on_exit()
 
     if (strlen(m_playername.data()) > 0)
     {
-        entries.at(m_level).emplace_back(ScoreEntry{m_playername.data(), m_score});
+        entries[m_level].emplace_back(ScoreEntry{m_playername.data(), m_score});
         std::sort(entries.at(m_level).begin(), entries.at(m_level).end(),
                   [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
         write_high_score_entries_to_file(entries);

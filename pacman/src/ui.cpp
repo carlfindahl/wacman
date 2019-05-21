@@ -1,4 +1,7 @@
 #include "ui.h"
+#include "states/state_manager.h"
+#include "states/respawn_state.h"
+#include "states/game_state.h"
 
 #include <fstream>
 
@@ -94,6 +97,8 @@ void AnimationEditor::update(float dt)
     }
 }
 
+/* ---- CAMPAIGN EDITOR ---- */
+
 void CampaignEditor::update(float dt)
 {
     using namespace ImGui;
@@ -130,6 +135,35 @@ void CampaignEditor::update(float dt)
 }
 
 void CampaignEditor::save() {}
+
+/* ---- LEVEL SELECTOR ---- */
+
+LevelSelector::LevelSelector(GameContext context) : m_context(context)
+{
+    context.lua->script_file(cgl::native_absolute_path("res/levels.lua"));
+    sol::table levels = (*context.lua)["levels"];
+    for (const auto& [k, _] : levels)
+    {
+        m_levels.push_back(k.as<std::string>());
+    }
+    std::sort(m_levels.begin(), m_levels.end());
+}
+
+void LevelSelector::update(float dt)
+{
+    using namespace ImGui;
+
+    for (const auto& level : m_levels)
+    {
+        char btn_txt[64];
+        sprintf(btn_txt, "%s##BTN", level.c_str());
+        if (Button(btn_txt))
+        {
+            m_context.state_manager->push<GameState>(m_context, level);
+            m_context.state_manager->push<RespawnState>(m_context);
+        }
+    }
+}
 
 }  // namespace ui
 }  // namespace pac

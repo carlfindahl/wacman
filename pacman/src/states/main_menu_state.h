@@ -2,6 +2,7 @@
 
 #include "state.h"
 #include "rendering/renderer.h"
+#include "ui.h"
 
 namespace pac
 {
@@ -10,6 +11,9 @@ class MainMenuState : public State
 private:
     /* Splash screen texture */
     TextureID m_splash_texture{};
+
+    /* Level Select UI */
+    ui::LevelSelector m_selector_ui{m_context};
 
     /* Music id */
     unsigned m_music_id = 0u;

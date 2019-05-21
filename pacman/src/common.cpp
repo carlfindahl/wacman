@@ -29,15 +29,17 @@ robin_hood::unordered_map<std::string, std::vector<ScoreEntry>> load_high_score_
     while (tmp_sstream >> level_name >> entry_count)
     {
         tmp_sstream.ignore();
-        out.emplace(level_name);
+        out.emplace(level_name, std::vector<ScoreEntry>());
 
         /* Read each entry per level */
         for (int i = 0; i < entry_count; ++i)
         {
-            tmp_sstream >> e.name;
-            tmp_sstream.ignore();
+            std::getline(tmp_sstream, e.name);
             tmp_sstream >> e.score;
             tmp_sstream.ignore();
+
+            /* Safe to move and re-use since we overwrite every iteration */
+            out.at(level_name).emplace_back(std::move(e));
         }
     }
 

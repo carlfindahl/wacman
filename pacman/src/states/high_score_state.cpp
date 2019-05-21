@@ -32,6 +32,15 @@ bool HighScoreState::update(float dt)
 
     if (ImGui::BeginTabBar("ScoreTabBar"))
     {
+        for (const auto& [k, v] : m_entries)
+        {
+            if (ImGui::BeginTabItem(k.c_str()))
+            {
+                scores_for(k);
+                ImGui::EndTabItem();
+            }
+        }
+
         ImGui::EndTabBar();
     }
 

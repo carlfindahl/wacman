@@ -25,7 +25,7 @@ void pac::MainMenuState::on_exit() {}
 bool pac::MainMenuState::update(float dt)
 {
     /* Begin Main Menu Window, and center it */
-    ImGui::SetNextWindowSize({160, 220});
+    ImGui::SetNextWindowSize({160, 300});
     ImGui::SetNextWindowPos({SCREEN_W / 2.f, SCREEN_H / 2.f}, 0, {0.5f, 0.5f});
     ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
@@ -33,8 +33,7 @@ bool pac::MainMenuState::update(float dt)
     {
         /* Stop music if still playing to avoid massive music load */
         get_sound().stop(m_music_id);
-        m_context.state_manager->push<GameState>(m_context, "level0");
-        m_context.state_manager->push<RespawnState>(m_context);
+        ImGui::OpenPopup("Choose##Level");
     }
 
     if (ImGui::Button("High Scores", {150, 50}))
@@ -55,6 +54,17 @@ bool pac::MainMenuState::update(float dt)
     if (ImGui::Button("Exit", {150, 50}))
     {
         m_context.state_manager->pop();
+    }
+
+    /* Level Select Popup */
+    if (ImGui::BeginPopupModal("Choose##Level"))
+    {
+        m_selector_ui.update(dt);
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
 
     ImGui::End();
