@@ -4,7 +4,7 @@
  
 ### Version History
 
-Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
+Currently the latest version is 1.1.0. Before that there was 1.0.0, 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
 
  * **1.1.0:** Level Editor, Refactored entire gamplay, basic LUA support, multiple levels and high scores per level...
  * **1.0.2:** Add Post processing effects
@@ -19,6 +19,8 @@ Currently the latest version is 1.0.0. Before that there was only 0.9.0 and 0.1.
      * `std::filesystem`
      * `std::string_view`
  * OpenGL 4.5 Compliant Driver
+ * [EnTT](https://github.com/skypjack/entt)
+ * [sol2 v3.0](https://github.com/ThePhD/sol2/) 
  * [GLFW 3.2](http://glfw.org/)
  * [GLM](https://glm.g-truc.net/0.9.9/index.html)
  * [OpenAL 1.1](https://www.openal.org/)
