@@ -9,8 +9,8 @@ namespace pac
 class RespawnState : public State
 {
 private:
-    /* Respawn state is active for 3 seconds, then the game starts */
-    std::chrono::duration<float> m_respawn_timer{3.f};
+    /* Respawn state is active for 2 seconds, then the game starts */
+    std::chrono::duration<float> m_respawn_timer{2.f};
 
     /* Prefix Message */
     std::string m_prefix_msg = "STARTING";

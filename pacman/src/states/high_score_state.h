@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include <robinhood/robinhood.h>
+
 namespace pac
 {
 class HighScoreState : public State
@@ -15,8 +17,8 @@ private:
     /* Splash screen texture */
     TextureID m_splash_texture = {};
 
-    /* All entries */
-    std::vector<ScoreEntry> m_entries = {};
+    /* All high score entries */
+    robin_hood::unordered_map<std::string, std::vector<ScoreEntry>> m_entries;
 
 public:
     using State::State;
@@ -28,6 +30,13 @@ public:
     bool update(float dt) override;
 
     bool draw() override;
+
+private:
+    /*!
+     * \brief scores_for creates score UI for level with given name
+     * \param level_name is name to show high scores for
+     */
+    void scores_for(const std::string& level_name);
 };
 
 }  // namespace pac

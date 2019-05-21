@@ -1,6 +1,6 @@
 #include "game.h"
-#include "input.h"
 #include "common.h"
+#include "input/input.h"
 #include "states/game_state.h"
 #include "states/main_menu_state.h"
 #include "rendering/shader_program.h"
@@ -15,13 +15,19 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <entt/signal/dispatcher.hpp>
 
 namespace pac
 {
+/* The game event queue */
+entt::dispatcher g_event_queue{};
+
 Game::Game(std::string_view title, glm::uvec2 window_size)
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
+    reflect_all();
+    set_up_lua();
 }
 
 Game::~Game() noexcept
@@ -36,7 +42,7 @@ Game::~Game() noexcept
 void Game::run()
 {
     /* Add initial state to the stack */
-    m_state_manager.push<MainMenuState>({&m_state_manager});
+    m_state_manager.push<MainMenuState>({&m_state_manager, &m_lua, &m_registry});
 
     /* Create variables for tracking frame-times */
     std::chrono::steady_clock delta_clock = {};
@@ -61,6 +67,7 @@ void Game::run()
 #endif
 
         glfwPollEvents();
+        g_event_queue.update();
         update(dt);
         draw();
     } while (m_flags.running && !glfwWindowShouldClose(m_window) && !m_state_manager.empty());
@@ -83,9 +90,9 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
     m_window = glfwCreateWindow(window_size.x, window_size.y, title, nullptr, nullptr);
     GFX_ASSERT(m_window, "Failed to create window %ux%u", window_size.x, window_size.y);
 
-    glfwSetCursorPosCallback(m_window, pac::input::cursor_position_callback);
-    glfwSetMouseButtonCallback(m_window, pac::input::mouse_button_callback);
-    glfwSetKeyCallback(m_window, pac::input::key_callback);
+    glfwSetCursorPosCallback(m_window, pac::cursor_position_callback);
+    glfwSetMouseButtonCallback(m_window, pac::mouse_button_callback);
+    glfwSetKeyCallback(m_window, pac::key_callback);
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
 
@@ -102,7 +109,7 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
 
     /* Enable default debug callback provided by cgl */
 #ifndef NDEBUG
-//    cgl::create_debug_callback();
+    cgl::create_debug_callback();
 #endif
 }
 
@@ -137,7 +144,11 @@ void Game::init_imgui()
     ImGui_ImplOpenGL3_Init();
 }
 
-void Game::update(float dt) { m_state_manager.update(dt); }
+void Game::update(float dt)
+{
+    get_input().update(dt, m_window);
+    m_state_manager.update(dt);
+}
 
 void Game::draw()
 {
@@ -147,6 +158,37 @@ void Game::draw()
     get_renderer().submit_work();
 
     glfwSwapBuffers(m_window);
+}
+
+void Game::set_up_lua()
+{
+    m_lua.open_libraries(sol::lib::base, sol::lib::package);
+
+    /* Register Data Types */
+    m_lua.new_usertype<glm::ivec2>("ivec2", sol::constructors<glm::ivec2(), glm::ivec2(int, int)>(), "x", &glm::ivec2::x, "y",
+                                   &glm::ivec2::y);
+
+    m_lua.new_usertype<Level::TeleportDestination>(
+        "TeleportDestination",
+        sol::constructors<Level::TeleportDestination(const glm::ivec2&, const glm::ivec2&, const glm::ivec2&)>(), "from",
+        &Level::TeleportDestination::from, "position", &Level::TeleportDestination::position, "direction",
+        &Level::TeleportDestination::direction);
+
+    /* Register action enum */
+    m_lua.new_enum<Action>("Action", {{"MOVE_NORTH", ACTION_MOVE_NORTH},
+                                      {"MOVE_EAST", ACTION_MOVE_EAST},
+                                      {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
+                                      {"MOVE_WEST", ACTION_MOVE_WEST}});
+
+    /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
+     * given entity has this component. This makes for a flexible way to tell something what you want to do */
+    m_lua.set_function("move", [this](unsigned e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
+
+    /* Animation actions */
+    m_lua.set_function("set_animation", [this](unsigned e, const std::string& anim) {
+        auto& ac = m_registry.get<CAnimationSprite>(e);
+        ac.active_animation = ac.available_animations.at(anim);
+    });
 }
 
 }  // namespace pac

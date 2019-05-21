@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string>
 #include <memory>
@@ -33,15 +34,18 @@ std::string get_executable_dir();
  */
 std::string convert_path_separator(std::string_view str);
 
-/*!
- * \brief gl_debug_callback is the OpenGL debug message callback function
- */
-void gl_debug_callback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message,
-                       const void* userParam);
 }  // namespace detail
 
+/*!
+ * \brief native_absolute_path takes a relative path and returns an absolute path on the native format (Windows / Linux). It will
+ * check for relativity both in the working directory and relative to where the executable file is. It is designed to always take
+ * a relative path, however.
+ * \param relative_path is a relative path to the working directory or to the executable file.
+ * \throws std::runtime_error if the given path does not exist in either of the relative locations, the input is wrong and the
+ * function can not proceed, so it throws
+ * \return An absolute path formatted in the native way. IE: On Windows (C:\Something\Something\s.img) Linux (/home/user/s.img)
+ */
 std::string native_absolute_path(std::string_view relative_path);
-
 }  // namespace cgl
 
 /*
@@ -69,6 +73,27 @@ struct LoadedTexture
     int width = 0u;
     int height = 0u;
     std::vector<uint8_t> pixels = {};
+};
+
+/*!
+ * \brief The LoadedTexture struct represents a 16-bit R-only heightmap that has been loaded and contains relevant information
+ * about it.
+ */
+struct LoadedHeightmap
+{
+    int width = 0u;
+    int height = 0u;
+    std::vector<uint16_t> pixels = {};
+};
+
+/*!
+ * \brief The ModelData struct represents vertices in a loaded model based on the obj format
+ */
+struct ModelData
+{
+    std::array<float, 3> position{};
+    std::array<float, 3> normal{};
+    std::array<float, 2> uv{};
 };
 }  // namespace cgl
 
@@ -126,7 +151,9 @@ unsigned make_shader_program(const std::vector<ShaderStage>& stages);
 
 /* RESOURCE UTILITIES:
  *  - load_texture loads a texture file from disk and returns a vector of R8G8B8A8 pixels
- *  - load_texture_partitioned
+ *  - load_texture_partitioned extracts multiple textures (from an atlas) as separate textures based on parameters
+ *  - load_gl_texture loads a texture and copies it to OpenGL returning a texture handle instead
+ *  - load_obj loads an obj file as vertices only - non indexed
  *  - size_bytes returns the size of a standard container's contents in bytes
  */
 namespace cgl
@@ -138,18 +165,82 @@ namespace cgl
  */
 LoadedTexture load_texture(const char* fp);
 
+/*!
+ * \brief load_texture_partitioned loads a texture in similar partitions starting at {xoffset,yoffset}, then moving {w,h} pixels
+ * out from that. It does this count times and every time it has done {cols} number of tiles it moves to the next row and
+ * continues there
+ * \param fp is the relative file path
+ * \param xoffset is the starting x coordinate to sample from
+ * \param yoffset is the starting y coordinate to sample from
+ * \param w is the width of each texture to extract
+ * \param h is the height of each texture to extract
+ * \param cols is the number of columns
+ * \param count is the total number of sprites/textures to extract
+ * \return a vector of data about the loaded textures, in order
+ * \note this function is great for loading animations and storing them as a 2D Array Texture for example
+ */
 std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
 
 /*!
- * \brief size_bytes returns the size in bytes of the elements of the given container.
- * \tparam Container is the type of the container, for example std::vector<int>
- * \param c is the container to check the size of
- * \return the size of the container's contents in bytes
+ * \brief load_gl_texture is a shortcut helper function to quickly load an entire texture with sensible defaults with OpenGL and
+ * get out a handle to that texture
+ * \param fp is the relative filepath of the texture
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
+ * \return an OpenGL handle to the texture
  */
-template<typename Container>
-constexpr typename Container::size_type size_bytes(const Container& c) noexcept
+unsigned load_gl_texture(const char* fp);
+
+/*!
+ * \brief load_gl_texture_partitioned does the same as {@load_texture_partitioned}, except it creates a default 2D_ARRAY_TEXTURE
+ * where each of the partitions are stored on their own layer.
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
+ * \return an OpenGL handle to the texture
+ */
+unsigned load_gl_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count);
+
+/*!
+ * \brief load_texture loads the heightmap texture at the given relative filepath.
+ * \param fp is the filepath of the heightmap
+ * \return a heightmap resource with information and a vector of pixel data laid out like: [R0,R1,R2,R3,R4 ...]
+ * \note The heigmap must be 16-bits per channel
+ */
+LoadedHeightmap load_heightmap(const char* fp);
+
+/*!
+ * \brief load_gl_heightmap is a shortcut helper function to quickly load an entire heightmap with sensible defaults with OpenGL
+ * and get out a handle to that texture
+ * \param fp is the relative filepath of the heightmap
+ * \note it is the callers responsibility to destroy the OpenGL texture handle
+ * \return an OpenGL handle to the heightmap
+ */
+unsigned load_gl_heightmap(const char* fp);
+
+/*!
+ * \brief load_obj loads a single obj file, ignoring indices (vertices only)
+ * \param fp is the relative file path of the model
+ * \return a vector of vertex data objects that contain positions, normals and texture coordinates
+ */
+std::vector<ModelData> load_obj(const char* fp);
+
+/*!
+ * \brief size_bytes returns the size in bytes of the elements of the given containers
+ * \tparam Container is the required container to compute the size
+ * \tparam Containers is a parameter pack of containers, for example a couple of std::vector<int>
+ * \param c is the required container compute the size of
+ * \param cs are the rest of the containers that contribute to the sum of the size
+ * \return the sum of the sizes of the given container's contents in bytes
+ */
+template<typename Container, typename... Containers>
+constexpr std::size_t size_bytes(const Container& c, const Containers&... cs) noexcept
 {
-    return c.size() * sizeof(typename Container::value_type);
+    if constexpr (sizeof...(Containers) == 0)
+    {
+        return c.size() * sizeof(typename Container::value_type);
+    }
+    else
+    {
+        return (size_bytes(c) + size_bytes(cs...));
+    }
 }
 }  // namespace cgl
 
@@ -317,7 +408,7 @@ namespace cgl
 
 /*
  * MACROS:
- *  Contains macros related to CGL functionality and other useful macros to be used in the program*
+ *  Contains macros related to CGL functionality and other useful macros to be used in the program
  */
 
 #define CGL_DETAIL_CONCAT_IMPL(s1, s2) s1##s2

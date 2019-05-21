@@ -16,13 +16,19 @@ private:
     /* Title of window */
     const char* m_title = {};
 
+    /* Name of level */
+    const char* m_level = {};
+
     /* Score given from game */
     int32_t m_score = 0u;
 
 public:
     using State::State;
 
-    GameOverState(GameContext context, int score, const char* title_text) : State(context), m_title(title_text), m_score(score) {}
+    GameOverState(GameContext context, int score, const char* level, const char* title_text)
+        : State(context), m_title(title_text), m_level(level), m_score(score)
+    {
+    }
 
     void on_enter() override;
 

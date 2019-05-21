@@ -101,7 +101,7 @@
 static GLuint g_FontTexture = 0;
 static GLuint g_ShaderHandle = 0;
 static GLuint g_VaoHandle = 0;
-static int g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
+static int g_AttribLocationProjMtx = 0, g_AttribLocationTexIdx = 0;
 static int g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
@@ -186,11 +186,11 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
         {(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f},
     };
     glUseProgram(g_ShaderHandle);
-    glUniform1i(g_AttribLocationTex, 0);
-    glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
+    glProgramUniformMatrix4fv(g_ShaderHandle, g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
 
     // Draw
     glBindVertexArray(g_VaoHandle);
+    glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
     ImVec2 pos = draw_data->DisplayPos;
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
@@ -202,9 +202,6 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 
         glNamedBufferData(g_ElementsHandle, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                           (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
-
-        glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
-        glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, 0u, sizeof(ImDrawVert));
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
@@ -225,8 +222,10 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                               (int)clip_rect.w);  // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
                 }
 
-                // Bind texture, Draw
-                glBindTextureUnit(0, reinterpret_cast<uintptr_t>(pcmd->TextureId));
+                // Bind texture, Draw (using custom texture id with array layer and gl name)
+                const auto tex_id = reinterpret_cast<uint64_t>(pcmd->TextureId);
+                glBindTextureUnit(15u, tex_id & 0xFFFFFFFF);
+                glProgramUniform1f(g_ShaderHandle, g_AttribLocationTexIdx, tex_id >> 32u);
                 glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
                                sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
             }
@@ -259,12 +258,12 @@ bool ImGui_ImplOpenGL3_CreateFontsTexture()
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
     // Upload texture to graphics system
-    glCreateTextures(GL_TEXTURE_2D, 1, &g_FontTexture);
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &g_FontTexture);
     glTextureParameteri(g_FontTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTextureParameteri(g_FontTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTextureStorage2D(g_FontTexture, 1, GL_RGBA8, width, height);
-    glTextureSubImage2D(g_FontTexture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    glTextureStorage3D(g_FontTexture, 1, GL_RGBA8, width, height, 1);
+    glTextureSubImage3D(g_FontTexture, 0, 0, 0, 0, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     // Store our identifier
     io.Fonts->TexID = (ImTextureID)(intptr_t)g_FontTexture;
@@ -289,7 +288,7 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
                                                 "layout (location = 0) in vec2 Position;\n"
                                                 "layout (location = 1) in vec2 UV;\n"
                                                 "layout (location = 2) in vec4 Color;\n"
-                                                "layout (location = 1) uniform mat4 ProjMtx;\n"
+                                                "layout (location = 0) uniform mat4 ProjMtx;\n"
                                                 "layout (location = 0) out vec2 Frag_UV;\n"
                                                 "layout (location = 1) out vec4 Frag_Color;\n"
                                                 "void main()\n"
@@ -302,11 +301,12 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
     const GLchar* fragment_shader_glsl_450_core = "#version 450 core\n"
                                                   "layout (location = 0) in vec2 Frag_UV;\n"
                                                   "layout (location = 1) in vec4 Frag_Color;\n"
-                                                  "layout (location = 0) uniform sampler2D Texture;\n"
+                                                  "layout (location = 1) uniform float TexIdx;\n"
+                                                  "layout (binding = 15) uniform sampler2DArray Texture;\n"
                                                   "layout (location = 0) out vec4 Out_Color;\n"
                                                   "void main()\n"
                                                   "{\n"
-                                                  "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+                                                  "    Out_Color = Frag_Color * texture(Texture, vec3(Frag_UV.st, TexIdx));\n"
                                                   "}\n";
 
     // Create shaders
@@ -315,8 +315,8 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
     g_ShaderHandle = cgl::create_program({vertex_shader, fragment_shader});
 
     // Assign shader locations
-    g_AttribLocationTex = 0;
-    g_AttribLocationProjMtx = 1;
+    g_AttribLocationProjMtx = 0;
+    g_AttribLocationTexIdx = 1;
     g_AttribLocationPosition = 0;
     g_AttribLocationUV = 1;
     g_AttribLocationColor = 2;

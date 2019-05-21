@@ -14,15 +14,13 @@ constexpr unsigned SCREEN_W = TILE_SIZE<unsigned> * 28u;
 constexpr unsigned SCREEN_H = TILE_SIZE<unsigned> * 36u;
 
 /* Animation Frame rate */
-constexpr unsigned FRAME_RATE = 24u;
-constexpr float TIME_PER_FRAME = 1.f / FRAME_RATE;
 constexpr int MAX_TEXTURES = 16;
 
 /* Scoring */
 constexpr int FOOD_SCORE = 10;
 constexpr int GHOST_KILLER_SCORE = 50;
 constexpr int POWERUP_SCORE = 500;
-constexpr int GHOST_KILL_SCORE = 200;
+constexpr int GHOST_KILL_SCORE = 250;
 
 /* Encryption String (very secure) */
 inline const char * ENCRYPTION_STRING = "PACMAN";

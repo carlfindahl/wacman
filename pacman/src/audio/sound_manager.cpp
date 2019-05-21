@@ -28,7 +28,7 @@ pac::SoundManager::SoundManager()
     GFX_INFO("Using audio device: %s", device_name);
 
     /* Iterate all files in resource folder */
-    const auto res_path = std::filesystem::path(cgl::native_absolute_path("res/"));
+    const auto res_path = std::filesystem::path(cgl::native_absolute_path("res/audio"));
     for (auto entry = std::filesystem::directory_iterator(res_path); entry != std::filesystem::directory_iterator(); ++entry)
     {
         /* If file is a .wav file, load it! */

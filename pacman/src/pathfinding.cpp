@@ -38,7 +38,7 @@ bool pac::Path::empty() const { return m_directions.empty(); }
 
 bool pac::Path::outdated() const
 {
-    return m_directions.empty() || (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(120);
+    return m_directions.empty() || (std::chrono::steady_clock::now() - m_creation_time) > std::chrono::milliseconds(400);
 }
 
 void pac::Path::pathfind_bfs(const pac::Level& graph, glm::ivec2 origin, glm::ivec2 target) noexcept

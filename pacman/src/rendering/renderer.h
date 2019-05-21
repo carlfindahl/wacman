@@ -98,6 +98,9 @@ private:
     /* Matrix UBO */
     UniformBuffer<detail::MatrixData> m_ubo = {};
 
+    /* Post processing enabled or not */
+    bool m_post_enabled = true;
+
 public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
@@ -127,12 +130,32 @@ public:
     TextureID load_texture(std::string_view relative_fp);
 
     /*!
+     * \brief get_tileset_texture is a shortcut to get the tileset texture, and the texture at location NO. Starting to count
+     * from the top left corner
+     * \param no is the index into the tileset
+     * \return A Texture ID to the correct texture
+     */
+    TextureID get_tileset_texture(unsigned no);
+
+    /*!
+     * \brief get_texture_for_imgui fetches the raw texture handle for the purpose of using it with ImGui
+     * \param id is the texture ID of the texture
+     */
+    unsigned long get_texture_for_imgui(TextureID id) const;
+
+    /*!
      * \brief load_animation_texture loads a texture with an animated sprite in it that can later be used with an animation
      * \note if you call this multiple times with the same texture, it will be loaded again! Not cached. So be careful.
      * \param relative_fp is the relative file path
      * \return a handle to the new texture, you do not own this, so please do not delete it or otherwise be careless with it
      */
     TextureID load_animation_texture(std::string_view relative_fp, int xoffset, int yoffset, int w, int h, int cols, int count);
+
+    /*!
+     * \brief set_post_enabled allow you to enable or disable post processing
+     * \param flag is the value to set
+     */
+    void set_post_enabled(bool flag);
 
 private:
     /* Private because we want the singleton function to be the only one able to create a Renderer */

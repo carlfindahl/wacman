@@ -1,11 +1,14 @@
 #pragma once
 
 #include "common.h"
-#include "input.h"
+#include "input/input.h"
 
 #include <utility>
 #include <functional>
 #include <unordered_map>
+
+#include <sol/state.hpp>
+#include <entt/entity/registry.hpp>
 
 namespace pac
 {
@@ -33,7 +36,7 @@ public:
 
     State& operator=(const State&) = delete;
 
-    State& operator=(State&& other) noexcept = default;
+    State& operator=(State&& other) = default;
 
     virtual ~State() noexcept = default;
 

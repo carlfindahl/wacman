@@ -17,23 +17,24 @@ void GameOverState::on_enter()
     m_playername.fill('\0');
 
     /* Add input state that is blocking so no other input works */
-    input::InputState pause_input(true);
-    input::get_input().push(std::move(pause_input));
+    InputDomain pause_input(true);
+    get_input().push(std::move(pause_input));
 }
 
 void GameOverState::on_exit()
 {
     /* Load and sort entries, then write back to file */
-    std::vector<ScoreEntry> entries = load_high_score_entries_from_file();
+    auto entries = load_high_score_entries_from_file();
 
     if (strlen(m_playername.data()) > 0)
     {
-        entries.push_back({m_playername.data(), m_score});
-        std::sort(entries.begin(), entries.end(), [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
+        entries[m_level].emplace_back(ScoreEntry{m_playername.data(), m_score});
+        std::sort(entries.at(m_level).begin(), entries.at(m_level).end(),
+                  [](const ScoreEntry& a, const ScoreEntry& b) { return a.score > b.score; });
         write_high_score_entries_to_file(entries);
     }
 
-    input::get_input().pop();
+    get_input().pop();
 }
 
 bool GameOverState::update(float dt)

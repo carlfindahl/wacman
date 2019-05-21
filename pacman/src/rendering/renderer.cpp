@@ -35,8 +35,8 @@ void Renderer::init(unsigned max_sprites)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     /* Create Shader Program */
-    prog = std::make_unique<ShaderProgram>(
-        std::vector<cgl::ShaderStage>{{GL_VERTEX_SHADER, "res/sprite.vert"}, {GL_FRAGMENT_SHADER, "res/sprite.frag"}});
+    prog = std::make_unique<ShaderProgram>(std::vector<cgl::ShaderStage>{{GL_VERTEX_SHADER, "res/shaders/sprite.vert"},
+                                                                         {GL_FRAGMENT_SHADER, "res/shaders/sprite.frag"}});
 
     /* Use program and set sampler values to texture bind points right away, this state is stored in the program so we never
      * need to update this ever again since the texture bind points will be fixed. */
@@ -76,7 +76,7 @@ void Renderer::init(unsigned max_sprites)
     glVertexArrayVertexBuffer(m_vao, 1u, m_instance_buffer, 0u, sizeof(InstanceVertex));
 
     /* Load default texture ID 0 -> blank.png */
-    load_texture("res/blank.png");
+    load_texture("res/textures/blank.png");
 }
 
 Renderer::~Renderer()
@@ -105,11 +105,24 @@ void Renderer::submit_work()
     m_ubo.bind(0);
     glBindVertexArray(m_vao);
     glBindTextures(0, m_textures.size(), m_textures.data());
-    m_post_processor.capture();
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    m_post_processor.process();
+
+    /* Enable post processing */
+    if (m_post_enabled)
+    {
+        m_post_processor.capture();
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_post_processor.process();
+    }
+    /* Or don't */
+    else
+    {
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
     m_instance_data.clear();
 }
 
@@ -138,10 +151,29 @@ TextureID Renderer::load_texture(std::string_view relative_fp)
 
     /* Return texture ID and add to cache */
     m_textures.push_back(tex_id);
-    GFX_DEBUG("You have loaded %u textures now.", m_textures.size());
+    GFX_DEBUG("You have loaded %u/15 textures now.", m_textures.size());
+
+    if (m_textures.size() > 15)
+    {
+        GFX_ERROR("Too many textures.");
+    }
 
     TextureID out{0u, 1u, 0u, static_cast<uint8_t>(m_textures.size() - 1)};
     m_loaded_texture_cache.emplace(relative_fp.data(), out);
+    return out;
+}
+
+TextureID Renderer::get_tileset_texture(unsigned no)
+{
+    static auto id = load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 21);
+    id.frame_number = no;
+    return id;
+}
+
+unsigned long Renderer::get_texture_for_imgui(TextureID id) const
+{
+    uint64_t out = m_textures.at(id.array_index);
+    out |= (static_cast<uint64_t>(id.frame_number) << 32u);
     return out;
 }
 
@@ -180,12 +212,19 @@ TextureID Renderer::load_animation_texture(std::string_view relative_fp, int xof
 
     /* Return ID and add to texture cache */
     m_textures.push_back(tex_id);
-    GFX_DEBUG("You have loaded %u textures now.", m_textures.size());
+    GFX_DEBUG("You have loaded %u/15 textures now.", m_textures.size());
+
+    if (m_textures.size() > 15)
+    {
+        GFX_ERROR("Too many textures.");
+    }
 
     TextureID out{0u, static_cast<uint8_t>(tex_data.size()), 0u, static_cast<uint8_t>(m_textures.size() - 1)};
     m_loaded_texture_cache.emplace(hash_string, out);
     return out;
 }
+
+void Renderer::set_post_enabled(bool flag) { m_post_enabled = flag; }
 
 std::optional<TextureID> Renderer::check_texture_is_loaded(std::string_view fp)
 {

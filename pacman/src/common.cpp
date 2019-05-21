@@ -9,45 +9,58 @@
 
 namespace pac
 {
-std::vector<ScoreEntry> load_high_score_entries_from_file(const char* filepath)
+robin_hood::unordered_map<std::string, std::vector<ScoreEntry>> load_high_score_entries_from_file(const char* filepath)
 {
     /* Decrypt the level file */
     auto scorestring = cgl::read_entire_file(filepath);
     VignereEncryption decryptor(ENCRYPTION_STRING);
     decryptor.decrypt(scorestring);
 
-    /* Store each new entry temporarily in e, then based on the line count, read data into line and parse relevant information */
-    ScoreEntry e;
-    int line_count = 0;
-    std::string line{};
-    std::vector<ScoreEntry> out{};
-    std::stringstream tmp_sstream(scorestring);
-    while (std::getline(tmp_sstream, line))
-    {
-        switch (line_count % 2)
-        {
-        case 0: e.name = line; break;
-        case 1:
-            e.score = std::stoi(line);
-            out.push_back(std::move(e));  // It is fine to move here, since we always assign values again before moving next
-            break;
-        }
+    /* Out data */
+    robin_hood::unordered_map<std::string, std::vector<ScoreEntry>> out{};
 
-        ++line_count;
+    /* Per level variables:
+     * Store each new entry temporarily in e, then read data into line and parse relevant information
+     */
+    ScoreEntry e;
+    int entry_count = 0;
+    std::string level_name{};
+    std::stringstream tmp_sstream(scorestring);
+    while (tmp_sstream >> level_name >> entry_count)
+    {
+        tmp_sstream.ignore();
+        out.emplace(level_name, std::vector<ScoreEntry>());
+
+        /* Read each entry per level */
+        for (int i = 0; i < entry_count; ++i)
+        {
+            std::getline(tmp_sstream, e.name);
+            tmp_sstream >> e.score;
+            tmp_sstream.ignore();
+
+            /* Safe to move and re-use since we overwrite every iteration */
+            out.at(level_name).emplace_back(std::move(e));
+        }
     }
 
     return out;
 }
 
-void write_high_score_entries_to_file(const std::vector<ScoreEntry>& entries, const char* filepath)
+void write_high_score_entries_to_file(const robin_hood::unordered_map<std::string, std::vector<ScoreEntry>>& entries,
+                                      const char* filepath)
 {
     /* First write to a string */
     std::stringstream tmpstring;
-    for (const auto& entry : entries)
+    for (const auto& [level, scores] : entries)
     {
-        tmpstring << entry.name << '\n' << entry.score << '\n';
+        tmpstring << level << ' ' << scores.size() << '\n';
+
+        for (const auto& entry : scores)
+        {
+            tmpstring << entry.name << '\n' << entry.score << '\n';
+        }
     }
-    
+
     /* Encrypt the string we just created */
     VignereEncryption encryptor(ENCRYPTION_STRING);
     std::string levelstring = tmpstring.str();
@@ -56,7 +69,7 @@ void write_high_score_entries_to_file(const std::vector<ScoreEntry>& entries, co
     /* Write it to file */
     std::ofstream file(cgl::native_absolute_path(filepath));
     file.sync_with_stdio(false);
-    file.write(levelstring.c_str(), levelstring.size());    
+    file.write(levelstring.c_str(), levelstring.size());
 }
 
 int manhattan_distance(glm::ivec2 from, glm::ivec2 to) noexcept { return std::abs(from.x - to.x) + std::abs(from.y - to.y); }
