@@ -61,6 +61,17 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
     /* Reisze level to level size */
     resize({level_data["w"], level_data["h"]});
 
+    /* Load Teleporter Information */
+    m_teleporters.clear();
+    sol::table tp_tbl = level_data["teleporters"];
+    for (const auto& [_, tpelem] : tp_tbl)
+    {
+        sol::table tp = tpelem.as<sol::table>();
+        m_teleporters.emplace_back(TeleportDestination{glm::ivec2{tp["from"][1], tp["from"][2]},
+                                                       glm::ivec2{tp["position"][1], tp["position"][2]},
+                                                       glm::ivec2{tp["direction"][1], tp["direction"][2]}});
+    }
+
     /* Load the tile information */
     const auto& tiles = level_data["tiles"].get<std::vector<int>>();
 
@@ -122,7 +133,7 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     level_data["h"] = m_tiles.size();
 
     /* Write out the teleporter data */
-
+    level_data["teleporters"] = m_teleporters;
 
     /* Extract tiles into a single vector */
     std::vector<int> tiles{};
@@ -338,9 +349,17 @@ void Level::save_to_file(sol::table levels_table)
         ofile << "},\n\t\t";
 
         /* Write teleporter data to file */
-//        ofile << "teleporters = {\n\t\t\t";
-//        const auto& teleporters = current_level["teleporters"].get<std::vector<TeleportDestination>>();
-//        for (const auto& tp : teleporters) {}
+        ofile << "teleporters = {\n\t\t\t";
+        const auto& teleporters = current_level["teleporters"].get<std::vector<TeleportDestination>>();
+        for (auto i = 0u; i < teleporters.size(); ++i)
+        {
+            ofile << '[' << i + 1 << "] = {\n\t\t\t\t";
+            ofile << "from = {" << teleporters[i].from.x << ',' << teleporters[i].from.y << "},\n\t\t\t\t";
+            ofile << "position = {" << teleporters[i].position.x << ',' << teleporters[i].position.y << "},\n\t\t\t\t";
+            ofile << "direction = {" << teleporters[i].direction.x << ',' << teleporters[i].direction.y << "},\n\t\t\t";
+            ofile << "},\n\t\t\t";
+        }
+        ofile << "},\n\t\t";
 
         /* Copy entities to file */
         ofile << "entities = {\n\t\t\t";
