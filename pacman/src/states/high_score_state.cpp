@@ -30,26 +30,11 @@ bool HighScoreState::update(float dt)
     ImGui::SetNextWindowSize({400.f, 500.f});
     ImGui::Begin("High Score", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
-    /* Set up a 3 column high score table */
-    ImGui::Columns(3, "ScoreColumns", false);
-    ImGui::SetColumnWidth(0, 25.f);
-    ImGui::SetColumnWidth(1, 275.f);
-
-    /* Print score for each element */
-    int i = 1;
-    for (const auto& e : m_entries)
+    if (ImGui::BeginTabBar("ScoreTabBar"))
     {
-        ImGui::Text("%d", i++);
-        ImGui::NextColumn();
-        ImGui::Text("%s", e.name.c_str());
-        ImGui::NextColumn();
-        ImGui::Text("%d", e.score);
-        ImGui::NextColumn();
-        ImGui::Separator();
+        ImGui::EndTabBar();
     }
 
-    /* Reset columns and add a back buton */
-    ImGui::Columns();
     if (ImGui::Button("Back"))
     {
         m_context.state_manager->pop();
@@ -63,6 +48,28 @@ bool HighScoreState::draw()
 {
     get_renderer().draw({{SCREEN_W / 2.f, SCREEN_H / 2.f}, glm::vec2(SCREEN_W, SCREEN_H), {1.f, 1.f, 1.f}, m_splash_texture});
     return false;
+}
+
+void HighScoreState::scores_for(const std::string& level_name)
+{
+    /* Set up a 3 column high score table */
+    ImGui::Columns(3, "ScoreColumns", false);
+    ImGui::SetColumnWidth(0, 25.f);
+    ImGui::SetColumnWidth(1, 275.f);
+
+    /* Print score for each element */
+    int i = 1;
+    for (const auto& e : m_entries.at(level_name))
+    {
+        ImGui::Text("%d", i++);
+        ImGui::NextColumn();
+        ImGui::Text("%s", e.name.c_str());
+        ImGui::NextColumn();
+        ImGui::Text("%d", e.score);
+        ImGui::NextColumn();
+        ImGui::Separator();
+    }
+    ImGui::Columns();
 }
 
 }  // namespace pac

@@ -19,13 +19,19 @@ GameSystem::~GameSystem() noexcept { g_event_queue.sink<EvPacLifeChanged>().disc
 void GameSystem::update(float dt)
 {
     /* Do player only updates */
-    m_reg.view<CPlayer>().each([dt](CPlayer& plr) {
+    m_reg.view<CPlayer>().each([dt, this](CPlayer& plr) {
         /* Turn of invulnerable when timer too low */
         if (plr.invulnerable > 0.f && plr.invulnerable - dt <= 0.f)
         {
             g_event_queue.trigger<EvPacInvulnreableChange>(false);
         }
         plr.invulnerable -= dt;
+
+        /* Check if the game is won */
+        if (m_reg.view<CPickup>().empty())
+        {
+            g_event_queue.enqueue(EvLevelFinished{true, plr.score});
+        }
     });
 
     /* Add score to player when touching pickups */
@@ -76,8 +82,6 @@ void GameSystem::update(float dt)
             }
         }
     });
-
-    /* Manage ... */
 }
 
 void GameSystem::recieve(const EvPacLifeChanged& life_update)
