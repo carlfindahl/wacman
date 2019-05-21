@@ -53,11 +53,6 @@ void reflect_components()
         .data<&CMovement::progress>("progress")
         .data<&CMovement::current_direction>("current_direction")
         .data<&CMovement::desired_direction>("desired_direction");
-
-    /* Teleporter */
-    entt::reflect<CTeleporter>("Teleporter")
-        .data<&CTeleporter::target>("target")
-        .data<&CTeleporter::out_direction>("out_direction");
 }
 
 void reflect_events()

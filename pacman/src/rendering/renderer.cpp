@@ -105,11 +105,11 @@ void Renderer::submit_work()
     m_ubo.bind(0);
     glBindVertexArray(m_vao);
     glBindTextures(0, m_textures.size(), m_textures.data());
-    //    m_post_processor.capture();
+    m_post_processor.capture();
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_instance_data.size()));
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    //    m_post_processor.process();
+    m_post_processor.process();
     m_instance_data.clear();
 }
 
