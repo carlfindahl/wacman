@@ -2,7 +2,7 @@
 # 3.11 is needed for FetchContent
 cmake_minimum_required(VERSION 3.13)
 
-project(imt2531_assignment01 VERSION 1.0.2)
+project(imt2531_assignment01 VERSION 1.1.0)
 
 # CMake Complains if this is not set
 set(OpenGL_GL_PREFERENCE GLVND)
