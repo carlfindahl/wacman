@@ -48,6 +48,12 @@ public:
 
         /* Direction of output */
         glm::ivec2 direction{};
+
+        /* Add a ctor for LUA Purposes */
+        TeleportDestination(const glm::ivec2 _from, const glm::ivec2& _position, const glm::ivec2& _direction)
+            : from(_from), position(_position), direction(_direction)
+        {
+        }
     };
 
     /*!

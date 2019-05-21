@@ -49,16 +49,23 @@ void EditorState::on_enter()
 
     /* Fetch available entities */
     load_entity_prototypes();
+
+    /* Disable post (for UI purposes) */
+    get_renderer().set_post_enabled(false);
 }
 
 void EditorState::on_exit()
 {
+    /* Unhook events */
     g_event_queue.sink<EvInput>().disconnect<&EditorState::recieve_key>(this);
     g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(this);
     m_tileselect_ui.on_select_tile.sink().disconnect<&EditorState::set_selection>(this);
 
     get_input().pop();
     m_context.registry->reset();
+
+    /* Re-Enable Post Processing */
+    get_renderer().set_post_enabled(true);
 }
 
 bool EditorState::update(float dt)

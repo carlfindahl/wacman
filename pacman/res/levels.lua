@@ -50,9 +50,9 @@ levels = {
 		h = 36,
 		teleporters = {
 			[1] = {
-				from = {0,16},
-				position = {26,16},
-				direction = {-1,0},
+				from = {0, 16},
+				position = {26, 16},
+				direction = {-1, 0},
 			},
 			[2] = {
 				from = {27,16},

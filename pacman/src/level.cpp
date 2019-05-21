@@ -135,7 +135,14 @@ void Level::save(sol::state_view& state_view, const entt::registry& reg, std::st
     level_data["h"] = m_tiles.size();
 
     /* Write out the teleporter data */
-    level_data["teleporters"] = m_teleporters;
+    sol::table tp_tbl = level_data.create("teleporters");
+    for (auto i = 0u; i < m_teleporters.size(); ++i)
+    {
+        sol::table current = tp_tbl.create(i + 1);
+        current["from"] = std::vector<int>{m_teleporters[i].from.x, m_teleporters[i].from.y};
+        current["position"] = std::vector<int>{m_teleporters[i].position.x, m_teleporters[i].position.y};
+        current["direction"] = std::vector<int>{m_teleporters[i].direction.x, m_teleporters[i].direction.y};
+    }
 
     /* Extract tiles into a single vector */
     std::vector<int> tiles{};
@@ -352,13 +359,14 @@ void Level::save_to_file(sol::table levels_table)
 
         /* Write teleporter data to file */
         ofile << "teleporters = {\n\t\t\t";
-        const auto& teleporters = current_level["teleporters"].get<std::vector<TeleportDestination>>();
-        for (auto i = 0u; i < teleporters.size(); ++i)
+        sol::table teleporter_table = current_level["teleporters"].get<sol::table>();
+        for (const auto& [idx, tp] : teleporter_table)
         {
-            ofile << '[' << i + 1 << "] = {\n\t\t\t\t";
-            ofile << "from = {" << teleporters[i].from.x << ',' << teleporters[i].from.y << "},\n\t\t\t\t";
-            ofile << "position = {" << teleporters[i].position.x << ',' << teleporters[i].position.y << "},\n\t\t\t\t";
-            ofile << "direction = {" << teleporters[i].direction.x << ',' << teleporters[i].direction.y << "},\n\t\t\t";
+            sol::table tbl = tp.as<sol::table>();
+            ofile << '[' << idx.as<int>() << "] = {\n\t\t\t\t";
+            ofile << "from = {" << tbl["from"][1].get<int>() << "," << tbl["from"][2].get<int>() << "},\n\t\t\t\t";
+            ofile << "position = {" << tbl["position"][1].get<int>() << "," << tbl["position"][2].get<int>() << "},\n\t\t\t\t";
+            ofile << "direction = {" << tbl["direction"][1].get<int>() << ", " << tbl["direction"][2].get<int>() << "},\n\t\t\t";
             ofile << "},\n\t\t\t";
         }
         ofile << "},\n\t\t";
