@@ -20,7 +20,7 @@ class GameState : public State
 {
 private:
     /* The level / world */
-    Level m_level;
+    Level m_level{};
 
     /* Active Systems */
     std::vector<std::unique_ptr<System>> m_systems{};
@@ -45,6 +45,8 @@ public:
     bool draw() override;
 
     void recieve(const EvInput& input);
+
+    void on_win_or_lose(const EvLevelFinished& data);
 
 private:
     /*!

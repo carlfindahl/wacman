@@ -21,10 +21,7 @@
 
 namespace pac
 {
-Level::Level(GameContext context) : m_context(context)
-{
-    m_tileset_texture = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 21);
-}
+Level::Level() { m_tileset_texture = get_renderer().load_animation_texture("res/textures/tileset.png", 0, 0, 25, 25, 4, 21); }
 
 void Level::update(float dt) {}
 
@@ -49,6 +46,8 @@ void Level::draw()
         }
     }
 }
+
+const std::string& Level::get_name() const { return m_name; }
 
 void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_view level_name)
 {
@@ -117,6 +116,9 @@ void Level::load(sol::state_view& state_view, entt::registry& reg, std::string_v
             reg.get<CPosition>(e).spawn = {x_positions[i], y_positions[i]};
         }
     }
+
+    /* Set level name */
+    m_name = level_name;
 }
 
 void Level::save(sol::state_view& state_view, const entt::registry& reg, std::string_view level_name,

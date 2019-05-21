@@ -1,6 +1,7 @@
 #include "game_system.h"
 #include "states/state_manager.h"
 #include "states/respawn_state.h"
+#include "states/game_over_state.h"
 #include "entity/components.h"
 #include "config.h"
 
@@ -82,9 +83,9 @@ void GameSystem::update(float dt)
 void GameSystem::recieve(const EvPacLifeChanged& life_update)
 {
     /* GAME OVER */
-    if (life_update.new_life == 0)
+    if (life_update.new_life <= 0)
     {
-        m_context.state_manager->pop(); /* TODO : Should put high score state here. */
+        g_event_queue.enqueue(EvLevelFinished{false, m_reg.get<CPlayer>(life_update.pacman).score});
     }
     /* Lost a life = Move everything to their spawn point and push respawn context */
     else if (life_update.delta < 0)

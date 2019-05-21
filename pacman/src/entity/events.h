@@ -34,4 +34,13 @@ struct EvPacLifeChanged
     int new_life = 0;
 };
 
+struct EvLevelFinished
+{
+    /* Did you win or not */
+    bool won = false;
+
+    /* Your final score */
+    int final_score = 0;
+};
+
 }  // namespace pac

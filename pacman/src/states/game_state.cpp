@@ -7,6 +7,7 @@
 #include "entity/movement_system.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
+#include "game_over_state.h"
 #include "state_manager.h"
 #include "pause_state.h"
 #include "input/input.h"
@@ -21,7 +22,7 @@ namespace pac
 {
 extern entt::dispatcher g_event_queue;
 
-GameState::GameState(GameContext owner, std::string_view level_name) : State(owner), m_level(owner)
+GameState::GameState(GameContext owner, std::string_view level_name) : State(owner)
 {
     m_level.load(*owner.lua, *m_context.registry, level_name);
 }
@@ -45,11 +46,13 @@ void GameState::on_enter()
     get_input().push(std::move(game_input));
 
     g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
+    g_event_queue.sink<EvLevelFinished>().connect<&GameState::on_win_or_lose>(this);
 }
 
 void GameState::on_exit()
 {
     g_event_queue.sink<EvInput>().disconnect<&GameState::recieve>(this);
+    g_event_queue.sink<EvLevelFinished>().disconnect<&GameState::on_win_or_lose>(this);
 
     get_sound().stop(m_music_id);
     get_input().pop();
@@ -80,6 +83,18 @@ void GameState::recieve(const EvInput& input)
     case ACTION_BACK: m_context.state_manager->pop(); break;
     case ACTION_PAUSE: m_context.state_manager->push<PauseState>(m_context); break;
     default: break;
+    }
+}
+
+void GameState::on_win_or_lose(const EvLevelFinished& data)
+{
+    if (data.won)
+    {
+        m_context.state_manager->push<GameOverState>(m_context, data.final_score, m_level.get_name().c_str(), "You Won!");
+    }
+    else
+    {
+        m_context.state_manager->push<GameOverState>(m_context, data.final_score * 0.5f, m_level.get_name().c_str(), "You Lost!");
     }
 }
 

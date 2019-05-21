@@ -68,19 +68,17 @@ private:
     /* Teleporters in level */
     std::vector<TeleportDestination> m_teleporters{};
 
+    /* Name of current level */
+    std::string m_name{};
+
     /* The level tileset texture */
     TextureID m_tileset_texture = {};
 
     /* Score on this level */
     int32_t m_score = 0u;
 
-    /* Context in which level exists */
-    GameContext m_context{};
-
 public:
-    Level() = default;
-
-    Level(GameContext context);
+    Level();
 
     /* Level editor can freely change the level */
     friend class EditorState;
@@ -96,6 +94,12 @@ public:
      * \brief draw draws the level (food, tiles and blank tiles
      */
     void draw();
+
+    /*!
+     * \brief get_name returns the name of the level that is currently loaded
+     * \return name of level
+     */
+    const std::string& get_name() const;
 
     /*!
      * \brief load a level at the given relative file path
