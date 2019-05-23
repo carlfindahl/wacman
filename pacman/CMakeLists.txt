@@ -7,7 +7,6 @@ add_executable(${EXEC_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 # Discover and link required libraries
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
-find_package(EnTT 3.0 REQUIRED)
 find_package(Lua REQUIRED)
 
 target_link_libraries(
