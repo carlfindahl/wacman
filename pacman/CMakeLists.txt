@@ -16,7 +16,7 @@ target_link_libraries(
     $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
     $<$<PLATFORM_ID:Linux>:dl>                  # Required by glad on Linux
-    $<IF:$<PLATFORM_ID:Linux>,openal,Openal32>  # For OpenAL Audio
+    ${OPENAL_LIBRARY}                           # For OpenAL Audio
     OpenGL::GL                                  # For OpenGL
     glad::glad                                  # OpenGL Loader
     gfx::gfx                                    # Logging mostly
