@@ -13,7 +13,7 @@ target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
     # Manually link asan on GCC in Debug mode since it doesn't do it automatically (MUST BE FIRST IN THE LIST OR WON'T WORK!)
-    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
+    # $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:asan>
 
     $<$<PLATFORM_ID:Linux>:dl>                  # Required by glad on Linux
     ${OPENAL_LIBRARY}                           # For OpenAL Audio
@@ -37,7 +37,7 @@ target_compile_options(
     PRIVATE
 
     # On GCC in Debug mode Enable address sanitizer to detect nasty bugs
-    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:-fsanitize=address>
+    # $<$<AND:$<CXX_COMPILER_ID:GNU>,$<CONFIG:Debug>>:-fsanitize=address>
 )
 
 # Explicitly tell what features are required to maximize compiler support
