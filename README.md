@@ -24,9 +24,8 @@ Currently the latest version is 1.1.0. Before that there was 1.0.0, 0.9.0 and 0.
  * [GLFW 3.2](http://glfw.org/)
  * [GLM](https://glm.g-truc.net/0.9.9/index.html)
  * [OpenAL 1.1](https://www.openal.org/)
- * [Google Benchmark](https://github.com/google/benchmark) *[optional, only if you want to run benchmarks]*
 
-GLFW, GLM and OpenAL are required to play. I use `find_package` to locate these libraries so on Linux it should be a matter of installing them via the terminal and then running CMake. On Windows you should specify these directories manually unless you have installed the libraries in a way that they can be found on the `PATH` variable.
+GLFW, GLM and OpenAL are required to play. I use `find_package` to locate these libraries so on Linux it should be a matter of installing them via the terminal and then running CMake. On Windows you should specify these directories manually unless you have installed the libraries in a way that they can be found on the `PATH` variable. EnTT and sol2 will attempt to `find_package` but if not, CMake will download the required versions from GitHub and use that local version in the build using `FetchContent`.
 
 #### Building
 
@@ -39,9 +38,9 @@ The application works with relative paths where the relativity always starts fro
 
 #### Running
 
-The game has does not have multiple levels at the moment. It attempts to be as true to the original as possible, with a few tweaks and a more modern feel overall. For example, the theme is remixed and there are some interesting new rules. Check out the `Help / Credits` section of the Main Menu in order to see the rules and controls.
+The game has multiple levels you can play through. It attempts to be as true to the original as possible, with a few tweaks and a more modern feel overall. For example, the theme is remixed and due to the new levels things work differently. Also, the Ghost AI is not 100% like the original. Check out the `Help / Credits` section of the Main Menu in order to see more info.
 
-When you play, your goal is to eat all the tiny food objects without dying. When you do, you win. A high score is recorded locally and as long as you play on the same PC, you can compete with others. (*Future idea: Sync high scores online*)
+When you play, your goal is to eat all the tiny food objects without dying. When you do, you win. A high score is recorded locally and as long as you play on the same PC, you can compete with others. The high scores are per level, so if you are terrible at one level, perhaps you will shine doing another one. (*Future idea: Sync high scores online*)
 
 ### Sound Licensing
 All sound effects are home-made using [SFXR](http://www.drpetter.se/project_sfxr.html) or recorded live and are CC0, public domain now.
