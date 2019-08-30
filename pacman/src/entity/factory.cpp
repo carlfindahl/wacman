@@ -7,7 +7,7 @@ namespace pac
 {
 EntityFactory::EntityFactory(entt::registry& registry) : m_registry(registry) {}
 
-uint32_t EntityFactory::spawn(sol::state_view& state, const std::string& name)
+entt::entity EntityFactory::spawn(sol::state_view& state, const std::string& name)
 {
     auto e = m_registry.create();
 
@@ -85,14 +85,14 @@ std::optional<std::filesystem::path> EntityFactory::find_entity_path(const std::
     return std::nullopt;
 }
 
-void EntityFactory::make_sprite_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_sprite_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     GFX_DEBUG("Adding Sprite Component");
     m_registry.assign<CSprite>(e, CSprite{get_renderer().get_tileset_texture(comp["index"]),
                                           glm::vec3{comp["tint"][1], comp["tint"][2], comp["tint"][3]}});
 }
 
-void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_animsprite_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     /* Prepare data */
     robin_hood::unordered_map<std::string, TextureID> anims{};
@@ -117,25 +117,28 @@ void EntityFactory::make_animsprite_component(sol::state_view& state, const sol:
                                         anims[comp["starting"]], 0.f, comp["fps"]);
 }
 
-void EntityFactory::make_ai_component(sol::state_view& state, const sol::table& comp, uint32_t e) { m_registry.assign<CAI>(e); }
+void EntityFactory::make_ai_component(sol::state_view& state, const sol::table& comp, entt::entity e)
+{
+    m_registry.assign<CAI>(e);
+}
 
-void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_position_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     GFX_DEBUG("Position Component at (%d, %d)", comp["x"].get<int>(), comp["y"].get<int>());
     m_registry.assign<CPosition>(e, CPosition{glm::ivec2{comp["x"], comp["y"]}, glm::ivec2{comp["x"], comp["y"]}});
 }
 
-void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_movement_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     m_registry.assign<CMovement>(e, glm::ivec2{0}, glm::ivec2{0}, comp["speed"], 0.f);
 }
 
-void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_player_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     m_registry.assign<CPlayer>(e, get_renderer().get_tileset_texture(comp["icon"]), comp["lives"], 0.f, 0);
 }
 
-void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_input_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     robin_hood::unordered_map<Action, sol::function> actions{};
     for (auto& [k, v] : comp)
@@ -146,13 +149,13 @@ void EntityFactory::make_input_component(sol::state_view& state, const sol::tabl
     m_registry.assign<CInput>(e, std::move(actions));
 }
 
-void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_pickup_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     GFX_DEBUG("Adding Pikcup Component");
     m_registry.assign<CPickup>(e, comp["score"].get<int>());
 }
 
-void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, uint32_t e)
+void EntityFactory::make_collision_component(sol::state_view& state, const sol::table& comp, entt::entity e)
 {
     m_registry.assign<CCollision>(e);
 }

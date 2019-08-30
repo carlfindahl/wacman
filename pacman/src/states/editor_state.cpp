@@ -43,9 +43,9 @@ void EditorState::on_enter()
     m_level.resize(m_size);
 
     /* Register event listeners */
-    g_event_queue.sink<EvInput>().connect<&EditorState::recieve_key>(this);
-    g_event_queue.sink<EvMouseMove>().connect<&EditorState::recieve_mouse>(this);
-    m_tileselect_ui.on_select_tile.sink().connect<&EditorState::set_selection>(this);
+    g_event_queue.sink<EvInput>().connect<&EditorState::recieve_key>(*this);
+    g_event_queue.sink<EvMouseMove>().connect<&EditorState::recieve_mouse>(*this);
+//    m_tileselect_ui.on_select_tile.sink().connect<&EditorState::set_selection>(*this);
 
     /* Fetch available entities */
     load_entity_prototypes();
@@ -57,9 +57,9 @@ void EditorState::on_enter()
 void EditorState::on_exit()
 {
     /* Unhook events */
-    g_event_queue.sink<EvInput>().disconnect<&EditorState::recieve_key>(this);
-    g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(this);
-    m_tileselect_ui.on_select_tile.sink().disconnect<&EditorState::set_selection>(this);
+    g_event_queue.sink<EvInput>().disconnect<&EditorState::recieve_key>(*this);
+    g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(*this);
+//    m_tileselect_ui.on_select_tile sink().disconnect<&EditorState::set_selection>(*this);
 
     get_input().pop();
     m_context.registry->reset();
@@ -281,7 +281,7 @@ void EditorState::load_get_entities()
 {
     /* For every entity with meta data, load it into the entity map */
     auto view = m_context.registry->view<CMeta>();
-    view.each([this](uint32_t e, const CMeta& meta) {
+    view.each([this](entt::entity e, const CMeta& meta) {
         glm::ivec2 new_position = {0, 0};
 
         if (m_context.registry->has<CPosition>(e))
@@ -317,7 +317,7 @@ void EditorState::spawn_entity()
     bool occupied = false;
 
     /* Ensure no two entities with position components are on the same tile */
-    m_context.registry->view<CPosition>().each([this, &occupied](uint32_t e, const CPosition& pos) {
+    m_context.registry->view<CPosition>().each([this, &occupied](entt::entity e, const CPosition& pos) {
         if (e != m_entity_about_to_spawn && pos.position == m_hovered_tile)
         {
             occupied = true;
@@ -335,7 +335,7 @@ void EditorState::spawn_entity()
 void EditorState::remove_entity()
 {
     /* Search for entities to delete (and then remove from entity lookup if matching) */
-    m_context.registry->view<CPosition>().each([this](uint32_t e, const CPosition& pos) {
+    m_context.registry->view<CPosition>().each([this](entt::entity e, const CPosition& pos) {
         if (pos.position == m_hovered_tile)
         {
             /* If found in saved-vector map, delete it */

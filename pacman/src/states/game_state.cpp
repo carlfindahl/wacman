@@ -45,14 +45,14 @@ void GameState::on_enter()
     game_input.bind_key(GLFW_KEY_LEFT, ACTION_MOVE_WEST);
     get_input().push(std::move(game_input));
 
-    g_event_queue.sink<EvInput>().connect<&GameState::recieve>(this);
-    g_event_queue.sink<EvLevelFinished>().connect<&GameState::on_win_or_lose>(this);
+    g_event_queue.sink<EvInput>().connect<&GameState::recieve>(*this);
+    g_event_queue.sink<EvLevelFinished>().connect<&GameState::on_win_or_lose>(*this);
 }
 
 void GameState::on_exit()
 {
-    g_event_queue.sink<EvInput>().disconnect<&GameState::recieve>(this);
-    g_event_queue.sink<EvLevelFinished>().disconnect<&GameState::on_win_or_lose>(this);
+    g_event_queue.sink<EvInput>().disconnect<&GameState::recieve>(*this);
+    g_event_queue.sink<EvLevelFinished>().disconnect<&GameState::on_win_or_lose>(*this);
 
     get_sound().stop(m_music_id);
     get_input().pop();

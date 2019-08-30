@@ -12,7 +12,7 @@ extern entt::dispatcher g_event_queue;
 void MovementSystem::update(float dt)
 {
     auto movement_group = m_reg.group<CPosition, CMovement>(entt::get<CCollision>);
-    movement_group.each([dt, this](uint32_t e, CPosition& pos, CMovement& mov, const CCollision& _) {
+    movement_group.each([dt, this](entt::entity e, CPosition& pos, CMovement& mov, const CCollision& _) {
         /* Check if we can move towards desired direction and switch it if possible */
         if (mov.desired_direction != mov.current_direction && !m_level.will_collide(pos.position, mov.desired_direction) &&
             mov.progress < 0.35f)

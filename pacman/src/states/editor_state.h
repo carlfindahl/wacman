@@ -59,7 +59,7 @@ private:
     std::string m_current_entity{};
 
     /* ID of Entity that is about to be spawned */
-    unsigned m_entity_about_to_spawn = entt::null;
+    entt::entity m_entity_about_to_spawn = entt::null;
 
     /* Overlay */
     TextureID m_overlay = {};

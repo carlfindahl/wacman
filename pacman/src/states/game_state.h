@@ -12,7 +12,6 @@
 #include <string_view>
 
 #include <robinhood/robinhood.h>
-#include <entt/entity/prototype.hpp>
 
 namespace pac
 {

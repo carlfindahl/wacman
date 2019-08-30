@@ -2,6 +2,8 @@
 
 #include "input/input.h"
 
+#include <entt/entity/registry.hpp>
+
 namespace pac
 {
 struct EvInput
@@ -17,7 +19,7 @@ struct EvMouseMove
 
 struct EvEntityMoved
 {
-    uint32_t entity{};
+    entt::entity entity{};
     glm::ivec2 direction{};
     glm::ivec2 new_position{};
 };
@@ -29,7 +31,7 @@ struct EvPacInvulnreableChange
 
 struct EvPacLifeChanged
 {
-    uint32_t pacman{};
+    entt::entity pacman{};
     int delta = 0;
     int new_life = 0;
 };

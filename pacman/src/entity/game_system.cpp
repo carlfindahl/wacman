@@ -11,10 +11,10 @@ extern entt::dispatcher g_event_queue;
 
 GameSystem::GameSystem(entt::registry& reg, GameContext context) : System(reg), m_context(context)
 {
-    g_event_queue.sink<EvPacLifeChanged>().connect<&GameSystem::recieve>(this);
+    g_event_queue.sink<EvPacLifeChanged>().connect<&GameSystem::recieve>(*this);
 }
 
-GameSystem::~GameSystem() noexcept { g_event_queue.sink<EvPacLifeChanged>().disconnect<&GameSystem::recieve>(this); }
+GameSystem::~GameSystem() noexcept { g_event_queue.sink<EvPacLifeChanged>().disconnect<&GameSystem::recieve>(*this); }
 
 void GameSystem::update(float dt)
 {
@@ -37,7 +37,7 @@ void GameSystem::update(float dt)
     });
 
     /* Add score to player when touching pickups */
-    m_reg.view<CPlayer, CPosition>().each([this](uint32_t e, CPlayer& plr, CPosition& pos) {
+    m_reg.view<CPlayer, CPosition>().each([this](entt::entity e, CPlayer& plr, CPosition& pos) {
         auto pickups = m_reg.group<CPickup>(entt::get<CPosition>);
         for (auto p : pickups)
         {

@@ -182,10 +182,10 @@ void Game::set_up_lua()
 
     /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
      * given entity has this component. This makes for a flexible way to tell something what you want to do */
-    m_lua.set_function("move", [this](unsigned e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
+    m_lua.set_function("move", [this](entt::entity e, int x, int y) { m_registry.get<CMovement>(e).desired_direction = {x, y}; });
 
     /* Animation actions */
-    m_lua.set_function("set_animation", [this](unsigned e, const std::string& anim) {
+    m_lua.set_function("set_animation", [this](entt::entity e, const std::string& anim) {
         auto& ac = m_registry.get<CAnimationSprite>(e);
         ac.active_animation = ac.available_animations.at(anim);
     });

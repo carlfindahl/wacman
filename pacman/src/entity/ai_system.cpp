@@ -9,20 +9,20 @@ extern entt::dispatcher g_event_queue;
 
 AISystem::AISystem(entt::registry& reg, Level& level) : System(reg), m_level(level)
 {
-    g_event_queue.sink<EvEntityMoved>().connect<&AISystem::recieve>(this);
-    g_event_queue.sink<EvPacInvulnreableChange>().connect<&AISystem::recieve_pacmanstate>(this);
+    g_event_queue.sink<EvEntityMoved>().connect<&AISystem::recieve>(*this);
+    g_event_queue.sink<EvPacInvulnreableChange>().connect<&AISystem::recieve_pacmanstate>(*this);
 }
 
 AISystem::~AISystem() noexcept
 {
-    g_event_queue.sink<EvEntityMoved>().disconnect<&AISystem::recieve>(this);
-    g_event_queue.sink<EvPacInvulnreableChange>().disconnect<&AISystem::recieve_pacmanstate>(this);
+    g_event_queue.sink<EvEntityMoved>().disconnect<&AISystem::recieve>(*this);
+    g_event_queue.sink<EvPacInvulnreableChange>().disconnect<&AISystem::recieve_pacmanstate>(*this);
 }
 
 void AISystem::update(float dt)
 {
     /* Update paths when required */
-    m_reg.view<CAI>().each([this, dt](uint32_t e, CAI& ai) {
+    m_reg.view<CAI>().each([this, dt](entt::entity e, CAI& ai) {
         /* Get position of AI */
         const auto& ai_pos = m_reg.get<CPosition>(e);
         const auto& plr_pos = get_player_pos();
@@ -93,13 +93,13 @@ void AISystem::recieve_pacmanstate(const EvPacInvulnreableChange& pac)
     {
         GFX_DEBUG("Ghosts becoming scared.")
         m_reg.view<CAI>().each(
-            [](uint32_t e, CAI& ai) { ai.state = (ai.state == EAIState::Dead) ? ai.state : EAIState::Scared; });
+            [](entt::entity e, CAI& ai) { ai.state = (ai.state == EAIState::Dead) ? ai.state : EAIState::Scared; });
     }
     else
     {
         GFX_DEBUG("Ghosts no longer scared -> Searching")
         m_reg.view<CAI>().each(
-            [](uint32_t e, CAI& ai) { ai.state = (ai.state == EAIState::Dead) ? ai.state : EAIState::Searching; });
+            [](entt::entity e, CAI& ai) { ai.state = (ai.state == EAIState::Dead) ? ai.state : EAIState::Searching; });
     }
 }
 
