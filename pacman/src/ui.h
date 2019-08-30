@@ -21,6 +21,9 @@ private:
     /* Current selected */
     unsigned m_selected = 0u;
 
+    /* Signal for when a tile is selected */
+    entt::sigh<void(unsigned)> select_tile{};
+
 public:
     TilesetSelector();
     TilesetSelector(TextureID texture);
@@ -37,8 +40,8 @@ public:
      */
     void set_selection(unsigned s);
 
-    /* Signal for when a tile is selected */
-    entt::sigh<void(unsigned)> on_select_tile{};
+    /* Sink to handle user connections to the signal */
+    entt::sink<void(unsigned)> on_select_tile{select_tile};
 };
 
 class AnimationEditor
@@ -122,8 +125,8 @@ private:
     GameContext m_context;
 
 public:
-
-    LevelSelector(GameContext context);;
+    LevelSelector(GameContext context);
+    ;
 
     /*!
      * \brief update draws the UI

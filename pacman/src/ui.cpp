@@ -32,7 +32,7 @@ void TilesetSelector::update(float dt)
                         (m_selected == i ? ImVec4{1.f, 1.f, 1.f, 1.f} : ImVec4{0.5f, 0.5f, 0.5f, 0.5f})))
         {
             m_selected = i;
-            on_select_tile.publish(static_cast<unsigned>(i));
+            select_tile.publish(static_cast<unsigned>(i));
         }
 
         if ((i + 1) % 6 != 0)

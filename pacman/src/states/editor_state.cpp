@@ -45,7 +45,7 @@ void EditorState::on_enter()
     /* Register event listeners */
     g_event_queue.sink<EvInput>().connect<&EditorState::recieve_key>(*this);
     g_event_queue.sink<EvMouseMove>().connect<&EditorState::recieve_mouse>(*this);
-//    m_tileselect_ui.on_select_tile.sink().connect<&EditorState::set_selection>(*this);
+    m_tileselect_ui.on_select_tile.connect<&EditorState::set_selection>(*this);
 
     /* Fetch available entities */
     load_entity_prototypes();
@@ -59,7 +59,7 @@ void EditorState::on_exit()
     /* Unhook events */
     g_event_queue.sink<EvInput>().disconnect<&EditorState::recieve_key>(*this);
     g_event_queue.sink<EvMouseMove>().disconnect<&EditorState::recieve_mouse>(*this);
-//    m_tileselect_ui.on_select_tile sink().disconnect<&EditorState::set_selection>(*this);
+    m_tileselect_ui.on_select_tile.disconnect<&EditorState::set_selection>(*this);
 
     get_input().pop();
     m_context.registry->reset();
