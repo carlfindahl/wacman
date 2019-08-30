@@ -60,7 +60,7 @@ void AnimationEditor::update(float dt)
     InputInt("Length", &m_current_anim.length, 1, 2);
 
     /* Commit to preview */
-    if (Button("Preview"))
+    if (Button("Preview") && strlen(m_current_anim.texture_name) > 0)
     {
         glDeleteTextures(1, &m_current_tex);
         char final_buffer[256];
