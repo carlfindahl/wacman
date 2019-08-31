@@ -1,6 +1,6 @@
 # Set up sol2, either by finding the package directly, or by fetching it from GitHub
 
-find_package(sol2 3.0)
+find_package(sol2 3.0.3)
 
 # If we found it, then propagate it globally so we can see it elsewhere
 if(sol2_FOUND)
@@ -19,7 +19,7 @@ else()
     FetchContent_Declare(
         sol2_external
         GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-        GIT_TAG 8f88e104be42b84a61288c28710ab04ee17fb57d
+        GIT_TAG v3.0.3
         GIT_PROGRESS TRUE
     )
 
