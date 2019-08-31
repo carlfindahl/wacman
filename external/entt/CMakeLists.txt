@@ -23,6 +23,7 @@ else()
         GIT_PROGRESS TRUE
     )
 
+    # Populate and make available
     FetchContent_MakeAvailable(EnTT_external)
 
 endif()

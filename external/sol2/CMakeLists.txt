@@ -24,8 +24,6 @@ else()
     )
 
     # Populate it for building
-    if(NOT sol2_external_POPULATED)
-        FetchContent_Populate(sol2_external)
-        add_subdirectory(${sol2_external_SOURCE_DIR} ${sol2_external_BINARY_DIR})
-    endif()
+    FetchContent_MakeAvailable(sol2_external)
+
 endif()

@@ -24,8 +24,6 @@ else()
     )
 
     # Populate it for building
-    if(NOT glm_external_POPULATED)
-        FetchContent_Populate(glm_external)
-        add_subdirectory(${glm_external_SOURCE_DIR} ${glm_external_BINARY_DIR})
-    endif()
+    FetchContent_MakeAvailable(glm_external)
+
 endif()
