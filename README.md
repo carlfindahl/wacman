@@ -19,7 +19,7 @@ Currently the latest version is 1.1.0. Before that there was 1.0.0, 0.9.0 and 0.
      * `std::filesystem`
      * `std::string_view`
  * OpenGL 4.5 Compliant Driver
- * [EnTT](https://github.com/skypjack/entt)
+ * [EnTT 3.1](https://github.com/skypjack/entt)
  * [sol2 v3.0](https://github.com/ThePhD/sol2/) 
  * [GLFW 3.2](http://glfw.org/)
  * [GLM](https://glm.g-truc.net/0.9.9/index.html)
