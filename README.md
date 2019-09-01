@@ -4,7 +4,7 @@
  
 ### Version History
 
-Currently the latest version is 1.1.0. Before that there was 1.0.0, 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
+Currently the latest version is 1.1.1. Before that there was 1.1.0, 1.0.0, 0.9.0 and 0.1.0. Where 0.9.0 was the almost completed version and 0.1.0 was every version before that as an in-development build.
 
  * **1.1.1:** Add AudioSystem. This will play sounds on food pickup and on ghost / player death etc. More events too.
  * **1.1.0:** Level Editor, Refactored entire gamplay, basic LUA support, multiple levels and high scores per level...
