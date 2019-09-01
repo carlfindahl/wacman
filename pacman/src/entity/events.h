@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "input/input.h"
 
 #include <entt/entity/registry.hpp>
@@ -27,6 +28,18 @@ struct EvEntityMoved
 struct EvPacInvulnreableChange
 {
     bool is_invulnerable = false;
+};
+
+struct EvPacPickup
+{
+    std::string pickup_name{};
+    int score_delta;
+};
+
+struct EvGhostStateChanged
+{
+    entt::entity ghost{};
+    EAIState new_state{};
 };
 
 struct EvPacLifeChanged

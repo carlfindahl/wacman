@@ -40,6 +40,7 @@ void AISystem::update(float dt)
                 GFX_DEBUG("Ghost scattering after chasing");
                 ai.state = EAIState::Scattering;
                 ai.state_timer = 0.f;
+                g_event_queue.enqueue(EvGhostStateChanged{e, ai.state});
             }
             break;
         /* Scatter for 10 seconds, then search for player */
@@ -49,6 +50,7 @@ void AISystem::update(float dt)
                 GFX_DEBUG("Ghost searching after scattering");
                 ai.state = EAIState::Searching;
                 ai.state_timer = 0.f;
+                g_event_queue.enqueue(EvGhostStateChanged{e, ai.state});
             }
         /* Search until you see player, then chase */
         case EAIState::Searching:
@@ -57,6 +59,7 @@ void AISystem::update(float dt)
                 GFX_DEBUG("Ghost chasing after searching");
                 ai.state = EAIState::Chasing;
                 ai.state_timer = 0.f;
+                g_event_queue.enqueue(EvGhostStateChanged{e, ai.state});
             }
             break;
         case EAIState::Dead:
@@ -66,6 +69,7 @@ void AISystem::update(float dt)
                 m_reg.get<CAnimationSprite>(e).tint = glm::vec3{1.f, 1.f, 1.f};
                 ai.state = EAIState::Searching;
                 ai.state_timer = 0.f;
+                g_event_queue.enqueue(EvGhostStateChanged{e, ai.state});
             }
             break;
         default: break;

@@ -6,7 +6,6 @@ namespace pac
 {
 class AnimationSystem : public System
 {
-private:
 public:
     using System::System;
 

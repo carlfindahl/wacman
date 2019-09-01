@@ -47,11 +47,12 @@ void GameSystem::update(float dt)
                 if (auto* meta = m_reg.try_get<CMeta>(p); meta && meta->name == "ghostkiller")
                 {
                     plr.invulnerable = GHOST_KILLER_TIME;
-                    g_event_queue.trigger<EvPacInvulnreableChange>(true);
+                    g_event_queue.enqueue(EvPacInvulnreableChange{true});
                 }
 
                 /* Add pickup score to player */
                 plr.score += pickups.get<CPickup>(p).score;
+                g_event_queue.enqueue(EvPacPickup{m_reg.get<CMeta>(p).name, pickups.get<CPickup>(p).score});
                 m_reg.destroy(p);
             }
         }
@@ -73,9 +74,10 @@ void GameSystem::update(float dt)
                         plr.score += GHOST_KILL_SCORE * plr.ghosts_killed;
                     }
 
-                    /* Mark ghost as dead and set it's ting to someting sensible */
+                    /* Mark ghost as dead and set it's tint to someting sensible */
                     enemies.get<CAI>(ghost).state = EAIState::Dead;
                     enemies.get<CAnimationSprite>(ghost).tint = glm::vec3{0.05f, 0.05f, 1.f};
+                    g_event_queue.enqueue(EvGhostStateChanged{ghost, EAIState::Dead});
                 }
                 else
                 {
