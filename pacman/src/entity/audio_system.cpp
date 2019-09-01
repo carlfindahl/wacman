@@ -38,6 +38,13 @@ void AudioSystem::recieve_ghost_state(const EvGhostStateChanged& state) const
 
 void AudioSystem::recieve_pacman_life(const EvPacLifeChanged& life) const
 {
+    /* Play 'ghost die xD' when pacman dies */
+    if (life.delta < 0)
+    {
+        get_sound().play("ghost_die");
+    }
+
+    /* Play game over if we are entirely dead */
     if (life.new_life == 0)
     {
         get_sound().play("game_over");

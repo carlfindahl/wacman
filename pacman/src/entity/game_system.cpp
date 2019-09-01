@@ -72,12 +72,12 @@ void GameSystem::update(float dt)
                         /* Multiply by number of ghosts killed */
                         ++plr.ghosts_killed;
                         plr.score += GHOST_KILL_SCORE * plr.ghosts_killed;
+                        g_event_queue.enqueue(EvGhostStateChanged{ghost, EAIState::Dead});
                     }
 
                     /* Mark ghost as dead and set it's tint to someting sensible */
                     enemies.get<CAI>(ghost).state = EAIState::Dead;
                     enemies.get<CAnimationSprite>(ghost).tint = glm::vec3{0.05f, 0.05f, 1.f};
-                    g_event_queue.enqueue(EvGhostStateChanged{ghost, EAIState::Dead});
                 }
                 else
                 {

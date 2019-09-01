@@ -18,18 +18,18 @@ public:
 
     void update(float dt) override;
 
-    /**
-     * @brief play pickup sound
+    /*!
+     * \brief play pickup sound
      */
     void recieve_pickup(const struct EvPacPickup& pickup) const;
 
-    /**
-     * @brief play ghost death sound
+    /*!
+     * \brief play ghost death sound
      */
     void recieve_ghost_state(const struct EvGhostStateChanged& state) const;
 
-    /**
-     * @brief play pacman game over sound
+    /*!
+     * \brief play pacman game over sound
      */
     void recieve_pacman_life(const struct EvPacLifeChanged& life) const;
 };
