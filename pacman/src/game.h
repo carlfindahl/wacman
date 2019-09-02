@@ -39,6 +39,9 @@ private:
     /* Event Binder to allow lua to bind events */
     robin_hood::unordered_map<std::string, entt::scoped_connection (*)(entt::dispatcher&, sol::function&)> m_lua_events{};
 
+    /* To keep objects alive (hacky solution until I find a better way to hook up lua with entt events) */
+    std::vector<sol::function> m_registered_event_functions{};
+
     /* This struct will contain flags that can be flipped on / off to toggle features */
     struct Flags
     {

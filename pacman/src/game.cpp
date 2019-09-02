@@ -32,6 +32,7 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
                    {"PacLifeChanged", &lua_binder<EvPacLifeChanged>},
                    {"LevelFinished", &lua_binder<EvLevelFinished>}}
 {
+    m_registered_event_functions.reserve(100);  // Please never use more than 100 functions in lua while this is a thing
     init_glfw_window(title.data(), window_size);
     init_imgui();
     reflect_all();
@@ -176,6 +177,15 @@ void Game::set_up_lua()
     m_lua.new_usertype<glm::ivec2>("ivec2", sol::constructors<glm::ivec2(), glm::ivec2(int, int)>(), "x", &glm::ivec2::x, "y",
                                    &glm::ivec2::y);
 
+    m_lua.new_usertype<EvPacPickup>("EvPacPickup", "pickup_name", &EvPacPickup::pickup_name, "score_delta",
+                                    &EvPacPickup::score_delta);
+
+    m_lua.new_usertype<EvGhostStateChanged>("EvGhostStateChanged", "new_state", &EvGhostStateChanged::new_state, "ghost",
+                                            &EvGhostStateChanged::ghost);
+
+    m_lua.new_usertype<EvPacLifeChanged>("EvPacLifeChanged", "delta", &EvPacLifeChanged::delta, "pacman",
+                                         &EvPacLifeChanged::pacman, "new_life", &EvPacLifeChanged::new_life);
+
     m_lua.new_usertype<Level::TeleportDestination>(
         "TeleportDestination",
         sol::constructors<Level::TeleportDestination(const glm::ivec2&, const glm::ivec2&, const glm::ivec2&)>(), "from",
@@ -188,10 +198,20 @@ void Game::set_up_lua()
                                       {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
                                       {"MOVE_WEST", ACTION_MOVE_WEST}});
 
+    /* AI Enum */
+    m_lua.new_enum<EAIState>("AIState", {{"CHASING", EAIState::Chasing},
+                                         {"SCATTERING", EAIState::Scattering},
+                                         {"DEAD", EAIState::Dead},
+                                         {"SEARCHING", EAIState::Searching}});
+
     /* Function to allow lua to connect to events */
     m_lua.set_function("connect", [this](const std::string& event_name, sol::function func) {
-        return m_lua_events.at(event_name)(g_event_queue, func);
+        m_registered_event_functions.push_back(func);
+        return m_lua_events.at(event_name)(g_event_queue, m_registered_event_functions.back());
     });
+
+    /* Play audio from lua */
+    m_lua.set_function("play_sound", [](const std::string& sound) { get_sound().play(sound); });
 
     /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
      * given entity has this component. This makes for a flexible way to tell something what you want to do */
@@ -202,6 +222,9 @@ void Game::set_up_lua()
         auto& ac = m_registry.get<CAnimationSprite>(e);
         ac.active_animation = ac.available_animations.at(anim);
     });
+
+    /* Run sound fx player script */
+    m_lua.script_file(cgl::native_absolute_path("res/scripts/sfx_player.lua"));
 }
 
 }  // namespace pac
