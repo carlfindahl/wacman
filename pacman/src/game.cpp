@@ -23,6 +23,14 @@ namespace pac
 entt::dispatcher g_event_queue{};
 
 Game::Game(std::string_view title, glm::uvec2 window_size)
+    : m_lua_events{{"Input", &lua_binder<EvInput>},
+                   {"MouseMove", &lua_binder<EvMouseMove>},
+                   {"EntityMoved", &lua_binder<EvEntityMoved>},
+                   {"PacInvulnerableChange", &lua_binder<EvPacInvulnreableChange>},
+                   {"Pickup", &lua_binder<EvPacPickup>},
+                   {"GhostStateChanged", &lua_binder<EvGhostStateChanged>},
+                   {"PacLifeChanged", &lua_binder<EvPacLifeChanged>},
+                   {"LevelFinished", &lua_binder<EvLevelFinished>}}
 {
     init_glfw_window(title.data(), window_size);
     init_imgui();
@@ -179,6 +187,11 @@ void Game::set_up_lua()
                                       {"MOVE_EAST", ACTION_MOVE_EAST},
                                       {"MOVE_SOUTH", ACTION_MOVE_SOUTH},
                                       {"MOVE_WEST", ACTION_MOVE_WEST}});
+
+    /* Function to allow lua to connect to events */
+    m_lua.set_function("connect", [this](const std::string& event_name, sol::function func) {
+        return m_lua_events.at(event_name)(g_event_queue, func);
+    });
 
     /* Create action functions (each of these requires a certain component to work. It is the callers responsibility that the
      * given entity has this component. This makes for a flexible way to tell something what you want to do */

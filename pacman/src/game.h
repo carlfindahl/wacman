@@ -13,8 +13,7 @@
 #include <glm/vec2.hpp>
 #include <sol/state.hpp>
 #include <entt/entity/registry.hpp>
-
-struct GLFWwindow;
+#include <robinhood/robinhood.h>
 
 namespace pac
 {
@@ -35,7 +34,10 @@ private:
     entt::registry m_registry{};
 
     /* The Game Window */
-    GLFWwindow* m_window = nullptr;
+    struct GLFWwindow* m_window = nullptr;
+
+    /* Event Binder to allow lua to bind events */
+    robin_hood::unordered_map<std::string, entt::scoped_connection (*)(entt::dispatcher&, sol::function&)> m_lua_events{};
 
     /* This struct will contain flags that can be flipped on / off to toggle features */
     struct Flags
@@ -81,13 +83,11 @@ private:
      */
     void draw();
 
-
 private:
     /*!
      * \brief set_up_lua adds lua bindings and functions to the lua state
      */
     void set_up_lua();
-
 };
 
 }  // namespace pac

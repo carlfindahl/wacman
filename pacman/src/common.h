@@ -78,7 +78,7 @@ void sol_function_wrapper(sol::function& func, const Ev& event)
 template<typename Ev>
 entt::scoped_connection lua_binder(entt::dispatcher& disp, sol::function& func)
 {
-    return disp.sink<Ev>().connect<&sol_function_wrapper<Ev>>(func);
+    return disp.sink<Ev>().template connect<&sol_function_wrapper<Ev>>(func);
 }
 
 /*!
