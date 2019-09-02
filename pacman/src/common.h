@@ -8,6 +8,7 @@
 #include <glm/vec2.hpp>
 #include <sol/state.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
 #include <robinhood/robinhood.h>
 
 namespace pac
@@ -59,6 +60,26 @@ enum class EAIState
     Scared,
     Dead
 };
+
+/*!
+ * \brief wraps a sol function call for use with EnTT
+ * \note Thanks @skypjack for the implementation and help
+ */
+template<typename Ev>
+void sol_function_wrapper(sol::function& func, const Ev& event)
+{
+    func(event);
+}
+
+/*!
+ * \brief function used to bind lua and entt event connections
+ * \note Again, thanks to @skypjack for the tip
+ */
+template<typename Ev>
+entt::scoped_connection lua_binder(entt::dispatcher& disp, sol::function& func)
+{
+    return disp.sink<Ev>().connect<&sol_function_wrapper<Ev>>(func);
+}
 
 /*!
  * \brief load_entries_from_file loads high score entries from highscores.txt in order to display them in the menu
