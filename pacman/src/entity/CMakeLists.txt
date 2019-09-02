@@ -13,9 +13,6 @@ target_sources(
     "${CMAKE_CURRENT_LIST_DIR}/factory.h"
     "${CMAKE_CURRENT_LIST_DIR}/factory.cpp"
 
-    "${CMAKE_CURRENT_LIST_DIR}/audio_system.h"
-    "${CMAKE_CURRENT_LIST_DIR}/audio_system.cpp"
-
     "${CMAKE_CURRENT_LIST_DIR}/input_system.h"
     "${CMAKE_CURRENT_LIST_DIR}/input_system.cpp"
 

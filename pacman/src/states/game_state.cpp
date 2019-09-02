@@ -7,7 +7,6 @@
 #include "entity/movement_system.h"
 #include "entity/rendering_system.h"
 #include "entity/animation_system.h"
-#include "entity/audio_system.h"
 #include "game_over_state.h"
 #include "state_manager.h"
 #include "pause_state.h"
