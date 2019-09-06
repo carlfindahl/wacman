@@ -12,7 +12,7 @@ enum class EBehaviourStatus
 {
     Invalid,    // Tree is not in a good place
     Running,    // Behaviour is still going
-    Finished,   // Success State
+    Success,   // Success State
     Suspended,  // Waiting State
     Failed      // Fail State
 };
@@ -65,10 +65,37 @@ public:
     decorator(std::unique_ptr<behaviour> child) : m_child(std::move(child)) {}
 };
 
+/*!
+ * \brief The composite node acepts multiple behaviours and composes behaviour from all of them
+ */
 class composite : public behaviour
 {
 protected:
-    std::vector<std::unique_ptr<behaviour>> m_children{};
+    /** Typedef for vector of owning unique ptrs to behaviour */
+    using behaviours = std::vector<std::unique_ptr<behaviour>>;
+
+    /** Behaviours encapsulated by the composite */
+    behaviours m_children{};
+
+public:
+    /*!
+     * \brief add a behaviour to the compoiste
+     * \param behaviour to add
+     * \return non-owning pointer to added behaviour
+     */
+    behaviour* add_behaviour(std::unique_ptr<behaviour> behaviour);
+
+    /*!
+     * \brief remove a behaviour
+     * \param behaviour to remove (use non owning pointer from add_)
+     * \return true if successful
+     */
+    bool remove_behaviour(behaviour* behaviour);
+
+    /*!
+     * \brief clear all behaviours
+     */
+    void clear();
 };
 
 /*!
