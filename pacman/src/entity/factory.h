@@ -28,6 +28,7 @@ private:
     /* Cached entity paths */
     robin_hood::unordered_map<std::string, std::filesystem::path> m_entity_path_map{};
 
+    /* Map component names to their respective creation functions */
     robin_hood::unordered_map<std::string, ComponentFn> m_component_map{
         {"Sprite", [this](sol::state_view& s, const sol::table& t, entt::entity e) { make_sprite_component(s, t, e); }},
         {"Position", [this](sol::state_view& s, const sol::table& t, entt::entity e) { make_position_component(s, t, e); }},
