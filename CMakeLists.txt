@@ -1,6 +1,6 @@
 # CMakeLists.txt for the GFX Pacman Assignment - Spring 2019
-# 3.11 is needed for FetchContent
-cmake_minimum_required(VERSION 3.13)
+# 3.14 is required for latest CMake features
+cmake_minimum_required(VERSION 3.14)
 
 project(imt2531_assignment01 VERSION 1.1.1)
 
