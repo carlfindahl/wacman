@@ -9,7 +9,6 @@ using namespace std::string_literals;
 
 int main(int argc, char* argv[])
 {
-    /* Run game if we are not benchmarking */
     if (glfwInit())
     {
         const auto title_string = "OpenGL Pacman "s + pac::VERSION_STRING;

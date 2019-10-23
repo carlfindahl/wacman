@@ -14,17 +14,23 @@ namespace pac
 void reflect_common_data()
 {
     /* Reflect Vector Types from GLM */
-    entt::reflect<glm::ivec2>("ivec2"_hs).ctor<int, int>().data<&glm::ivec2::x>("x"_hs).data<&glm::ivec2::y>("y"_hs);
-    entt::reflect<glm::vec2>("vec2"_hs).ctor<float, float>().ctor<glm::ivec2>().data<&glm::vec2::x>("x"_hs).data<&glm::vec2::y>(
-        "y"_hs);
+    entt::meta<glm::ivec2>().type("ivec2"_hs).ctor<int, int>().data<&glm::ivec2::x>("x"_hs).data<&glm::ivec2::y>("y"_hs);
+    entt::meta<glm::vec2>()
+        .type("vec2"_hs)
+        .ctor<float, float>()
+        .ctor<glm::ivec2>()
+        .data<&glm::vec2::x>("x"_hs)
+        .data<&glm::vec2::y>("y"_hs);
 
-    entt::reflect<glm::ivec3>("ivec3"_hs)
+    entt::meta<glm::ivec3>()
+        .type("ivec3"_hs)
         .ctor<int, int, int>()
         .data<&glm::ivec3::x>("x"_hs)
         .data<&glm::ivec3::y>("y"_hs)
         .data<&glm::ivec3::z>("z"_hs);
 
-    entt::reflect<glm::vec3>("vec3"_hs)
+    entt::meta<glm::vec3>()
+        .type("vec3"_hs)
         .ctor<float, float, float>()
         .ctor<glm::vec3>()
         .data<&glm::vec3::x>("x"_hs)
@@ -32,13 +38,15 @@ void reflect_common_data()
         .data<&glm::vec3::z>("z"_hs);
 
     /* Reflect Texture ID */
-    entt::reflect<TextureID>("TextureID"_hs)
+    entt::meta<TextureID>()
+        .type("TextureID"_hs)
         .data<&TextureID::frame_number>("frame_number"_hs)
         .data<&TextureID::frame_count>("frame_count"_hs)
         .data<&TextureID::array_index>("array_index"_hs);
 
     /* Reflect TP Destination */
-    entt::reflect<Level::TeleportDestination>("TeleportDestination"_hs)
+    entt::meta<Level::TeleportDestination>()
+        .type("TeleportDestination"_hs)
         .data<&Level::TeleportDestination::from>("from"_hs)
         .data<&Level::TeleportDestination::position>("position"_hs)
         .data<&Level::TeleportDestination::direction>("direction"_hs);
@@ -47,10 +55,11 @@ void reflect_common_data()
 void reflect_components()
 {
     /* Position */
-    entt::reflect<CPosition>("Position"_hs).data<&CPosition::position>("position"_hs).data<&CPosition::spawn>("spawn"_hs);
+    entt::meta<CPosition>().type("Position"_hs).data<&CPosition::position>("position"_hs).data<&CPosition::spawn>("spawn"_hs);
 
     /* Movement */
-    entt::reflect<CMovement>("Movement"_hs)
+    entt::meta<CMovement>()
+        .type("Movement"_hs)
         .data<&CMovement::speed>("speed"_hs)
         .data<&CMovement::progress>("progress"_hs)
         .data<&CMovement::current_direction>("current_direction"_hs)
@@ -60,7 +69,8 @@ void reflect_components()
 void reflect_events()
 {
     /* Reflect Action Enum */
-    entt::reflect<Action>("Action"_hs)
+    entt::meta<Action>()
+        .type("Action"_hs)
         .data<Action::ACTION_QUIT>("ACTION_QUIT"_hs)
         .data<Action::ACTION_BACK>("ACTION_BACK"_hs)
         .data<Action::ACTION_TOGGLE_DEBUG>("ACTION_TOGGLE_DEBUG"_hs)
@@ -80,15 +90,17 @@ void reflect_events()
         .data<Action::ACTION_PREV_ENTITY>("ACTION_PREV_ENTITY"_hs);
 
     /* Reflect Input Event */
-    entt::reflect<EvInput>("EvInput"_hs).data<&EvInput::action>("action"_hs);
+    entt::meta<EvInput>().type("EvInput"_hs).data<&EvInput::action>("action"_hs);
 
     /* Reflect Mouse Event */
-    entt::reflect<EvMouseMove>("EvMouseMove"_hs)
+    entt::meta<EvMouseMove>()
+        .type("EvMouseMove"_hs)
         .data<&EvMouseMove::delta>("delta"_hs)
         .data<&EvMouseMove::position>("position"_hs);
 
     /* Reflect movement event */
-    entt::reflect<EvEntityMoved>("EvEntityMoved"_hs)
+    entt::meta<EvEntityMoved>()
+        .type("EvEntityMoved"_hs)
         .data<&EvEntityMoved::entity>("entity"_hs)
         .data<&EvEntityMoved::direction>("direction"_hs)
         .data<&EvEntityMoved::new_position>("new_position"_hs);
