@@ -9,4 +9,4 @@ void reflect_components();
 void reflect_events();
 
 void reflect_all();
-}
+}  // namespace pac

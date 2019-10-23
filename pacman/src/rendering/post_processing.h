@@ -22,7 +22,8 @@ private:
     /*!
      * \brief The FrameBuffer struct represents all GL objects required to have a PP framebuffer
      */
-    struct FrameBuffer {
+    struct FrameBuffer
+    {
         unsigned renderbuffer = 0u;
         unsigned framebuffer = 0u;
         unsigned texture = 0u;

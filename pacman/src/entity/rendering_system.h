@@ -10,7 +10,6 @@ namespace pac
 class RenderingSystem : public System
 {
 private:
-
 public:
     using System::System;
 
