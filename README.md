@@ -15,7 +15,7 @@ Currently the latest version is 1.1.1. Before that there was 1.1.0, 1.0.0, 0.9.0
 
 ### Build and Run
 
-#### Requirements
+#### Build Requirements
  * C++ 17 Compliant Compiler
      * `std::filesystem`
      * `std::string_view`
@@ -25,6 +25,7 @@ Currently the latest version is 1.1.1. Before that there was 1.1.0, 1.0.0, 0.9.0
  * [GLFW 3.2](http://glfw.org/)
  * [GLM](https://glm.g-truc.net/0.9.9/index.html)
  * [OpenAL 1.1](https://www.openal.org/)
+ * [Lua](https://www.lua.org/download.html)
 
 GLFW, GLM and OpenAL are required to play. I use `find_package` to locate these libraries so on Linux it should be a matter of installing them via the terminal and then running CMake. On Windows you should specify these directories manually unless you have installed the libraries in a way that they can be found on the `PATH` variable. EnTT and sol2 will attempt to `find_package` but if not, CMake will download the required versions from GitHub and use that local version in the build using `FetchContent`.
 
