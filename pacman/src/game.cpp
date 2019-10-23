@@ -32,7 +32,10 @@ Game::Game(std::string_view title, glm::uvec2 window_size)
                    {"PacLifeChanged", &lua_binder<EvPacLifeChanged>},
                    {"LevelFinished", &lua_binder<EvLevelFinished>}}
 {
-    m_registered_event_functions.reserve(100);  // Please never use more than 100 functions in lua while this is a thing
+    /* Please never use more than 100 functions in LUA while this is a thing (limitation of using a vector here) */
+    m_registered_event_functions.reserve(100);
+
+    /* Perform initialization in correct order */
     init_glfw_window(title.data(), window_size);
     init_imgui();
     reflect_all();
@@ -68,7 +71,7 @@ void Game::run()
         const float dt = std::chrono::duration<float>(delta_clock.now() - last_frame).count();
         last_frame = delta_clock.now();
 
-        /* ImGui Stuff */
+        /* Let ImGui show the FPS in Debug mode only */
 #ifndef NDEBUG
         ImGui::Text("FPS: %5.1f", ImGui::GetIO().Framerate);
         ImGui::SameLine(0.f, 25.f);
@@ -90,8 +93,7 @@ void Game::init_glfw_window(const char* title, glm::uvec2 window_size)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    /* In Debug mode, make the GL context a Debug context so we can use debug callback for errors (further
-     * down) */
+    /* In Debug mode, make the GL context a Debug context so we can use debug callback for errors (further down) */
 #ifndef NDEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
@@ -173,7 +175,7 @@ void Game::set_up_lua()
 {
     m_lua.open_libraries(sol::lib::base, sol::lib::package);
 
-    /* Register Data Types */
+    /* Register Data Types in LUA */
     m_lua.new_usertype<glm::ivec2>("ivec2", sol::constructors<glm::ivec2(), glm::ivec2(int, int)>(), "x", &glm::ivec2::x, "y",
                                    &glm::ivec2::y);
 

@@ -10,6 +10,9 @@ namespace pac
 {
 class Level;
 
+/*!
+ * \brief The AISystem handles Ghost AI
+ */
 class AISystem : public System
 {
 private:

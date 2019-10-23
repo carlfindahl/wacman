@@ -12,6 +12,9 @@ namespace pac
 {
 namespace ui
 {
+/*!
+ * \brief The TilesetSelector creates UI to select tiles from the current tile-set
+ */
 class TilesetSelector
 {
 private:
@@ -44,6 +47,9 @@ public:
     entt::sink<void(unsigned)> on_select_tile{select_tile};
 };
 
+/*!
+ * \brief The AnimationEditor let you edit animations and preview them
+ */
 class AnimationEditor
 {
 private:
@@ -85,6 +91,9 @@ public:
     void update(float dt);
 };
 
+/*!
+ * \brief The CampaignEditor class is made to let you chain levels together, but is currently not in use
+ */
 class CampaignEditor
 {
 private:

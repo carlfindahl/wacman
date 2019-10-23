@@ -4,6 +4,9 @@
 
 namespace pac
 {
+/*!
+ * \brief The AnimationSystem handles sprite animation updates
+ */
 class AnimationSystem : public System
 {
 public:

@@ -8,6 +8,9 @@ namespace pac
 {
 class Level;
 
+/*!
+ * \brief The GameSystem handles scoring, kills and death and other game-specific logic
+ */
 class GameSystem : public System
 {
 private:

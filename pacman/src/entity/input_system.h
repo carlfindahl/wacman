@@ -6,7 +6,7 @@
 namespace pac
 {
 /*!
- * \brief The RenderingSystem class takes care of drawing and interpolating entities with sprite components
+ * \brief The InputSystem handles actions that players want to take
  */
 class InputSystem : public System
 {

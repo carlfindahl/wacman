@@ -16,6 +16,9 @@
 
 namespace pac
 {
+/*!
+ * \brief The EditorState is run when the user is in the level editor
+ */
 class EditorState : public State
 {
 private:

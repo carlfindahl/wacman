@@ -76,6 +76,7 @@ bool EditorState::update(float dt)
         system->update(dt);
     }
 
+    /* We can either be placing entities*/
     if (m_editor_mode == EMode::EntityPlacement)
     {
         if (m_context.registry->valid(m_entity_about_to_spawn) && m_context.registry->has<CPosition>(m_entity_about_to_spawn))
@@ -83,6 +84,7 @@ bool EditorState::update(float dt)
             m_context.registry->get<CPosition>(m_entity_about_to_spawn).position = m_hovered_tile;
         }
     }
+    /* Or tiles */
     else
     {
         if (m_context.registry->valid(m_entity_about_to_spawn))
@@ -127,6 +129,7 @@ void EditorState::recieve_key(const EvInput& input)
 {
     auto& tile = m_level.get_tile(m_hovered_tile);
 
+    /* Handle editor input */
     switch (input.action)
     {
     case ACTION_BACK: m_context.state_manager->pop(); break;

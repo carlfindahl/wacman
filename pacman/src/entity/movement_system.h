@@ -7,6 +7,9 @@ namespace pac
 {
 class Level;
 
+/*!
+ * \brief The MovementSystem takes care of handling movement updates for all entities that desire to move
+ */
 class MovementSystem : public System
 {
 private:
