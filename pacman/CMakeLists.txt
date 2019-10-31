@@ -20,7 +20,7 @@ target_link_libraries(
     OpenGL::GL                                  # For OpenGL
     glad::glad                                  # OpenGL Loader
     gfx::gfx                                    # Logging mostly
-    EnTT                                        # ECS
+    EnTT::EnTT                                  # ECS
     glfw                                        # For window integration
     glm                                         # For Maths
     cgl                                         # OpenGL utilities (custom library built in-source for this project)
