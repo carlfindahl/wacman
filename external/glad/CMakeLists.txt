@@ -1,6 +1,6 @@
 # Add GLAD as a Library that we can link with
 
-add_library(glad ${BUILD_SHARED_LIBS})
+add_library(glad SHARED)
 add_library(glad::glad ALIAS glad)
 
 # Add source files

@@ -1,6 +1,6 @@
 # Add GFX from the Course as a Library that we can link with
 
-add_library(gfx ${BUILD_SHARED_LIBS})
+add_library(gfx SHARED)
 add_library(gfx::gfx ALIAS gfx)
 
 # Add source files
