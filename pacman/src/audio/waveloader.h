@@ -69,7 +69,7 @@ private:
     detail::HeaderData m_data;
 
 public:
-    WaveFile(const char* filepath) { loadFromFile(filepath); }
+    WaveFile(const std::string& filepath) { loadFromFile(filepath.c_str()); }
 
     /*!
      * \brief loadFromFile loads a new wave file from file.

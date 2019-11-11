@@ -7,6 +7,7 @@
 
 #include <gfx.h>
 #include <cglutil.h>
+
 #include <AL/al.h>
 #include <AL/alc.h>
 
@@ -35,8 +36,8 @@ pac::SoundManager::SoundManager()
         if (entry->path().extension() == ".wav")
         {
             GFX_DEBUG("Loading audio file (%s) as (%s)", entry->path().c_str(), entry->path().stem().c_str());
-            auto sound = loadio::WaveFile(entry->path().c_str());
-            m_sound_buffers[entry->path().stem()] = sound.createOpenalBuffer();
+            auto sound = loadio::WaveFile(entry->path().string());
+            m_sound_buffers[entry->path().stem().string()] = sound.createOpenalBuffer();
         }
     }
 
