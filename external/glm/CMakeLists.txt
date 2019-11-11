@@ -1,7 +1,5 @@
 # Set up GLM, either by finding the package directly, or by fetching it from GitHub
 
-find_package(glm)
-
 include(FetchContent)
 message(STATUS "Get GLM package from GitHub.")
 
