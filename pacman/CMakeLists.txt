@@ -9,6 +9,13 @@ find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(Lua REQUIRED)
 
+target_include_directories(
+    ${EXEC_NAME}
+    PRIVATE
+    ${LUA_INCLUDE_DIR}
+    ${OPENAL_INCLUDE_DIR}
+)
+
 target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
@@ -24,7 +31,7 @@ target_link_libraries(
     glfw                                        # For window integration
     glm                                         # For Maths
     cgl                                         # OpenGL utilities (custom library built in-source for this project)
-    lua                                         # Sol2 Needs this
+    ${LUA_LIBRARY}                              # Sol2 Needs this
     sol2::sol2                                  # Lua Bindings
 )
 
